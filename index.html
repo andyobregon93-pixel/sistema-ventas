@@ -170,14 +170,14 @@ onAuthStateChanged(auth, async (user) => {
     if(snap.exists()){
       rolActual = snap.data().role;
 
-      loginBox.style.display="none";
-      app.style.display="block";
-      infoUsuario.innerText =
-        "Usuario: " + usuarioActual + " | Rol: " + rolActual;
+      document.getElementById("loginBox").style.display="none";
+document.getElementById("app").style.display="block";
+document.getElementById("infoUsuario").innerText =
+  "Usuario: " + usuarioActual + " | Rol: " + rolActual;
 
-      if(rolActual === "admin"){
-        panelAdmin.style.display="block";
-      }
+if(rolActual === "admin"){
+  document.getElementById("panelAdmin").style.display="block";
+}
 
       cargarProductos();
       cargarVentas();
