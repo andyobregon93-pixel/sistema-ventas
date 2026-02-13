@@ -13,7 +13,7 @@ body{
 }
 .container{
   width:90%;
-  max-width:900px;
+  max-width:1000px;
   margin:30px auto;
   background:white;
   padding:20px;
@@ -80,6 +80,7 @@ th{
   <div id="panelAdmin" class="admin-panel" style="display:none;">
     <h2>Administrar Usuarios</h2>
 
+    <input type="text" id="nuevoNombre" placeholder="Nombre del vendedor">
     <input type="email" id="nuevoEmail" placeholder="Email">
     <input type="password" id="nuevoPassword" placeholder="Contraseña">
 
@@ -107,6 +108,7 @@ th{
   <table>
     <thead>
       <tr>
+        <th>N° Venta</th>
         <th>Fecha</th>
         <th>Vendedor</th>
         <th>Cliente</th>
@@ -129,16 +131,16 @@ th{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp }
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, updateDoc }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-  authDomain: "sistema-ventas-64a4c.firebaseapp.com",
-  projectId: "sistema-ventas-64a4c",
-  storageBucket: "sistema-ventas-64a4c.appspot.com",
-  messagingSenderId: "291577824119",
-  appId: "1:291577824119:web:894fe9842b427c9ac3d772"
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_BUCKET",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -147,6 +149,7 @@ const db = getFirestore(app);
 
 let usuarioActual = null;
 let rolActual = null;
+let nombreActual = null;
 
 window.login = async function(){
   const email = document.getElementById("email").value;
@@ -168,12 +171,13 @@ onAuthStateChanged(auth, async(user)=>{
     if(docSnap.exists()){
 
       rolActual = docSnap.data().role;
-      usuarioActual = user.email;
+      nombreActual = docSnap.data().nombre;
+      usuarioActual = user.uid;
 
       document.getElementById("loginBox").style.display="none";
       document.getElementById("app").style.display="block";
       document.getElementById("infoUsuario").innerText =
-        "Usuario: "+usuarioActual+" | Rol: "+rolActual;
+        "Usuario: "+nombreActual+" | Rol: "+rolActual;
 
       if(rolActual === "admin"){
         document.getElementById("panelAdmin").style.display="block";
@@ -194,8 +198,9 @@ window.crearUsuario = async function(){
   const email = document.getElementById("nuevoEmail").value;
   const password = document.getElementById("nuevoPassword").value;
   const rol = document.getElementById("nuevoRol").value;
+  const nombre = document.getElementById("nuevoNombre").value;
 
-  if(!email || !password){
+  if(!email || !password || !nombre){
     alert("Completa todos los campos");
     return;
   }
@@ -205,7 +210,9 @@ window.crearUsuario = async function(){
     const user = userCredential.user;
 
     await setDoc(doc(db,"usuarios",user.uid),{
-      role: rol
+      role: rol,
+      nombre: nombre,
+      email: email
     });
 
     alert("Usuario creado correctamente");
@@ -217,15 +224,13 @@ window.crearUsuario = async function(){
 }
 
 async function cargarUsuarios(){
-
   const lista = document.getElementById("listaUsuarios");
   lista.innerHTML="";
-
   const snapshot = await getDocs(collection(db,"usuarios"));
 
   snapshot.forEach(docSnap=>{
     const data = docSnap.data();
-    lista.innerHTML += `<li>${docSnap.id} - ${data.role}</li>`;
+    lista.innerHTML += `<li>${data.nombre} - ${data.role}</li>`;
   });
 }
 
@@ -241,12 +246,17 @@ window.guardarVenta = async function(){
     return;
   }
 
+  const snapshot = await getDocs(collection(db,"ventas"));
+  const numeroVenta = snapshot.size + 1;
+
   await addDoc(collection(db,"ventas"),{
+    numeroVenta,
     cliente,
     plataforma,
     metodoPago,
     precio,
-    vendedor: usuarioActual,
+    vendedorId: usuarioActual,
+    vendedorNombre: nombreActual,
     fecha: new Date().toLocaleString(),
     timestamp: serverTimestamp()
   });
@@ -266,20 +276,22 @@ async function cargarVentas(){
     const v = docSnap.data();
     const id = docSnap.id;
 
-    if(rolActual==="admin" || v.vendedor===usuarioActual){
+    if(rolActual==="admin" || v.vendedorId===usuarioActual){
 
       total += v.precio;
 
       tabla.innerHTML+=`
       <tr>
+        <td>${v.numeroVenta}</td>
         <td>${v.fecha}</td>
-        <td>${v.vendedor}</td>
+        <td>${v.vendedorNombre}</td>
         <td>${v.cliente}</td>
         <td>${v.plataforma}</td>
         <td>${v.metodoPago}</td>
         <td>$${v.precio}</td>
         <td>
-          <button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>
+          <button onclick="editarVenta('${id}')">Editar</button>
+          ${rolActual==="admin" ? `<button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>` : ``}
         </td>
       </tr>`;
     }
@@ -288,18 +300,45 @@ async function cargarVentas(){
   document.getElementById("total").innerText="Total: $"+total;
 }
 
+window.editarVenta = async function(id){
+
+  const ventaRef = doc(db,"ventas",id);
+  const ventaSnap = await getDoc(ventaRef);
+  const venta = ventaSnap.data();
+
+  const nuevoCliente = prompt("Cliente:",venta.cliente);
+  const nuevaPlataforma = prompt("Plataforma:",venta.plataforma);
+  const nuevoMetodo = prompt("Método:",venta.metodoPago);
+  const nuevoPrecio = parseFloat(prompt("Precio:",venta.precio));
+
+  if(!nuevoCliente || !nuevaPlataforma || !nuevoMetodo || isNaN(nuevoPrecio)){
+    alert("Datos inválidos");
+    return;
+  }
+
+  await updateDoc(ventaRef,{
+    cliente: nuevoCliente,
+    plataforma: nuevaPlataforma,
+    metodoPago: nuevoMetodo,
+    precio: nuevoPrecio,
+    fecha: new Date().toLocaleString()
+  });
+
+  cargarVentas();
+}
+
 window.eliminarVenta = async function(id){
+
+  if(rolActual!=="admin"){
+    alert("Solo el administrador puede eliminar ventas");
+    return;
+  }
 
   const confirmar = confirm("¿Seguro que deseas eliminar esta venta?");
   if(!confirmar) return;
 
-  try{
-    await deleteDoc(doc(db,"ventas",id));
-    alert("Venta eliminada");
-    cargarVentas();
-  }catch(error){
-    alert(error.message);
-  }
+  await deleteDoc(doc(db,"ventas",id));
+  cargarVentas();
 }
 
 window.logout = function(){
