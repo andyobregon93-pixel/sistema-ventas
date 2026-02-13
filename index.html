@@ -1,274 +1,134 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sistema Empresarial PRO</title>
+<script type="module">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<style>
+const firebaseConfig = {
+  apiKey: "PEGA_AQUI_TU_API_KEY",
+  authDomain: "PEGA_AQUI",
+  projectId: "PEGA_AQUI",
+  storageBucket: "PEGA_AQUI",
+  messagingSenderId: "PEGA_AQUI",
+  appId: "PEGA_AQUI"
+};
 
-body{
-background: linear-gradient(135deg,#000000,#111827);
-color:white;
-font-family: 'Segoe UI', sans-serif;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let usuarioActual = null;
+
+window.login = async function(){
+  const user = document.getElementById("user").value;
+  const pass = document.getElementById("pass").value;
+
+  const q = query(collection(db, "usuarios"), where("user", "==", user), where("pass", "==", pass));
+  const querySnapshot = await getDocs(q);
+
+  if(!querySnapshot.empty){
+    usuarioActual = querySnapshot.docs[0].data();
+
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("infoUsuario").innerText =
+      "Usuario: " + usuarioActual.user + " | Rol: " + usuarioActual.role;
+
+    if(usuarioActual.role==="admin"){
+      document.getElementById("adminPanel").style.display="block";
+    }
+
+    actualizarTodo();
+  } else {
+    alert("Datos incorrectos");
+  }
 }
 
-.card{
-border-radius:15px;
-background:#1a1a1a;
-box-shadow:0 0 20px rgba(212,175,55,0.3);
-border:1px solid #d4af37;
+window.crearUsuario = async function(){
+  const user = document.getElementById("newUser").value;
+  const pass = document.getElementById("newPass").value;
+  const role = document.getElementById("newRole").value;
+
+  if(!user || !pass){
+    alert("Completa datos");
+    return;
+  }
+
+  await addDoc(collection(db, "usuarios"), {
+    user,
+    pass,
+    role
+  });
+
+  alert("Usuario creado");
 }
 
-h2,h3,h5{
-color:#d4af37;
-font-weight:bold;
+window.guardarVenta = async function(){
+  const cliente = document.getElementById("cliente").value;
+  const plataforma = document.getElementById("plataforma").value;
+  const metodoPago = document.getElementById("metodoPago").value;
+  const precio = parseFloat(document.getElementById("precio").value);
+
+  if(!cliente || !plataforma || !metodoPago || isNaN(precio)){
+    alert("Completa todos los campos");
+    return;
+  }
+
+  await addDoc(collection(db, "ventas"), {
+    cliente,
+    plataforma,
+    metodoPago,
+    precio,
+    vendedor: usuarioActual.user,
+    fecha: new Date().toLocaleString()
+  });
+
+  actualizarTodo();
 }
 
-.btn-dark,
-.btn-success{
-background:#d4af37;
-border:none;
-color:black;
-font-weight:bold;
+async function actualizarTodo(){
+  mostrarVentas();
+  mostrarResumen();
 }
 
-.btn-dark:hover,
-.btn-success:hover{
-background:#b8962e;
+async function mostrarVentas(){
+  const tabla = document.getElementById("tablaVentas");
+  tabla.innerHTML="";
+
+  const snapshot = await getDocs(collection(db, "ventas"));
+
+  snapshot.forEach(doc=>{
+    const v = doc.data();
+
+    if(usuarioActual.role==="admin" || v.vendedor===usuarioActual.user){
+      tabla.innerHTML+=`
+        <tr>
+          <td>${v.fecha}</td>
+          <td>${v.vendedor}</td>
+          <td>${v.cliente}</td>
+          <td>${v.plataforma}</td>
+          <td>${v.metodoPago}</td>
+          <td>$${v.precio.toFixed(2)}</td>
+        </tr>`;
+    }
+  });
 }
 
-.btn-danger{
-background:#8b0000;
+async function mostrarResumen(){
+  const cont = document.getElementById("resumenContenido");
+  const snapshot = await getDocs(collection(db, "ventas"));
+
+  let total = 0;
+  snapshot.forEach(doc=>{
+    const v = doc.data();
+    if(usuarioActual.role==="admin" || v.vendedor===usuarioActual.user){
+      total += v.precio;
+    }
+  });
+
+  cont.innerHTML = `<p>Total: $${total.toFixed(2)}</p>`;
 }
 
-table{
-color:white;
-}
-
-.table-dark{
-background:#1a1a1a;
-}
-
-input,select{
-background:#111;
-color:white;
-border:1px solid #d4af37;
-}
-
-input:focus,select:focus{
-border-color:#ffd700;
-box-shadow:0 0 5px #d4af37;
-}
-
-</style>
-</head>
-<body class="p-3">
-
-<div id="login">
-<div class="card p-4 text-dark">
-<h3><i class="bi bi-shield-lock-fill"></i> Login Empresarial</h3>
-<input id="user" class="form-control mb-2" placeholder="Usuario">
-<input type="password" id="pass" class="form-control mb-2" placeholder="Contraseña">
-<button class="btn btn-dark w-100" onclick="login()">Entrar</button>
-</div>
-</div>
-
-<div id="app" style="display:none">
-
-<h2><i class="bi bi-gem"></i> Panel Empresarial PRO</h2>
-<p id="infoUsuario"></p>
-<button class="btn btn-danger mb-3" onclick="logout()">Cerrar sesión</button>
-
-<div id="adminPanel" class="card p-3 text-dark mb-3" style="display:none">
-<h5><i class="bi bi-person-plus-fill"></i> Crear Usuario</h5>
-<input id="newUser" class="form-control mb-2" placeholder="Usuario">
-<input id="newPass" class="form-control mb-2" placeholder="Contraseña">
-<select id="newRole" class="form-control mb-2">
-<option value="admin">Admin</option>
-<option value="vendedor">Vendedor</option>
-</select>
-<button class="btn btn-primary w-100" onclick="crearUsuario()">Crear</button>
-</div>
-
-<div class="card p-3 text-dark mb-3">
-<h5><i class="bi bi-cash-coin"></i> Nueva Venta</h5>
-<input id="cliente" class="form-control mb-2" placeholder="Cliente">
-<input id="plataforma" class="form-control mb-2" placeholder="Cuenta / Plataforma">
-
-<select id="metodoPago" class="form-control mb-2">
-<option value="">Seleccionar método de pago</option>
-<option value="Banco">Banco</option>
-<option value="Transferencia">Transferencia</option>
-<option value="PayPal">PayPal</option>
-<option value="Binance">Binance</option>
-<option value="Giro">Giro</option>
-<option value="Efectivo">Efectivo</option>
-</select>
-
-<input id="precio" type="number" class="form-control mb-2" placeholder="Precio">
-<button class="btn btn-success w-100" onclick="guardarVenta()">Guardar Venta</button>
-</div>
-
-<div class="card p-3 text-dark mb-3">
-<h5><i class="bi bi-bar-chart-fill"></i> Resumen</h5>
-<div id="resumenContenido"></div>
-</div>
-
-<div class="card p-3 text-dark mb-3">
-<h5><i class="bi bi-clock-history"></i> Historial Ventas</h5>
-<table class="table table-dark">
-<thead>
-<tr>
-<th>Fecha</th>
-<th>Vendedor</th>
-<th>Cliente</th>
-<th>Plataforma</th>
-<th>Método Pago</th>
-<th>Monto</th>
-</tr>
-</thead>
-<tbody id="tablaVentas"></tbody>
-</table>
-</div>
-
-</div>
-
-<script>
-
-let usuarios=JSON.parse(localStorage.getItem("usuarios"))||[
-{user:"admin",pass:"2020",role:"admin"}
-];
-
-let ventas=JSON.parse(localStorage.getItem("ventas"))||[];
-let usuarioActual=null;
-
-function login(){
-let u=document.getElementById("user").value;
-let p=document.getElementById("pass").value;
-
-let encontrado=usuarios.find(x=>x.user===u && x.pass===p);
-if(encontrado){
-usuarioActual=encontrado;
-document.getElementById("login").style.display="none";
-document.getElementById("app").style.display="block";
-document.getElementById("infoUsuario").innerText="Usuario: "+usuarioActual.user+" | Rol: "+usuarioActual.role;
-
-if(usuarioActual.role==="admin"){
-document.getElementById("adminPanel").style.display="block";
-}
-
-actualizarTodo();
-}else{
-alert("Datos incorrectos");
-}
-}
-
-function logout(){
-location.reload();
-}
-
-function crearUsuario(){
-let u=document.getElementById("newUser").value;
-let p=document.getElementById("newPass").value;
-let r=document.getElementById("newRole").value;
-
-if(!u || !p){ alert("Completa datos"); return; }
-
-usuarios.push({user:u,pass:p,role:r});
-localStorage.setItem("usuarios",JSON.stringify(usuarios));
-
-document.getElementById("newUser").value="";
-document.getElementById("newPass").value="";
-alert("Usuario creado");
-}
-
-function guardarVenta(){
-let cliente=document.getElementById("cliente").value;
-let plataforma=document.getElementById("plataforma").value;
-let metodoPago=document.getElementById("metodoPago").value;
-let precio=parseFloat(document.getElementById("precio").value);
-
-if(!cliente || !plataforma || !metodoPago || isNaN(precio)){
-alert("Completa todos los campos");
-return;
-}
-
-let fecha=new Date().toLocaleString();
-
-ventas.push({
-cliente,
-plataforma,
-metodoPago,
-precio,
-fecha,
-vendedor: usuarioActual.user
-});
-
-localStorage.setItem("ventas",JSON.stringify(ventas));
-
-document.getElementById("cliente").value="";
-document.getElementById("plataforma").value="";
-document.getElementById("metodoPago").value="";
-document.getElementById("precio").value="";
-
-actualizarTodo();
-}
-
-function actualizarTodo(){
-mostrarVentas();
-mostrarResumen();
-}
-
-function mostrarVentas(){
-let tabla=document.getElementById("tablaVentas");
-tabla.innerHTML="";
-
-let ventasFiltradas = usuarioActual.role==="admin"
-? ventas
-: ventas.filter(v=>v.vendedor===usuarioActual.user);
-
-ventasFiltradas.forEach(v=>{
-tabla.innerHTML+=`
-<tr>
-<td>${v.fecha}</td>
-<td>${v.vendedor}</td>
-<td>${v.cliente}</td>
-<td>${v.plataforma}</td>
-<td>${v.metodoPago}</td>
-<td>$${v.precio.toFixed(2)}</td>
-</tr>`;
-});
-}
-
-function mostrarResumen(){
-let cont=document.getElementById("resumenContenido");
-
-if(usuarioActual.role==="admin"){
-let totalGlobal=ventas.reduce((a,b)=>a+b.precio,0);
-
-let resumenPorUsuario={};
-ventas.forEach(v=>{
-if(!resumenPorUsuario[v.vendedor]) resumenPorUsuario[v.vendedor]=0;
-resumenPorUsuario[v.vendedor]+=v.precio;
-});
-
-let html=`<p>Total Global: $${totalGlobal.toFixed(2)}</p>`;
-for(let u in resumenPorUsuario){
-html+=`<p>${u}: $${resumenPorUsuario[u].toFixed(2)}</p>`;
-}
-cont.innerHTML=html;
-
-}else{
-let misVentas=ventas.filter(v=>v.vendedor===usuarioActual.user);
-let total=misVentas.reduce((a,b)=>a+b.precio,0);
-cont.innerHTML=`<p>Mis Ventas: $${total.toFixed(2)}</p>`;
-}
+window.logout = function(){
+  location.reload();
 }
 
 </script>
-
-</body>
-</html>
