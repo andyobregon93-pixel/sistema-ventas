@@ -3,18 +3,73 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sistema Empresarial PRO</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 <style>
-body{background:#0f172a;color:white}
-.card{border-radius:15px}
-table{color:white}
+
+body{
+background: linear-gradient(135deg,#000000,#111827);
+color:white;
+font-family: 'Segoe UI', sans-serif;
+}
+
+.card{
+border-radius:15px;
+background:#1a1a1a;
+box-shadow:0 0 20px rgba(212,175,55,0.3);
+border:1px solid #d4af37;
+}
+
+h2,h3,h5{
+color:#d4af37;
+font-weight:bold;
+}
+
+.btn-dark,
+.btn-success{
+background:#d4af37;
+border:none;
+color:black;
+font-weight:bold;
+}
+
+.btn-dark:hover,
+.btn-success:hover{
+background:#b8962e;
+}
+
+.btn-danger{
+background:#8b0000;
+}
+
+table{
+color:white;
+}
+
+.table-dark{
+background:#1a1a1a;
+}
+
+input,select{
+background:#111;
+color:white;
+border:1px solid #d4af37;
+}
+
+input:focus,select:focus{
+border-color:#ffd700;
+box-shadow:0 0 5px #d4af37;
+}
+
 </style>
 </head>
 <body class="p-3">
 
 <div id="login">
 <div class="card p-4 text-dark">
-<h3>Login</h3>
+<h3><i class="bi bi-shield-lock-fill"></i> Login Empresarial</h3>
 <input id="user" class="form-control mb-2" placeholder="Usuario">
 <input type="password" id="pass" class="form-control mb-2" placeholder="Contraseña">
 <button class="btn btn-dark w-100" onclick="login()">Entrar</button>
@@ -23,12 +78,12 @@ table{color:white}
 
 <div id="app" style="display:none">
 
-<h2>Panel Empresarial</h2>
+<h2><i class="bi bi-gem"></i> Panel Empresarial PRO</h2>
 <p id="infoUsuario"></p>
 <button class="btn btn-danger mb-3" onclick="logout()">Cerrar sesión</button>
 
 <div id="adminPanel" class="card p-3 text-dark mb-3" style="display:none">
-<h5>Crear Usuario</h5>
+<h5><i class="bi bi-person-plus-fill"></i> Crear Usuario</h5>
 <input id="newUser" class="form-control mb-2" placeholder="Usuario">
 <input id="newPass" class="form-control mb-2" placeholder="Contraseña">
 <select id="newRole" class="form-control mb-2">
@@ -39,20 +94,31 @@ table{color:white}
 </div>
 
 <div class="card p-3 text-dark mb-3">
-<h5>Nueva Venta</h5>
+<h5><i class="bi bi-cash-coin"></i> Nueva Venta</h5>
 <input id="cliente" class="form-control mb-2" placeholder="Cliente">
 <input id="plataforma" class="form-control mb-2" placeholder="Cuenta / Plataforma">
+
+<select id="metodoPago" class="form-control mb-2">
+<option value="">Seleccionar método de pago</option>
+<option value="Banco">Banco</option>
+<option value="Transferencia">Transferencia</option>
+<option value="PayPal">PayPal</option>
+<option value="Binance">Binance</option>
+<option value="Giro">Giro</option>
+<option value="Efectivo">Efectivo</option>
+</select>
+
 <input id="precio" type="number" class="form-control mb-2" placeholder="Precio">
 <button class="btn btn-success w-100" onclick="guardarVenta()">Guardar Venta</button>
 </div>
 
 <div class="card p-3 text-dark mb-3">
-<h5>Resumen</h5>
+<h5><i class="bi bi-bar-chart-fill"></i> Resumen</h5>
 <div id="resumenContenido"></div>
 </div>
 
 <div class="card p-3 text-dark mb-3">
-<h5>Historial Ventas</h5>
+<h5><i class="bi bi-clock-history"></i> Historial Ventas</h5>
 <table class="table table-dark">
 <thead>
 <tr>
@@ -60,6 +126,7 @@ table{color:white}
 <th>Vendedor</th>
 <th>Cliente</th>
 <th>Plataforma</th>
+<th>Método Pago</th>
 <th>Monto</th>
 </tr>
 </thead>
@@ -121,9 +188,10 @@ alert("Usuario creado");
 function guardarVenta(){
 let cliente=document.getElementById("cliente").value;
 let plataforma=document.getElementById("plataforma").value;
+let metodoPago=document.getElementById("metodoPago").value;
 let precio=parseFloat(document.getElementById("precio").value);
 
-if(!cliente || !plataforma || isNaN(precio)){
+if(!cliente || !plataforma || !metodoPago || isNaN(precio)){
 alert("Completa todos los campos");
 return;
 }
@@ -133,6 +201,7 @@ let fecha=new Date().toLocaleString();
 ventas.push({
 cliente,
 plataforma,
+metodoPago,
 precio,
 fecha,
 vendedor: usuarioActual.user
@@ -142,6 +211,7 @@ localStorage.setItem("ventas",JSON.stringify(ventas));
 
 document.getElementById("cliente").value="";
 document.getElementById("plataforma").value="";
+document.getElementById("metodoPago").value="";
 document.getElementById("precio").value="";
 
 actualizarTodo();
@@ -167,6 +237,7 @@ tabla.innerHTML+=`
 <td>${v.vendedor}</td>
 <td>${v.cliente}</td>
 <td>${v.plataforma}</td>
+<td>${v.metodoPago}</td>
 <td>$${v.precio.toFixed(2)}</td>
 </tr>`;
 });
