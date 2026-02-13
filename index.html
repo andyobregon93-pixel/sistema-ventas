@@ -2,9 +2,8 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sistema Empresarial</title>
+<title>Sistema Empresarial PRO</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 body{background:#0f172a;color:white}
 .card{border-radius:15px}
@@ -25,58 +24,46 @@ table{color:white}
 <div id="app" style="display:none">
 
 <h2>Panel Empresarial</h2>
-<p id="rolInfo"></p>
+<p id="infoUsuario"></p>
 <button class="btn btn-danger mb-3" onclick="logout()">Cerrar sesión</button>
 
-<div id="adminPanel" style="display:none" class="card p-3 text-dark mb-3">
+<div id="adminPanel" class="card p-3 text-dark mb-3" style="display:none">
 <h5>Crear Usuario</h5>
 <input id="newUser" class="form-control mb-2" placeholder="Usuario">
 <input id="newPass" class="form-control mb-2" placeholder="Contraseña">
 <select id="newRole" class="form-control mb-2">
 <option value="admin">Admin</option>
-<option value="user">Usuario</option>
+<option value="vendedor">Vendedor</option>
 </select>
-<button class="btn btn-primary w-100" onclick="crearUsuario()">Guardar Usuario</button>
+<button class="btn btn-primary w-100" onclick="crearUsuario()">Crear</button>
 </div>
 
 <div class="card p-3 text-dark mb-3">
 <h5>Nueva Venta</h5>
 <input id="cliente" class="form-control mb-2" placeholder="Cliente">
+<input id="plataforma" class="form-control mb-2" placeholder="Cuenta / Plataforma">
 <input id="precio" type="number" class="form-control mb-2" placeholder="Precio">
 <button class="btn btn-success w-100" onclick="guardarVenta()">Guardar Venta</button>
 </div>
 
 <div class="card p-3 text-dark mb-3">
-<h5>Registrar Gasto</h5>
-<input id="conceptoGasto" class="form-control mb-2" placeholder="Concepto">
-<input id="montoGasto" type="number" class="form-control mb-2" placeholder="Monto">
-<button class="btn btn-warning w-100" onclick="guardarGasto()">Guardar Gasto</button>
-</div>
-
-<div class="card p-3 text-dark mb-3">
-<h5>Resumen General</h5>
-<p>Total Ventas: $<span id="totalVentas">0</span></p>
-<p>Total Gastos: $<span id="totalGastos">0</span></p>
-<p><strong>Ganancia Neta: $<span id="ganancia">0</span></strong></p>
+<h5>Resumen</h5>
+<div id="resumenContenido"></div>
 </div>
 
 <div class="card p-3 text-dark mb-3">
 <h5>Historial Ventas</h5>
 <table class="table table-dark">
 <thead>
-<tr><th>Cliente</th><th>Monto</th></tr>
+<tr>
+<th>Fecha</th>
+<th>Vendedor</th>
+<th>Cliente</th>
+<th>Plataforma</th>
+<th>Monto</th>
+</tr>
 </thead>
 <tbody id="tablaVentas"></tbody>
-</table>
-</div>
-
-<div class="card p-3 text-dark mb-3">
-<h5>Historial Gastos</h5>
-<table class="table table-dark">
-<thead>
-<tr><th>Concepto</th><th>Monto</th></tr>
-</thead>
-<tbody id="tablaGastos"></tbody>
 </table>
 </div>
 
@@ -89,21 +76,23 @@ let usuarios=JSON.parse(localStorage.getItem("usuarios"))||[
 ];
 
 let ventas=JSON.parse(localStorage.getItem("ventas"))||[];
-let gastos=JSON.parse(localStorage.getItem("gastos"))||[];
 let usuarioActual=null;
 
 function login(){
 let u=document.getElementById("user").value;
 let p=document.getElementById("pass").value;
+
 let encontrado=usuarios.find(x=>x.user===u && x.pass===p);
 if(encontrado){
 usuarioActual=encontrado;
 document.getElementById("login").style.display="none";
 document.getElementById("app").style.display="block";
-document.getElementById("rolInfo").innerText="Rol: "+usuarioActual.role;
+document.getElementById("infoUsuario").innerText="Usuario: "+usuarioActual.user+" | Rol: "+usuarioActual.role;
+
 if(usuarioActual.role==="admin"){
 document.getElementById("adminPanel").style.display="block";
 }
+
 actualizarTodo();
 }else{
 alert("Datos incorrectos");
@@ -118,67 +107,97 @@ function crearUsuario(){
 let u=document.getElementById("newUser").value;
 let p=document.getElementById("newPass").value;
 let r=document.getElementById("newRole").value;
+
+if(!u || !p){ alert("Completa datos"); return; }
+
 usuarios.push({user:u,pass:p,role:r});
 localStorage.setItem("usuarios",JSON.stringify(usuarios));
+
+document.getElementById("newUser").value="";
+document.getElementById("newPass").value="";
 alert("Usuario creado");
 }
 
 function guardarVenta(){
 let cliente=document.getElementById("cliente").value;
+let plataforma=document.getElementById("plataforma").value;
 let precio=parseFloat(document.getElementById("precio").value);
-if(!cliente || !precio){ alert("Completa los datos"); return; }
 
-ventas.push({cliente,precio});
+if(!cliente || !plataforma || isNaN(precio)){
+alert("Completa todos los campos");
+return;
+}
+
+let fecha=new Date().toLocaleString();
+
+ventas.push({
+cliente,
+plataforma,
+precio,
+fecha,
+vendedor: usuarioActual.user
+});
+
 localStorage.setItem("ventas",JSON.stringify(ventas));
 
 document.getElementById("cliente").value="";
+document.getElementById("plataforma").value="";
 document.getElementById("precio").value="";
 
 actualizarTodo();
 }
 
-function guardarGasto(){
-let concepto=document.getElementById("conceptoGasto").value;
-let monto=parseFloat(document.getElementById("montoGasto").value);
-if(!concepto || !monto){ alert("Completa los datos"); return; }
-
-gastos.push({concepto,monto});
-localStorage.setItem("gastos",JSON.stringify(gastos));
-
-document.getElementById("conceptoGasto").value="";
-document.getElementById("montoGasto").value="";
-
-actualizarTodo();
-}
-
 function actualizarTodo(){
-actualizarResumen();
-mostrarTablas();
+mostrarVentas();
+mostrarResumen();
 }
 
-function actualizarResumen(){
-let totalV=ventas.reduce((a,b)=>a+b.precio,0);
-let totalG=gastos.reduce((a,b)=>a+b.monto,0);
-document.getElementById("totalVentas").innerText=totalV.toFixed(2);
-document.getElementById("totalGastos").innerText=totalG.toFixed(2);
-document.getElementById("ganancia").innerText=(totalV-totalG).toFixed(2);
+function mostrarVentas(){
+let tabla=document.getElementById("tablaVentas");
+tabla.innerHTML="";
+
+let ventasFiltradas = usuarioActual.role==="admin"
+? ventas
+: ventas.filter(v=>v.vendedor===usuarioActual.user);
+
+ventasFiltradas.forEach(v=>{
+tabla.innerHTML+=`
+<tr>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.plataforma}</td>
+<td>$${v.precio.toFixed(2)}</td>
+</tr>`;
+});
 }
 
-function mostrarTablas(){
-let tablaV=document.getElementById("tablaVentas");
-tablaV.innerHTML="";
+function mostrarResumen(){
+let cont=document.getElementById("resumenContenido");
+
+if(usuarioActual.role==="admin"){
+let totalGlobal=ventas.reduce((a,b)=>a+b.precio,0);
+
+let resumenPorUsuario={};
 ventas.forEach(v=>{
-tablaV.innerHTML+=`<tr><td>${v.cliente}</td><td>$${v.precio.toFixed(2)}</td></tr>`;
+if(!resumenPorUsuario[v.vendedor]) resumenPorUsuario[v.vendedor]=0;
+resumenPorUsuario[v.vendedor]+=v.precio;
 });
 
-let tablaG=document.getElementById("tablaGastos");
-tablaG.innerHTML="";
-gastos.forEach(g=>{
-tablaG.innerHTML+=`<tr><td>${g.concepto}</td><td>$${g.monto.toFixed(2)}</td></tr>`;
-});
+let html=`<p>Total Global: $${totalGlobal.toFixed(2)}</p>`;
+for(let u in resumenPorUsuario){
+html+=`<p>${u}: $${resumenPorUsuario[u].toFixed(2)}</p>`;
+}
+cont.innerHTML=html;
+
+}else{
+let misVentas=ventas.filter(v=>v.vendedor===usuarioActual.user);
+let total=misVentas.reduce((a,b)=>a+b.precio,0);
+cont.innerHTML=`<p>Mis Ventas: $${total.toFixed(2)}</p>`;
+}
 }
 
 </script>
 
 </body>
-  </html>
+</html>
