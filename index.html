@@ -279,8 +279,49 @@ window.guardarVenta = async function(){
   cargarProductos();
 };
 
-async function cargarVentas(){
+function cargarVentas(){
 
+  const q = query(
+    collection(db,"ventas"),
+    orderBy("timestamp","desc")
+  );
+
+  onSnapshot(q, (snapshot)=>{
+
+    tablaVentas.innerHTML = "";
+    let totalVentas = 0;
+
+    snapshot.forEach(docSnap=>{
+      const v = docSnap.data();
+      const id = docSnap.id;
+
+      if(rolActual==="admin" || v.vendedor===usuarioActual){
+
+        totalVentas += v.precio;
+
+        tablaVentas.innerHTML += `
+        <tr>
+          <td>${v.fecha}</td>
+          <td>${v.vendedor}</td>
+          <td>${v.cliente}</td>
+          <td>${v.producto}</td>
+          <td>${v.metodoPago}</td>
+          <td>$${v.precio}</td>
+          <td>
+            <button onclick="generarFactura('${id}')">PDF</button>
+            <button onclick="enviarWhatsApp('${id}')">WhatsApp</button>
+            ${rolActual==="admin"
+              ? `<button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>`
+              : ""}
+          </td>
+        </tr>`;
+      }
+    });
+
+    total.innerText = "Total: $" + totalVentas;
+
+  });
+}
   tablaVentas.innerHTML = "";
   let totalVentas = 0;
 
