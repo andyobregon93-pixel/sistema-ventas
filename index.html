@@ -1,65 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Ventas</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#f4f6f9;
+  margin:0;
+}
+.container{
+  width:90%;
+  max-width:900px;
+  margin:30px auto;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+button{
+  background:#007bff;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+button:hover{
+  background:#0056b3;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+th{
+  background:#007bff;
+  color:white;
+}
+.logout{
+  background:#dc3545;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div id="loginBox">
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button onclick="login()">Ingresar</button>
+</div>
+
+<div id="app" style="display:none;">
+  <h3 id="infoUsuario"></h3>
+  <button class="logout" onclick="logout()">Cerrar sesión</button>
+
+  <hr>
+
+  <h2>Nueva Venta</h2>
+  <input type="text" id="cliente" placeholder="Cliente">
+  <input type="text" id="plataforma" placeholder="Plataforma">
+  <input type="text" id="metodoPago" placeholder="Método de Pago">
+  <input type="number" id="precio" placeholder="Precio">
+  <button onclick="guardarVenta()">Guardar Venta</button>
+
+  <h2>Ventas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Vendedor</th>
+        <th>Cliente</th>
+        <th>Plataforma</th>
+        <th>Método</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody id="tablaVentas"></tbody>
+  </table>
+
+  <h3 id="total"></h3>
+</div>
+
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "PEGA_AQUI_TU_API_KEY",
-  authDomain: "PEGA_AQUI",
-  projectId: "PEGA_AQUI",
-  storageBucket: "PEGA_AQUI",
-  messagingSenderId: "PEGA_AQUI",
-  appId: "PEGA_AQUI"
+  authDomain: "PEGA_AQUI_TU_AUTH_DOMAIN",
+  projectId: "PEGA_AQUI_TU_PROJECT_ID",
+  storageBucket: "PEGA_AQUI_TU_STORAGE",
+  messagingSenderId: "PEGA_AQUI_TU_SENDER_ID",
+  appId: "PEGA_AQUI_TU_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 let usuarioActual = null;
+let rolActual = null;
 
 window.login = async function(){
-  const user = document.getElementById("user").value;
-  const pass = document.getElementById("pass").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  const q = query(collection(db, "usuarios"), where("user", "==", user), where("pass", "==", pass));
-  const querySnapshot = await getDocs(q);
+  try{
+    await signInWithEmailAndPassword(auth, email, password);
+  }catch(error){
+    alert(error.message);
+  }
+}
 
-  if(!querySnapshot.empty){
-    usuarioActual = querySnapshot.docs[0].data();
+onAuthStateChanged(auth, async(user)=>{
+  if(user){
+    const docRef = doc(db,"usuarios",user.uid);
+    const docSnap = await getDoc(docRef);
 
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
-    document.getElementById("infoUsuario").innerText =
-      "Usuario: " + usuarioActual.user + " | Rol: " + usuarioActual.role;
+    if(docSnap.exists()){
+      rolActual = docSnap.data().role;
+      usuarioActual = user.email;
 
-    if(usuarioActual.role==="admin"){
-      document.getElementById("adminPanel").style.display="block";
+      document.getElementById("loginBox").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("infoUsuario").innerText =
+        "Usuario: "+usuarioActual+" | Rol: "+rolActual;
+
+      cargarVentas();
     }
-
-    actualizarTodo();
-  } else {
-    alert("Datos incorrectos");
+  }else{
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("app").style.display="none";
   }
-}
-
-window.crearUsuario = async function(){
-  const user = document.getElementById("newUser").value;
-  const pass = document.getElementById("newPass").value;
-  const role = document.getElementById("newRole").value;
-
-  if(!user || !pass){
-    alert("Completa datos");
-    return;
-  }
-
-  await addDoc(collection(db, "usuarios"), {
-    user,
-    pass,
-    role
-  });
-
-  alert("Usuario creado");
-}
+});
 
 window.guardarVenta = async function(){
   const cliente = document.getElementById("cliente").value;
@@ -68,67 +161,56 @@ window.guardarVenta = async function(){
   const precio = parseFloat(document.getElementById("precio").value);
 
   if(!cliente || !plataforma || !metodoPago || isNaN(precio)){
-    alert("Completa todos los campos");
+    alert("Completa todo");
     return;
   }
 
-  await addDoc(collection(db, "ventas"), {
+  await addDoc(collection(db,"ventas"),{
     cliente,
     plataforma,
     metodoPago,
     precio,
-    vendedor: usuarioActual.user,
-    fecha: new Date().toLocaleString()
+    vendedor: usuarioActual,
+    fecha: new Date().toLocaleString(),
+    timestamp: serverTimestamp()
   });
 
-  actualizarTodo();
+  cargarVentas();
 }
 
-async function actualizarTodo(){
-  mostrarVentas();
-  mostrarResumen();
-}
-
-async function mostrarVentas(){
+async function cargarVentas(){
   const tabla = document.getElementById("tablaVentas");
   tabla.innerHTML="";
+  let total=0;
 
-  const snapshot = await getDocs(collection(db, "ventas"));
+  const snapshot = await getDocs(collection(db,"ventas"));
 
   snapshot.forEach(doc=>{
     const v = doc.data();
 
-    if(usuarioActual.role==="admin" || v.vendedor===usuarioActual.user){
-      tabla.innerHTML+=`
-        <tr>
-          <td>${v.fecha}</td>
-          <td>${v.vendedor}</td>
-          <td>${v.cliente}</td>
-          <td>${v.plataforma}</td>
-          <td>${v.metodoPago}</td>
-          <td>$${v.precio.toFixed(2)}</td>
-        </tr>`;
-    }
-  });
-}
-
-async function mostrarResumen(){
-  const cont = document.getElementById("resumenContenido");
-  const snapshot = await getDocs(collection(db, "ventas"));
-
-  let total = 0;
-  snapshot.forEach(doc=>{
-    const v = doc.data();
-    if(usuarioActual.role==="admin" || v.vendedor===usuarioActual.user){
+    if(rolActual==="admin" || v.vendedor===usuarioActual){
       total += v.precio;
+
+      tabla.innerHTML+=`
+      <tr>
+        <td>${v.fecha}</td>
+        <td>${v.vendedor}</td>
+        <td>${v.cliente}</td>
+        <td>${v.plataforma}</td>
+        <td>${v.metodoPago}</td>
+        <td>$${v.precio}</td>
+      </tr>`;
     }
   });
 
-  cont.innerHTML = `<p>Total: $${total.toFixed(2)}</p>`;
+  document.getElementById("total").innerText="Total: $"+total;
 }
 
 window.logout = function(){
-  location.reload();
+  signOut(auth);
 }
 
 </script>
+
+</body>
+</html>
