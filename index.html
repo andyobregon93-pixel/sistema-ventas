@@ -2,10 +2,9 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panel Profesional</title>
+<title>Sistema Empresarial</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 body{background:#0f172a;color:white}
 .card{border-radius:15px}
@@ -15,131 +14,162 @@ body{background:#0f172a;color:white}
 
 <div id="login">
 <div class="card p-4 text-dark">
-<h3>Acceso Administrativo</h3>
-<input type="password" id="clave" class="form-control mb-2" placeholder="Ingrese contraseña">
-<button class="btn btn-dark w-100" onclick="verificar()">Entrar</button>
+<h3>Login</h3>
+<input id="user" class="form-control mb-2" placeholder="Usuario">
+<input type="password" id="pass" class="form-control mb-2" placeholder="Contraseña">
+<button class="btn btn-dark w-100" onclick="login()">Entrar</button>
 </div>
 </div>
 
-<div id="sistema" style="display:none">
+<div id="app" style="display:none">
 
-<h2>Dashboard Ventas</h2>
+<h2>Panel Empresarial</h2>
+<p id="rolInfo"></p>
+<button class="btn btn-danger mb-3" onclick="logout()">Cerrar sesión</button>
 
-<div class="row mt-3">
-<div class="col-6">
-<div class="card p-3 text-dark">
-<h5>Total Ventas</h5>
-<h3 id="totalGeneral">$0</h3>
-</div>
-</div>
-
-<div class="col-6">
-<div class="card p-3 text-dark">
-<h5>Cantidad</h5>
-<h3 id="cantidadVentas">0</h3>
-</div>
-</div>
+<div id="adminPanel" style="display:none" class="card p-3 text-dark mb-3">
+<h5>Crear Usuario</h5>
+<input id="newUser" class="form-control mb-2" placeholder="Usuario">
+<input id="newPass" class="form-control mb-2" placeholder="Contraseña">
+<select id="newRole" class="form-control mb-2">
+<option value="admin">Admin</option>
+<option value="user">Usuario</option>
+</select>
+<button class="btn btn-primary w-100" onclick="crearUsuario()">Guardar Usuario</button>
 </div>
 
-<hr>
-
-<div class="card p-3 text-dark">
+<div class="card p-3 text-dark mb-3">
 <h5>Nueva Venta</h5>
 <input id="cliente" class="form-control mb-2" placeholder="Cliente">
-<input id="producto" class="form-control mb-2" placeholder="Producto">
 <input id="precio" type="number" class="form-control mb-2" placeholder="Precio">
-
-<select id="metodo" class="form-control mb-2">
-<option>Efectivo</option>
-<option>Transferencia</option>
-<option>Tarjeta</option>
-<option>Cripto</option>
-</select>
-
-<button class="btn btn-success w-100" onclick="guardar()">Guardar Venta</button>
+<button class="btn btn-success w-100" onclick="guardarVenta()">Guardar Venta</button>
 </div>
 
-<hr>
+<div id="gastoPanel" class="card p-3 text-dark mb-3">
+<h5>Registrar Gasto</h5>
+<input id="conceptoGasto" class="form-control mb-2" placeholder="Concepto">
+<input id="montoGasto" type="number" class="form-control mb-2" placeholder="Monto">
+<button class="btn btn-warning w-100" onclick="guardarGasto()">Guardar Gasto</button>
+</div>
 
-<h5>Historial</h5>
-<table class="table table-dark">
-<tbody id="tabla"></tbody>
-</table>
+<div class="card p-3 text-dark mb-3">
+<h5>Resumen General</h5>
+<p>Total Ventas: $<span id="totalVentas">0</span></p>
+<p>Total Gastos: $<span id="totalGastos">0</span></p>
+<p><strong>Ganancia Neta: $<span id="ganancia">0</span></strong></p>
+</div>
+
+<div class="card p-3 text-dark mb-3">
+<h5>Reporte Mensual</h5>
+<select id="mesReporte" class="form-control mb-2"></select>
+<button class="btn btn-primary w-100" onclick="reporteMensual()">Descargar PDF</button>
+</div>
 
 </div>
 
 <script>
-const PASSWORD="2020";
 
-function verificar(){
-if(document.getElementById("clave").value===PASSWORD){
-document.getElementById("login").style.display="none";
-document.getElementById("sistema").style.display="block";
-}else{
-alert("Contraseña incorrecta");
-}
-}
+let usuarios=JSON.parse(localStorage.getItem("usuarios"))||[
+{user:"admin",pass:"2020",role:"admin"}
+];
 
 let ventas=JSON.parse(localStorage.getItem("ventas"))||[];
-let factura=localStorage.getItem("factura")||1000;
+let gastos=JSON.parse(localStorage.getItem("gastos"))||[];
+let usuarioActual=null;
 
-function guardar(){
-let c=document.getElementById("cliente").value;
-let p=document.getElementById("producto").value;
-let pr=parseFloat(document.getElementById("precio").value);
-let m=document.getElementById("metodo").value;
+function login(){
+let u=document.getElementById("user").value;
+let p=document.getElementById("pass").value;
+let encontrado=usuarios.find(x=>x.user===u && x.pass===p);
+if(encontrado){
+usuarioActual=encontrado;
+document.getElementById("login").style.display="none";
+document.getElementById("app").style.display="block";
+document.getElementById("rolInfo").innerText="Rol: "+usuarioActual.role;
+if(usuarioActual.role==="admin"){
+document.getElementById("adminPanel").style.display="block";
+}else{
+document.getElementById("adminPanel").style.display="none";
+}
+actualizarResumen();
+cargarMeses();
+}else{
+alert("Datos incorrectos");
+}
+}
 
-let iva=pr*0.16;
-let total=pr+iva;
+function logout(){
+location.reload();
+}
 
-ventas.push({c,p,pr,iva,total,m});
+function crearUsuario(){
+let u=document.getElementById("newUser").value;
+let p=document.getElementById("newPass").value;
+let r=document.getElementById("newRole").value;
+usuarios.push({user:u,pass:p,role:r});
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+alert("Usuario creado");
+}
+
+function guardarVenta(){
+let cliente=document.getElementById("cliente").value;
+let precio=parseFloat(document.getElementById("precio").value);
+let fecha=new Date();
+let mes=fecha.getFullYear()+"-"+String(fecha.getMonth()+1).padStart(2,"0");
+ventas.push({cliente,precio,mes});
 localStorage.setItem("ventas",JSON.stringify(ventas));
-mostrar();
+actualizarResumen();
+cargarMeses();
 }
 
-function mostrar(){
-let tabla=document.getElementById("tabla");
-tabla.innerHTML="";
-let totalGeneral=0;
+function guardarGasto(){
+let concepto=document.getElementById("conceptoGasto").value;
+let monto=parseFloat(document.getElementById("montoGasto").value);
+let fecha=new Date();
+let mes=fecha.getFullYear()+"-"+String(fecha.getMonth()+1).padStart(2,"0");
+gastos.push({concepto,monto,mes});
+localStorage.setItem("gastos",JSON.stringify(gastos));
+actualizarResumen();
+cargarMeses();
+}
 
-ventas.forEach((v,i)=>{
-totalGeneral+=v.total;
+function actualizarResumen(){
+let totalV=ventas.reduce((a,b)=>a+b.precio,0);
+let totalG=gastos.reduce((a,b)=>a+b.monto,0);
+document.getElementById("totalVentas").innerText=totalV.toFixed(2);
+document.getElementById("totalGastos").innerText=totalG.toFixed(2);
+document.getElementById("ganancia").innerText=(totalV-totalG).toFixed(2);
+}
 
-tabla.innerHTML+=`
-<tr>
-<td>${v.c}</td>
-<td>$${v.total.toFixed(2)}</td>
-<td>
-<button class="btn btn-warning btn-sm" onclick="verFactura(${i})">PDF</button>
-</td>
-</tr>`;
+function cargarMeses(){
+let select=document.getElementById("mesReporte");
+let meses=[...new Set([...ventas.map(v=>v.mes),...gastos.map(g=>g.mes)])];
+select.innerHTML="";
+meses.forEach(m=>{
+select.innerHTML+=`<option value="${m}">${m}</option>`;
 });
-
-document.getElementById("totalGeneral").innerText="$"+totalGeneral.toFixed(2);
-document.getElementById("cantidadVentas").innerText=ventas.length;
 }
 
-async function verFactura(i){
+async function reporteMensual(){
+let mes=document.getElementById("mesReporte").value;
+let ventasMes=ventas.filter(v=>v.mes===mes);
+let gastosMes=gastos.filter(g=>g.mes===mes);
+
+let totalV=ventasMes.reduce((a,b)=>a+b.precio,0);
+let totalG=gastosMes.reduce((a,b)=>a+b.monto,0);
+
 const { jsPDF } = window.jspdf;
 let doc=new jsPDF();
 
-let v=ventas[i];
+doc.text("Reporte Mensual "+mes,20,20);
+doc.text("Total Ventas: $"+totalV.toFixed(2),20,30);
+doc.text("Total Gastos: $"+totalG.toFixed(2),20,40);
+doc.text("Ganancia Neta: $"+(totalV-totalG).toFixed(2),20,50);
 
-doc.text("Factura Nº "+factura,20,20);
-doc.text("Cliente: "+v.c,20,30);
-doc.text("Producto: "+v.p,20,40);
-doc.text("Subtotal: $"+v.pr,20,50);
-doc.text("IVA: $"+v.iva.toFixed(2),20,60);
-doc.text("Total: $"+v.total.toFixed(2),20,70);
-
-doc.save("factura_"+factura+".pdf");
-
-factura++;
-localStorage.setItem("factura",factura);
+doc.save("reporte_"+mes+".pdf");
 }
 
-mostrar();
 </script>
 
 </body>
-  </html>
+</html>
