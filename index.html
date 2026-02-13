@@ -34,6 +34,9 @@ button{
 button:hover{
   background:#0056b3;
 }
+.delete-btn{
+  background:#dc3545;
+}
 table{
   width:100%;
   border-collapse:collapse;
@@ -74,7 +77,6 @@ th{
   <h3 id="infoUsuario"></h3>
   <button class="logout" onclick="logout()">Cerrar sesión</button>
 
-  <!-- PANEL ADMIN -->
   <div id="panelAdmin" class="admin-panel" style="display:none;">
     <h2>Administrar Usuarios</h2>
 
@@ -111,6 +113,7 @@ th{
         <th>Plataforma</th>
         <th>Método</th>
         <th>Precio</th>
+        <th>Acción</th>
       </tr>
     </thead>
     <tbody id="tablaVentas"></tbody>
@@ -126,7 +129,7 @@ th{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, serverTimestamp }
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -261,8 +264,10 @@ async function cargarVentas(){
 
   snapshot.forEach(docSnap=>{
     const v = docSnap.data();
+    const id = docSnap.id;
 
     if(rolActual==="admin" || v.vendedor===usuarioActual){
+
       total += v.precio;
 
       tabla.innerHTML+=`
@@ -273,11 +278,28 @@ async function cargarVentas(){
         <td>${v.plataforma}</td>
         <td>${v.metodoPago}</td>
         <td>$${v.precio}</td>
+        <td>
+          <button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>
+        </td>
       </tr>`;
     }
   });
 
   document.getElementById("total").innerText="Total: $"+total;
+}
+
+window.eliminarVenta = async function(id){
+
+  const confirmar = confirm("¿Seguro que deseas eliminar esta venta?");
+  if(!confirmar) return;
+
+  try{
+    await deleteDoc(doc(db,"ventas",id));
+    alert("Venta eliminada");
+    cargarVentas();
+  }catch(error){
+    alert(error.message);
+  }
 }
 
 window.logout = function(){
