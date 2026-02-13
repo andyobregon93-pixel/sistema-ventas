@@ -77,7 +77,6 @@ th{
 </div>
 
 <div id="app" style="display:none;">
-
   <h3 id="infoUsuario"></h3>
   <button class="logout" onclick="logout()">Cerrar sesión</button>
 
@@ -121,7 +120,6 @@ th{
   </table>
 
   <h3 id="total"></h3>
-
 </div>
 </div>
 
@@ -130,16 +128,16 @@ th{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy }
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-  authDomain: "sistema-ventas-64a4c.firebaseapp.com",
-  projectId: "sistema-ventas-64a4c",
-  storageBucket: "sistema-ventas-64a4c.appspot.com",
-  messagingSenderId: "291577824119",
-  appId: "1:291577824119:web:894fe9842b427c9ac3d772"
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_BUCKET",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -150,7 +148,6 @@ let usuarioActual = null;
 let rolActual = null;
 
 /* LOGIN */
-
 window.login = async function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -162,50 +159,41 @@ window.login = async function(){
   }
 };
 
-/* CONTROL DE SESIÓN */
-
+/* CONTROL SESIÓN */
 onAuthStateChanged(auth, async (user) => {
 
   if(user){
-
     usuarioActual = user.email;
 
     const snap = await getDoc(doc(db, "usuarios", user.uid));
 
     if(snap.exists()){
-
       rolActual = snap.data().role;
 
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      document.getElementById("infoUsuario").innerText =
+      loginBox.style.display="none";
+      app.style.display="block";
+      infoUsuario.innerText =
         "Usuario: " + usuarioActual + " | Rol: " + rolActual;
 
       if(rolActual === "admin"){
-        document.getElementById("panelAdmin").style.display = "block";
+        panelAdmin.style.display="block";
       }
 
       cargarProductos();
       cargarVentas();
-
-    } else {
+    }else{
       alert("Usuario no existe en Firestore");
       signOut(auth);
     }
 
-  } else {
-
-    document.getElementById("loginBox").style.display = "block";
-    document.getElementById("app").style.display = "none";
-
+  }else{
+    loginBox.style.display="block";
+    app.style.display="none";
   }
-
 });
 
 /* PRODUCTOS */
-
 window.crearProducto = async function(){
-
   const nombre = nombreProducto.value;
   const precio = parseFloat(precioProducto.value);
   const stock = parseInt(stockProducto.value);
@@ -219,9 +207,8 @@ window.crearProducto = async function(){
 };
 
 async function cargarProductos(){
-
-  listaProductos.innerHTML = "";
-  productoSelect.innerHTML = "<option value=''>Seleccionar producto</option>";
+  listaProductos.innerHTML="";
+  productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
 
   const snapshot = await getDocs(collection(db,"productos"));
 
@@ -229,20 +216,19 @@ async function cargarProductos(){
     const p = docSnap.data();
     const id = docSnap.id;
 
-    if(rolActual === "admin"){
-      listaProductos.innerHTML +=
+    if(rolActual==="admin"){
+      listaProductos.innerHTML+=
         `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
     }
 
-    if(p.stock > 0){
-      productoSelect.innerHTML +=
+    if(p.stock>0){
+      productoSelect.innerHTML+=
         `<option value="${id}">${p.nombre} - $${p.precio} (Stock: ${p.stock})</option>`;
     }
   });
 }
 
 /* VENTAS */
-
 window.guardarVenta = async function(){
 
   const nombreCliente = cliente.value;
@@ -257,7 +243,7 @@ window.guardarVenta = async function(){
   const snap = await getDoc(ref);
   const producto = snap.data();
 
-  if(producto.stock <= 0)
+  if(producto.stock<=0)
     return alert("Sin stock");
 
   await addDoc(collection(db,"ventas"),{
@@ -273,33 +259,31 @@ window.guardarVenta = async function(){
   });
 
   await setDoc(ref,{...producto,stock:producto.stock-1});
-
   alert("Venta realizada");
-  cargarVentas();
   cargarProductos();
 };
 
 function cargarVentas(){
 
-  const q = query(
+  const q=query(
     collection(db,"ventas"),
     orderBy("timestamp","desc")
   );
 
-  onSnapshot(q, (snapshot)=>{
+  onSnapshot(q,(snapshot)=>{
 
-    tablaVentas.innerHTML = "";
-    let totalVentas = 0;
+    tablaVentas.innerHTML="";
+    let totalVentas=0;
 
     snapshot.forEach(docSnap=>{
-      const v = docSnap.data();
-      const id = docSnap.id;
+      const v=docSnap.data();
+      const id=docSnap.id;
 
       if(rolActual==="admin" || v.vendedor===usuarioActual){
 
-        totalVentas += v.precio;
+        totalVentas+=v.precio;
 
-        tablaVentas.innerHTML += `
+        tablaVentas.innerHTML+=`
         <tr>
           <td>${v.fecha}</td>
           <td>${v.vendedor}</td>
@@ -318,79 +302,38 @@ function cargarVentas(){
       }
     });
 
-    total.innerText = "Total: $" + totalVentas;
-
+    total.innerText="Total: $"+totalVentas;
   });
-}
-  tablaVentas.innerHTML = "";
-  let totalVentas = 0;
-
-  const snapshot = await getDocs(collection(db,"ventas"));
-
-  snapshot.forEach(docSnap=>{
-    const v = docSnap.data();
-    const id = docSnap.id;
-
-    if(rolActual==="admin" || v.vendedor===usuarioActual){
-
-      totalVentas += v.precio;
-
-      tablaVentas.innerHTML += `
-      <tr>
-        <td>${v.fecha}</td>
-        <td>${v.vendedor}</td>
-        <td>${v.cliente}</td>
-        <td>${v.producto}</td>
-        <td>${v.metodoPago}</td>
-        <td>$${v.precio}</td>
-        <td>
-          <button onclick="generarFactura('${id}')">PDF</button>
-          <button onclick="enviarWhatsApp('${id}')">WhatsApp</button>
-          ${rolActual==="admin"
-            ? `<button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>`
-            : ""}
-        </td>
-      </tr>`;
-    }
-  });
-
-  total.innerText = "Total: $" + totalVentas;
 }
 
 /* ELIMINAR */
-
-window.eliminarVenta = async function(id){
+window.eliminarVenta=async function(id){
   if(!confirm("Eliminar venta?")) return;
   await deleteDoc(doc(db,"ventas",id));
-  cargarVentas();
 };
 
-window.eliminarCliente = async function(){
-
-  const nombre = clienteEliminar.value;
+window.eliminarCliente=async function(){
+  const nombre=clienteEliminar.value;
   if(!nombre) return alert("Escribe nombre");
 
-  const snapshot = await getDocs(collection(db,"ventas"));
+  const snapshot=await getDocs(collection(db,"ventas"));
 
   snapshot.forEach(async(docSnap)=>{
-    if(docSnap.data().cliente === nombre){
+    if(docSnap.data().cliente===nombre){
       await deleteDoc(doc(db,"ventas",docSnap.id));
     }
   });
 
   alert("Cliente eliminado");
-  cargarVentas();
 };
 
 /* FACTURA */
+window.generarFactura=async function(id){
+  const snap=await getDoc(doc(db,"ventas",id));
+  const v=snap.data();
 
-window.generarFactura = async function(id){
-
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-
-  const {jsPDF} = window.jspdf;
-  const pdf = new jsPDF();
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF();
 
   pdf.text("FACTURA DE VENTA",60,20);
   pdf.text("Fecha: "+v.fecha,20,40);
@@ -402,12 +345,11 @@ window.generarFactura = async function(id){
   pdf.save("Factura_"+v.cliente+".pdf");
 };
 
-window.enviarWhatsApp = async function(id){
+window.enviarWhatsApp=async function(id){
+  const snap=await getDoc(doc(db,"ventas",id));
+  const v=snap.data();
 
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-
-  const mensaje = `
+  const mensaje=`
 FACTURA
 Fecha: ${v.fecha}
 Cliente: ${v.cliente}
@@ -422,7 +364,7 @@ Total: $${v.precio}
   );
 };
 
-window.logout = function(){
+window.logout=function(){
   signOut(auth);
 };
 
