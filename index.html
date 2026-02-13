@@ -127,7 +127,7 @@ window.guardarVenta = async function(){
   const snap = await getDoc(ref);
   const producto = snap.data();
 
-  if(producto.stock <= 0)
+  if(!producto || producto.stock <= 0)
     return alert("Sin stock");
 
   await addDoc(collection(db,"ventas"),{
@@ -141,11 +141,14 @@ window.guardarVenta = async function(){
     fecha:new Date().toLocaleString()
   });
 
-  await updateDoc(ref,{ stock: producto.stock - 1 });
+  await updateDoc(ref,{
+    stock: producto.stock - 1
+  });
 
   alert("Venta realizada");
-  cargarVentas();
-  cargarProductos();
+
+  await cargarVentas();
+  await cargarProductos();
 };
 
 async function cargarVentas(){
@@ -162,7 +165,7 @@ async function cargarVentas(){
 
     if(rolActual==="admin" || v.vendedor===usuarioActual){
 
-      totalVentas += Number(v.precio);
+      totalVentas += Number(v.precio || 0);
 
       tabla.innerHTML += `
       <tr>
