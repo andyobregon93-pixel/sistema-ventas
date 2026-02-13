@@ -1,136 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Ventas</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<style>
-body{
-  font-family: Arial;
-  background:#f4f6f9;
-  margin:0;
-}
-.container{
-  width:90%;
-  max-width:1000px;
-  margin:30px auto;
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-input,select,button{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-}
-button{
-  background:#007bff;
-  color:white;
-  border:none;
-  cursor:pointer;
-}
-button:hover{
-  background:#0056b3;
-}
-.delete-btn{
-  background:#dc3545;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-th,td{
-  border:1px solid #ddd;
-  padding:8px;
-  text-align:center;
-}
-th{
-  background:#007bff;
-  color:white;
-}
-.logout{
-  background:#dc3545;
-}
-.admin-panel{
-  background:#f1f1f1;
-  padding:15px;
-  border-radius:8px;
-  margin-top:20px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div id="loginBox">
-  <h2>Login</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="login()">Ingresar</button>
-</div>
-
-<div id="app" style="display:none;">
-
-  <h3 id="infoUsuario"></h3>
-  <button class="logout" onclick="logout()">Cerrar sesión</button>
-
-  <div id="panelAdmin" class="admin-panel" style="display:none;">
-    <h2>Administrar Productos</h2>
-    <input type="text" id="nombreProducto" placeholder="Nombre del producto">
-    <input type="number" id="precioProducto" placeholder="Precio">
-    <input type="number" id="stockProducto" placeholder="Stock inicial">
-    <button onclick="crearProducto()">Crear Producto</button>
-    <h3>Lista de Productos</h3>
-    <ul id="listaProductos"></ul>
-  </div>
-
-  <hr>
-
-  <h2>Nueva Venta</h2>
-  <input type="text" id="cliente" placeholder="Cliente">
-  <input type="text" id="telefono" placeholder="Teléfono (ej: 521234567890)">
-  <select id="productoSelect"></select>
-  <input type="text" id="metodoPago" placeholder="Método de Pago">
-  <button onclick="guardarVenta()">Guardar Venta</button>
-
-  <h3>Eliminar Ventas por Cliente</h3>
-  <input type="text" id="clienteEliminar" placeholder="Nombre del cliente">
-  <button onclick="eliminarCliente()">Eliminar Cliente</button>
-
-  <h2>Historial de Ventas</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Vendedor</th>
-        <th>Cliente</th>
-        <th>Producto</th>
-        <th>Método</th>
-        <th>Precio</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody id="tablaVentas"></tbody>
-  </table>
-
-  <h3 id="total"></h3>
-
-</div>
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy }
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -265,8 +138,7 @@ window.guardarVenta = async function(){
     metodoPago:metodo,
     precio:producto.precio,
     vendedor:usuarioActual,
-    fecha:new Date().toLocaleString(),
-    timestamp:serverTimestamp()
+    fecha:new Date().toLocaleString()
   });
 
   await updateDoc(ref,{ stock: producto.stock - 1 });
@@ -278,11 +150,11 @@ window.guardarVenta = async function(){
 
 async function cargarVentas(){
 
-  document.getElementById("tablaVentas").innerHTML = "";
+  const tabla = document.getElementById("tablaVentas");
+  tabla.innerHTML = "";
   let totalVentas = 0;
 
-  const q = query(collection(db,"ventas"), orderBy("timestamp","desc"));
-  const snapshot = await getDocs(q);
+  const snapshot = await getDocs(collection(db,"ventas"));
 
   snapshot.forEach(docSnap=>{
     const v = docSnap.data();
@@ -290,16 +162,16 @@ async function cargarVentas(){
 
     if(rolActual==="admin" || v.vendedor===usuarioActual){
 
-      totalVentas += v.precio;
+      totalVentas += Number(v.precio);
 
-      document.getElementById("tablaVentas").innerHTML += `
+      tabla.innerHTML += `
       <tr>
-        <td>${v.fecha}</td>
-        <td>${v.vendedor}</td>
-        <td>${v.cliente}</td>
-        <td>${v.producto}</td>
-        <td>${v.metodoPago}</td>
-        <td>$${v.precio}</td>
+        <td>${v.fecha || ""}</td>
+        <td>${v.vendedor || ""}</td>
+        <td>${v.cliente || ""}</td>
+        <td>${v.producto || ""}</td>
+        <td>${v.metodoPago || ""}</td>
+        <td>$${v.precio || 0}</td>
         <td>
           <button onclick="generarFactura('${id}')">PDF</button>
           <button onclick="enviarWhatsApp('${id}')">WhatsApp</button>
@@ -322,54 +194,8 @@ window.eliminarVenta = async function(id){
   cargarVentas();
 };
 
-window.eliminarCliente = async function(){
-  const nombre = document.getElementById("clienteEliminar").value;
-  if(!nombre) return alert("Escribe nombre");
-
-  const snapshot = await getDocs(collection(db,"ventas"));
-  snapshot.forEach(async(docSnap)=>{
-    if(docSnap.data().cliente === nombre){
-      await deleteDoc(doc(db,"ventas",docSnap.id));
-    }
-  });
-
-  alert("Cliente eliminado");
-  cargarVentas();
-};
-
-/* WHATSAPP */
-
-window.enviarWhatsApp = async function(id){
-
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-
-  let telefono = v.telefono.replace(/\D/g,'');
-
-  if(!telefono.startsWith("52")){
-    alert("El número debe incluir código país. Ejemplo: 521234567890");
-    return;
-  }
-
-  const mensaje =
-`FACTURA DE VENTA
-
-Fecha: ${v.fecha}
-Cliente: ${v.cliente}
-Producto: ${v.producto}
-Metodo: ${v.metodoPago}
-Total: $${v.precio}`;
-
-  const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
-  window.open(url,"_blank");
-};
-
-/* LOGOUT */
-
 window.logout = function(){
   signOut(auth);
 };
 
 </script>
-</body>
-</html>
