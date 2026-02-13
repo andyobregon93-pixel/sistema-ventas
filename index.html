@@ -1,287 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Ventas</title>
 
+<style>
+body{
+  font-family: Arial;
+  background:#f4f6f9;
+  margin:0;
+}
+.container{
+  width:90%;
+  max-width:1000px;
+  margin:30px auto;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+input,select,button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+button{
+  background:#007bff;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+button:hover{
+  background:#0056b3;
+}
+.delete-btn{
+  background:#dc3545;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+th{
+  background:#007bff;
+  color:white;
+}
+.logout{
+  background:#dc3545;
+}
+.admin-panel{
+  background:#f1f1f1;
+  padding:15px;
+  border-radius:8px;
+  margin-top:20px;
+}
+</style>
+</head>
 
-<!DOCTYPE html>  <html lang="es">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Sistema de Ventas</title>  <style>  
-body{  
-  font-family: Arial;  
-  background:#f4f6f9;  
-  margin:0;  
-}  
-.container{  
-  width:90%;  
-  max-width:900px;  
-  margin:30px auto;  
-  background:white;  
-  padding:20px;  
-  border-radius:10px;  
-  box-shadow:0 0 10px rgba(0,0,0,0.1);  
-}  
-input,select,button{  
-  width:100%;  
-  padding:10px;  
-  margin:6px 0;  
-}  
-button{  
-  background:#007bff;  
-  color:white;  
-  border:none;  
-  cursor:pointer;  
-}  
-button:hover{  
-  background:#0056b3;  
-}  
-.delete-btn{  
-  background:#dc3545;  
-}  
-table{  
-  width:100%;  
-  border-collapse:collapse;  
-  margin-top:10px;  
-}  
-th,td{  
-  border:1px solid #ddd;  
-  padding:8px;  
-  text-align:center;  
-}  
-th{  
-  background:#007bff;  
-  color:white;  
-}  
-.logout{  
-  background:#dc3545;  
-}  
-.admin-panel{  
-  background:#f1f1f1;  
-  padding:15px;  
-  border-radius:8px;  
-  margin-top:20px;  
-}  
-</style>  </head>  
-<body>  <div class="container">  <div id="loginBox">  
-  <h2>Login</h2>  
-  <input type="email" id="email" placeholder="Email">  
-  <input type="password" id="password" placeholder="Contraseña">  
-  <button onclick="login()">Ingresar</button>  
-</div>  <div id="app" style="display:none;">  
-  <h3 id="infoUsuario"></h3>  
-  <button class="logout" onclick="logout()">Cerrar sesión</button>    <div id="panelAdmin" class="admin-panel" style="display:none;">  
-    <h2>Administrar Usuarios</h2>  <input type="email" id="nuevoEmail" placeholder="Email">  
-<input type="password" id="nuevoPassword" placeholder="Contraseña">  
+<body>
 
-<select id="nuevoRol">  
-  <option value="vendedor">Vendedor</option>  
-  <option value="admin">Admin</option>  
-</select>  
+<div class="container">
 
-<button onclick="crearUsuario()">Crear Usuario</button>  
+<div id="loginBox">
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button onclick="login()">Ingresar</button>
+</div>
 
-<h3>Lista de Usuarios</h3>  
-<ul id="listaUsuarios"></ul>
+<div id="app" style="display:none;">
 
-  </div>    <hr>    <h2>Nueva Venta</h2>  
-  <input type="text" id="cliente" placeholder="Cliente">  
-  <input type="text" id="plataforma" placeholder="Plataforma">  
-  <input type="text" id="metodoPago" placeholder="Método de Pago">  
-  <input type="number" id="precio" placeholder="Precio">  
-  <button onclick="guardarVenta()">Guardar Venta</button>    <h2>Ventas</h2>  
-  <table>  
-    <thead>  
-      <tr>  
-        <th>Fecha</th>  
-        <th>Vendedor</th>  
-        <th>Cliente</th>  
-        <th>Plataforma</th>  
-        <th>Método</th>  
-        <th>Precio</th>  
-        <th>Acción</th>  
-      </tr>  
-    </thead>  
-    <tbody id="tablaVentas"></tbody>  
-  </table>    <h3 id="total"></h3>  
-</div>  </div>  <script type="module">  
-  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";  
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword }  
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";  
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp }  
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";  
-  
-const firebaseConfig = {  
-  apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",  
-  authDomain: "sistema-ventas-64a4c.firebaseapp.com",  
-  projectId: "sistema-ventas-64a4c",  
-  storageBucket: "sistema-ventas-64a4c.appspot.com",  
-  messagingSenderId: "291577824119",  
-  appId: "1:291577824119:web:894fe9842b427c9ac3d772"  
-};  
-  
-const app = initializeApp(firebaseConfig);  
-const auth = getAuth(app);  
-const db = getFirestore(app);  
-  
-let usuarioActual = null;  
-let rolActual = null;  
-  
-window.login = async function(){  
-  const email = document.getElementById("email").value;  
-  const password = document.getElementById("password").value;  
-  
-  try{  
-    await signInWithEmailAndPassword(auth, email, password);  
-  }catch(error){  
-    alert(error.message);  
-  }  
-}  
-  
-onAuthStateChanged(auth, async(user)=>{  
-  if(user){  
-  
-    const docRef = doc(db,"usuarios",user.uid);  
-    const docSnap = await getDoc(docRef);  
-  
-    if(docSnap.exists()){  
-  
-      rolActual = docSnap.data().role;  
-      usuarioActual = user.email;  
-  
-      document.getElementById("loginBox").style.display="none";  
-      document.getElementById("app").style.display="block";  
-      document.getElementById("infoUsuario").innerText =  
-        "Usuario: "+usuarioActual+" | Rol: "+rolActual;  
-  
-      if(rolActual === "admin"){  
-        document.getElementById("panelAdmin").style.display="block";  
-        cargarUsuarios();  
-      }  
-  
-      cargarVentas();  
-    }  
-  
-  }else{  
-    document.getElementById("loginBox").style.display="block";  
-    document.getElementById("app").style.display="none";  
-  }  
-});  
-  
-window.crearUsuario = async function(){  
-  
-  const email = document.getElementById("nuevoEmail").value;  
-  const password = document.getElementById("nuevoPassword").value;  
-  const rol = document.getElementById("nuevoRol").value;  
-  
-  if(!email || !password){  
-    alert("Completa todos los campos");  
-    return;  
-  }  
-  
-  try{  
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);  
-    const user = userCredential.user;  
-  
-    await setDoc(doc(db,"usuarios",user.uid),{  
-      role: rol  
-    });  
-  
-    alert("Usuario creado correctamente");  
-    cargarUsuarios();  
-  
-  }catch(error){  
-    alert(error.message);  
-  }  
-}  
-  
-async function cargarUsuarios(){  
-  
-  const lista = document.getElementById("listaUsuarios");  
-  lista.innerHTML="";  
-  
-  const snapshot = await getDocs(collection(db,"usuarios"));  
-  
-  snapshot.forEach(docSnap=>{  
-    const data = docSnap.data();  
-    lista.innerHTML += `<li>${docSnap.id} - ${data.role}</li>`;  
-  });  
-}  
-  
-window.guardarVenta = async function(){  
-  
-  const cliente = document.getElementById("cliente").value;  
-  const plataforma = document.getElementById("plataforma").value;  
-  const metodoPago = document.getElementById("metodoPago").value;  
-  const precio = parseFloat(document.getElementById("precio").value);  
-  
-  if(!cliente || !plataforma || !metodoPago || isNaN(precio)){  
-    alert("Completa todo");  
-    return;  
-  }  
-  
-  await addDoc(collection(db,"ventas"),{  
-    cliente,  
-    plataforma,  
-    metodoPago,  
-    precio,  
-    vendedor: usuarioActual,  
-    fecha: new Date().toLocaleString(),  
-    timestamp: serverTimestamp()  
-  });  
-  
-  cargarVentas();  
-}  
-  
-async function cargarVentas(){  
-  
-  const tabla = document.getElementById("tablaVentas");  
-  tabla.innerHTML="";  
-  let total=0;  
-  
-  const snapshot = await getDocs(collection(db,"ventas"));  
-  
-  snapshot.forEach(docSnap=>{  
-    const v = docSnap.data();  
-    const id = docSnap.id;  
-  
-    if(rolActual==="admin" || v.vendedor===usuarioActual){  
-  
-      total += v.precio;  
-  
-      tabla.innerHTML+=`  
-      <tr>  
-        <td>${v.fecha}</td>  
-        <td>${v.vendedor}</td>  
-        <td>${v.cliente}</td>  
-        <td>${v.plataforma}</td>  
-        <td>${v.metodoPago}</td>  
-        <td>$${v.precio}</td>  
-        <td>  
-          <button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>  
-        </td>  
-      </tr>`;  
-    }  
-  });  
-  
-  document.getElementById("total").innerText="Total: $"+total;  
-}  
-  
-window.eliminarVenta = async function(id){  
-  
-  const confirmar = confirm("¿Seguro que deseas eliminar esta venta?");  
-  if(!confirmar) return;  
-  
-  try{  
-    await deleteDoc(doc(db,"ventas",id));  
-    alert("Venta eliminada");  
-    cargarVentas();  
-  }catch(error){  
-    alert(error.message);  
-  }  
-}  
-  
-window.logout = function(){  
-  signOut(auth);  
-}  
-  
-</script>  </body>  
+  <h3 id="infoUsuario"></h3>
+  <button class="logout" onclick="logout()">Cerrar sesión</button>
+
+  <!-- PANEL ADMIN USUARIOS -->
+  <div id="panelAdmin" class="admin-panel" style="display:none;">
+    <h2>Administrar Usuarios</h2>
+
+    <input type="email" id="nuevoEmail" placeholder="Email">
+    <input type="password" id="nuevoPassword" placeholder="Contraseña">
+
+    <select id="nuevoRol">
+      <option value="vendedor">Vendedor</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button onclick="crearUsuario()">Crear Usuario</button>
+
+    <h3>Lista de Usuarios</h3>
+    <ul id="listaUsuarios"></ul>
+  </div>
+
+  <!-- PANEL PRODUCTOS -->
+  <div id="panelProductos" class="admin-panel" style="display:none;">
+    <h2>Administrar Productos</h2>
+
+    <input type="text" id="nombreProducto" placeholder="Nombre del producto">
+    <input type="number" id="precioProducto" placeholder="Precio">
+    <input type="number" id="stockProducto" placeholder="Stock inicial">
+
+    <button onclick="crearProducto()">Crear Producto</button>
+
+    <h3>Lista de Productos</h3>
+    <ul id="listaProductos"></ul>
+  </div>
+
+  <hr>
+
+  <!-- NUEVA VENTA -->
+  <h2>Nueva Venta</h2>
+  <input type="text" id="cliente" placeholder="Cliente">
+  <select id="productoSelect"></select>
+  <input type="text" id="metodoPago" placeholder="Método de Pago">
+  <button onclick="guardarVenta()">Guardar Venta</button>
+
+  <!-- TABLA -->
+  <h2>Ventas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Vendedor</th>
+        <th>Cliente</th>
+        <th>Producto</th>
+        <th>Método</th>
+        <th>Precio</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody id="tablaVentas"></tbody>
+  </table>
+
+  <h3 id="total"></h3>
+
+</div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_STORAGE",
+  messagingSenderId: "TU_ID",
+  appId: "TU_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let usuarioActual = null;
+let rolActual = null;
+
+window.login = async function(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  try{
+    await signInWithEmailAndPassword(auth, email, password);
+  }catch(error){
+    alert(error.message);
+  }
+}
+
+onAuthStateChanged(auth, async(user)=>{
+  if(user){
+
+    const docRef = doc(db,"usuarios",user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()){
+
+      rolActual = docSnap.data().role;
+      usuarioActual = user.email;
+
+      document.getElementById("loginBox").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("infoUsuario").innerText =
+        "Usuario: "+usuarioActual+" | Rol: "+rolActual;
+
+      if(rolActual === "admin"){
+        document.getElementById("panelAdmin").style.display="block";
+        document.getElementById("panelProductos").style.display="block";
+        cargarUsuarios();
+        cargarProductos();
+      }
+
+      cargarProductos();
+      cargarVentas();
+    }
+
+  }else{
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("app").style.display="none";
+  }
+});
+
+/* PRODUCTOS */
+
+window.crearProducto = async function(){
+  const nombre = document.getElementById("nombreProducto").value;
+  const precio = parseFloat(document.getElementById("precioProducto").value);
+  const stock = parseInt(document.getElementById("stockProducto").value);
+
+  if(!nombre || isNaN(precio) || isNaN(stock)){
+    alert("Completa todos los campos");
+    return;
+  }
+
+  await addDoc(collection(db,"productos"),{
+    nombre,
+    precio,
+    stock
+  });
+
+  alert("Producto creado");
+  cargarProductos();
+}
+
+async function cargarProductos(){
+
+  const lista = document.getElementById("listaProductos");
+  const select = document.getElementById("productoSelect");
+
+  if(lista) lista.innerHTML="";
+  if(select) select.innerHTML="";
+
+  const snapshot = await getDocs(collection(db,"productos"));
+
+  snapshot.forEach(docSnap=>{
+    const p = docSnap.data();
+    const id = docSnap.id;
+
+    if(lista){
+      lista.innerHTML += `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
+    }
+
+    if(select){
+      select.innerHTML += `<option value="${id}">
+        ${p.nombre} - Stock: ${p.stock}
+      </option>`;
+    }
+  });
+}
+
+/* VENTAS */
+
+window.guardarVenta = async function(){
+
+  const cliente = document.getElementById("cliente").value;
+  const metodoPago = document.getElementById("metodoPago").value;
+  const productoId = document.getElementById("productoSelect").value;
+
+  if(!cliente || !metodoPago || !productoId){
+    alert("Completa todo");
+    return;
+  }
+
+  const productoRef = doc(db,"productos",productoId);
+  const productoSnap = await getDoc(productoRef);
+
+  if(!productoSnap.exists()){
+    alert("Producto no encontrado");
+    return;
+  }
+
+  const producto = productoSnap.data();
+
+  if(producto.stock <= 0){
+    alert("No hay stock disponible");
+    return;
+  }
+
+  await addDoc(collection(db,"ventas"),{
+    cliente,
+    producto: producto.nombre,
+    metodoPago,
+    precio: producto.precio,
+    vendedor: usuarioActual,
+    fecha: new Date().toLocaleString(),
+    timestamp: serverTimestamp()
+  });
+
+  await setDoc(productoRef,{
+    ...producto,
+    stock: producto.stock - 1
+  });
+
+  alert("Venta realizada");
+  cargarVentas();
+  cargarProductos();
+}
+
+async function cargarVentas(){
+
+  const tabla = document.getElementById("tablaVentas");
+  tabla.innerHTML="";
+  let total=0;
+
+  const snapshot = await getDocs(collection(db,"ventas"));
+
+  snapshot.forEach(docSnap=>{
+    const v = docSnap.data();
+    const id = docSnap.id;
+
+    if(rolActual==="admin" || v.vendedor===usuarioActual){
+
+      total += v.precio;
+
+      tabla.innerHTML+=`
+      <tr>
+        <td>${v.fecha}</td>
+        <td>${v.vendedor}</td>
+        <td>${v.cliente}</td>
+        <td>${v.producto}</td>
+        <td>${v.metodoPago}</td>
+        <td>$${v.precio}</td>
+        <td>
+          <button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>
+        </td>
+      </tr>`;
+    }
+  });
+
+  document.getElementById("total").innerText="Total: $"+total;
+}
+
+window.eliminarVenta = async function(id){
+  const confirmar = confirm("¿Seguro que deseas eliminar esta venta?");
+  if(!confirmar) return;
+
+  await deleteDoc(doc(db,"ventas",id));
+  alert("Venta eliminada");
+  cargarVentas();
+}
+
+window.logout = function(){
+  signOut(auth);
+}
+
+</script>
+</body>
 </html>
