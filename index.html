@@ -15,67 +15,62 @@ const firebaseConfig = {
   appId: "1:291577824119:web:894fe9842b427c9ac3d772"
 };
 
-const appFirebase = initializeApp(firebaseConfig);
-const auth = getAuth(appFirebase);
-const db = getFirestore(appFirebase);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-let usuarioActual = null;
-let rolActual = null;
+let usuarioActual = "";
+let rolActual = "";
 
 /* LOGIN */
 
 window.login = async function(){
-  const emailValue = document.getElementById("email").value;
-  const passwordValue = document.getElementById("password").value;
-
   try{
-    await signInWithEmailAndPassword(auth, emailValue, passwordValue);
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+    await signInWithEmailAndPassword(auth, email, pass);
   }catch(e){
     alert(e.message);
   }
 };
 
-/* CONTROL SESIÓN */
+/* SESIÓN */
 
 onAuthStateChanged(auth, async (user) => {
 
-  if(user){
-
-    usuarioActual = user.email;
-    const snap = await getDoc(doc(db, "usuarios", user.uid));
-
-    if(snap.exists()){
-
-      rolActual = snap.data().role;
-
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      document.getElementById("infoUsuario").innerText =
-        "Usuario: " + usuarioActual + " | Rol: " + rolActual;
-
-      if(rolActual === "admin"){
-        document.getElementById("panelAdmin").style.display = "block";
-      }
-
-      cargarProductos();
-      cargarVentas();
-
-    } else {
-      alert("Usuario no existe en Firestore");
-      signOut(auth);
-    }
-
-  } else {
+  if(!user){
     document.getElementById("loginBox").style.display = "block";
     document.getElementById("app").style.display = "none";
+    return;
   }
 
+  usuarioActual = user.email;
+
+  const snap = await getDoc(doc(db,"usuarios",user.uid));
+
+  if(!snap.exists()){
+    alert("Usuario no existe en Firestore");
+    return signOut(auth);
+  }
+
+  rolActual = snap.data().role;
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  document.getElementById("infoUsuario").innerText =
+    "Usuario: " + usuarioActual + " | Rol: " + rolActual;
+
+  if(rolActual === "admin"){
+    document.getElementById("panelAdmin").style.display = "block";
+  }
+
+  cargarProductos();
+  cargarVentas();
 });
 
 /* PRODUCTOS */
 
 window.crearProducto = async function(){
-
   const nombre = document.getElementById("nombreProducto").value;
   const precio = parseFloat(document.getElementById("precioProducto").value);
   const stock = parseInt(document.getElementById("stockProducto").value);
@@ -89,9 +84,11 @@ window.crearProducto = async function(){
 };
 
 async function cargarProductos(){
+  const lista = document.getElementById("listaProductos");
+  const select = document.getElementById("productoSelect");
 
-  document.getElementById("listaProductos").innerHTML = "";
-  document.getElementById("productoSelect").innerHTML = "<option value=''>Seleccionar producto</option>";
+  lista.innerHTML = "";
+  select.innerHTML = "<option value=''>Seleccionar producto</option>";
 
   const snapshot = await getDocs(collection(db,"productos"));
 
@@ -100,13 +97,11 @@ async function cargarProductos(){
     const id = docSnap.id;
 
     if(rolActual === "admin"){
-      document.getElementById("listaProductos").innerHTML +=
-        `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
+      lista.innerHTML += `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
     }
 
     if(p.stock > 0){
-      document.getElementById("productoSelect").innerHTML +=
-        `<option value="${id}">${p.nombre} - $${p.precio} (Stock: ${p.stock})</option>`;
+      select.innerHTML += `<option value="${id}">${p.nombre} - $${p.precio}</option>`;
     }
   });
 }
@@ -115,12 +110,12 @@ async function cargarProductos(){
 
 window.guardarVenta = async function(){
 
-  const nombreCliente = document.getElementById("cliente").value;
+  const nombre = document.getElementById("cliente").value;
   const tel = document.getElementById("telefono").value.replace(/\D/g,'');
   const metodo = document.getElementById("metodoPago").value;
   const productoId = document.getElementById("productoSelect").value;
 
-  if(!nombreCliente || !tel || !metodo || !productoId)
+  if(!nombre || !tel || !metodo || !productoId)
     return alert("Completa todo");
 
   const ref = doc(db,"productos",productoId);
@@ -131,71 +126,52 @@ window.guardarVenta = async function(){
     return alert("Sin stock");
 
   await addDoc(collection(db,"ventas"),{
-    cliente:nombreCliente,
+    cliente:nombre,
     telefono:tel,
     producto:producto.nombre,
-    productoId,
     metodoPago:metodo,
     precio:producto.precio,
     vendedor:usuarioActual,
     fecha:new Date().toLocaleString()
   });
 
-  await updateDoc(ref,{
-    stock: producto.stock - 1
-  });
+  await updateDoc(ref,{stock: producto.stock - 1});
 
   alert("Venta realizada");
 
-  await cargarVentas();
-  await cargarProductos();
+  cargarVentas();
+  cargarProductos();
 };
 
 async function cargarVentas(){
 
   const tabla = document.getElementById("tablaVentas");
   tabla.innerHTML = "";
-  let totalVentas = 0;
+  let total = 0;
 
   const snapshot = await getDocs(collection(db,"ventas"));
 
   snapshot.forEach(docSnap=>{
     const v = docSnap.data();
-    const id = docSnap.id;
 
     if(rolActual==="admin" || v.vendedor===usuarioActual){
 
-      totalVentas += Number(v.precio || 0);
+      total += Number(v.precio || 0);
 
       tabla.innerHTML += `
       <tr>
-        <td>${v.fecha || ""}</td>
-        <td>${v.vendedor || ""}</td>
-        <td>${v.cliente || ""}</td>
-        <td>${v.producto || ""}</td>
-        <td>${v.metodoPago || ""}</td>
-        <td>$${v.precio || 0}</td>
-        <td>
-          <button onclick="generarFactura('${id}')">PDF</button>
-          <button onclick="enviarWhatsApp('${id}')">WhatsApp</button>
-          ${rolActual==="admin"
-            ? `<button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>`
-            : ""}
-        </td>
+        <td>${v.fecha}</td>
+        <td>${v.vendedor}</td>
+        <td>${v.cliente}</td>
+        <td>${v.producto}</td>
+        <td>${v.metodoPago}</td>
+        <td>$${v.precio}</td>
       </tr>`;
     }
   });
 
-  document.getElementById("total").innerText = "Total: $" + totalVentas;
+  document.getElementById("total").innerText = "Total: $" + total;
 }
-
-/* ELIMINAR */
-
-window.eliminarVenta = async function(id){
-  if(!confirm("Eliminar venta?")) return;
-  await deleteDoc(doc(db,"ventas",id));
-  cargarVentas();
-};
 
 window.logout = function(){
   signOut(auth);
