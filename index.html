@@ -20,7 +20,7 @@ body{
   border-radius:10px;
   box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
-input,button{
+input,select,button{
   width:100%;
   padding:10px;
   margin:6px 0;
@@ -51,6 +51,12 @@ th{
 .logout{
   background:#dc3545;
 }
+.admin-panel{
+  background:#f1f1f1;
+  padding:15px;
+  border-radius:8px;
+  margin-top:20px;
+}
 </style>
 </head>
 <body>
@@ -67,6 +73,24 @@ th{
 <div id="app" style="display:none;">
   <h3 id="infoUsuario"></h3>
   <button class="logout" onclick="logout()">Cerrar sesión</button>
+
+  <!-- PANEL ADMIN -->
+  <div id="panelAdmin" class="admin-panel" style="display:none;">
+    <h2>Administrar Usuarios</h2>
+
+    <input type="email" id="nuevoEmail" placeholder="Email">
+    <input type="password" id="nuevoPassword" placeholder="Contraseña">
+
+    <select id="nuevoRol">
+      <option value="vendedor">Vendedor</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button onclick="crearUsuario()">Crear Usuario</button>
+
+    <h3>Lista de Usuarios</h3>
+    <ul id="listaUsuarios"></ul>
+  </div>
 
   <hr>
 
@@ -100,9 +124,9 @@ th{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp }
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, serverTimestamp }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -134,10 +158,12 @@ window.login = async function(){
 
 onAuthStateChanged(auth, async(user)=>{
   if(user){
+
     const docRef = doc(db,"usuarios",user.uid);
     const docSnap = await getDoc(docRef);
 
     if(docSnap.exists()){
+
       rolActual = docSnap.data().role;
       usuarioActual = user.email;
 
@@ -146,15 +172,62 @@ onAuthStateChanged(auth, async(user)=>{
       document.getElementById("infoUsuario").innerText =
         "Usuario: "+usuarioActual+" | Rol: "+rolActual;
 
+      if(rolActual === "admin"){
+        document.getElementById("panelAdmin").style.display="block";
+        cargarUsuarios();
+      }
+
       cargarVentas();
     }
+
   }else{
     document.getElementById("loginBox").style.display="block";
     document.getElementById("app").style.display="none";
   }
 });
 
+window.crearUsuario = async function(){
+
+  const email = document.getElementById("nuevoEmail").value;
+  const password = document.getElementById("nuevoPassword").value;
+  const rol = document.getElementById("nuevoRol").value;
+
+  if(!email || !password){
+    alert("Completa todos los campos");
+    return;
+  }
+
+  try{
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    await setDoc(doc(db,"usuarios",user.uid),{
+      role: rol
+    });
+
+    alert("Usuario creado correctamente");
+    cargarUsuarios();
+
+  }catch(error){
+    alert(error.message);
+  }
+}
+
+async function cargarUsuarios(){
+
+  const lista = document.getElementById("listaUsuarios");
+  lista.innerHTML="";
+
+  const snapshot = await getDocs(collection(db,"usuarios"));
+
+  snapshot.forEach(docSnap=>{
+    const data = docSnap.data();
+    lista.innerHTML += `<li>${docSnap.id} - ${data.role}</li>`;
+  });
+}
+
 window.guardarVenta = async function(){
+
   const cliente = document.getElementById("cliente").value;
   const plataforma = document.getElementById("plataforma").value;
   const metodoPago = document.getElementById("metodoPago").value;
@@ -179,14 +252,15 @@ window.guardarVenta = async function(){
 }
 
 async function cargarVentas(){
+
   const tabla = document.getElementById("tablaVentas");
   tabla.innerHTML="";
   let total=0;
 
   const snapshot = await getDocs(collection(db,"ventas"));
 
-  snapshot.forEach(doc=>{
-    const v = doc.data();
+  snapshot.forEach(docSnap=>{
+    const v = docSnap.data();
 
     if(rolActual==="admin" || v.vendedor===usuarioActual){
       total += v.precio;
