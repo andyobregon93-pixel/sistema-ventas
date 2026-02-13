@@ -152,11 +152,16 @@ let rolActual=null;
 /* LOGIN */
 
 window.login = async function(){
-  const email=email.value;
-  const password=password.value;
+
+  const emailInput = document.getElementById("email").value;
+  const passwordInput = document.getElementById("password").value;
+
   try{
-    await signInWithEmailAndPassword(auth,email,password);
-  }catch(e){ alert(e.message); }
+    await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+  }catch(e){
+    alert(e.message);
+  }
+
 };
 
 onAuthStateChanged(auth,async(user)=>{
