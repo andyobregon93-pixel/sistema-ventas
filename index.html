@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Ventas</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 body{
   font-family: Arial;
@@ -79,49 +81,39 @@ th{
   <h3 id="infoUsuario"></h3>
   <button class="logout" onclick="logout()">Cerrar sesión</button>
 
-  <!-- PANEL ADMIN USUARIOS -->
   <div id="panelAdmin" class="admin-panel" style="display:none;">
     <h2>Administrar Usuarios</h2>
-
     <input type="email" id="nuevoEmail" placeholder="Email">
     <input type="password" id="nuevoPassword" placeholder="Contraseña">
-
     <select id="nuevoRol">
       <option value="vendedor">Vendedor</option>
       <option value="admin">Admin</option>
     </select>
-
     <button onclick="crearUsuario()">Crear Usuario</button>
-
     <h3>Lista de Usuarios</h3>
     <ul id="listaUsuarios"></ul>
   </div>
 
-  <!-- PANEL PRODUCTOS -->
   <div id="panelProductos" class="admin-panel" style="display:none;">
     <h2>Administrar Productos</h2>
-
     <input type="text" id="nombreProducto" placeholder="Nombre del producto">
     <input type="number" id="precioProducto" placeholder="Precio">
     <input type="number" id="stockProducto" placeholder="Stock inicial">
-
     <button onclick="crearProducto()">Crear Producto</button>
-
     <h3>Lista de Productos</h3>
     <ul id="listaProductos"></ul>
   </div>
 
   <hr>
 
-  <!-- NUEVA VENTA -->
   <h2>Nueva Venta</h2>
   <input type="text" id="cliente" placeholder="Cliente">
+  <input type="text" id="telefono" placeholder="Teléfono (ej: 521234567890)">
   <select id="productoSelect"></select>
   <input type="text" id="metodoPago" placeholder="Método de Pago">
   <button onclick="guardarVenta()">Guardar Venta</button>
 
-  <!-- TABLA -->
-  <h2>Ventas</h2>
+  <h2>Historial de Ventas</h2>
   <table>
     <thead>
       <tr>
@@ -178,12 +170,10 @@ window.login = async function(){
 
 onAuthStateChanged(auth, async(user)=>{
   if(user){
-
     const docRef = doc(db,"usuarios",user.uid);
     const docSnap = await getDoc(docRef);
 
     if(docSnap.exists()){
-
       rolActual = docSnap.data().role;
       usuarioActual = user.email;
 
@@ -196,7 +186,6 @@ onAuthStateChanged(auth, async(user)=>{
         document.getElementById("panelAdmin").style.display="block";
         document.getElementById("panelProductos").style.display="block";
         cargarUsuarios();
-        cargarProductos();
       }
 
       cargarProductos();
@@ -209,35 +198,27 @@ onAuthStateChanged(auth, async(user)=>{
   }
 });
 
-/* PRODUCTOS */
+/* ================= PRODUCTOS ================= */
 
 window.crearProducto = async function(){
-  const nombre = document.getElementById("nombreProducto").value;
-  const precio = parseFloat(document.getElementById("precioProducto").value);
-  const stock = parseInt(document.getElementById("stockProducto").value);
+  const nombre = nombreProducto.value;
+  const precio = parseFloat(precioProducto.value);
+  const stock = parseInt(stockProducto.value);
 
   if(!nombre || isNaN(precio) || isNaN(stock)){
     alert("Completa todos los campos");
     return;
   }
 
-  await addDoc(collection(db,"productos"),{
-    nombre,
-    precio,
-    stock
-  });
+  await addDoc(collection(db,"productos"),{ nombre, precio, stock });
 
   alert("Producto creado");
   cargarProductos();
 }
 
 async function cargarProductos(){
-
-  const lista = document.getElementById("listaProductos");
-  const select = document.getElementById("productoSelect");
-
-  if(lista) lista.innerHTML="";
-  if(select) select.innerHTML="";
+  listaProductos.innerHTML="";
+  productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
 
   const snapshot = await getDocs(collection(db,"productos"));
 
@@ -245,49 +226,48 @@ async function cargarProductos(){
     const p = docSnap.data();
     const id = docSnap.id;
 
-    if(lista){
-      lista.innerHTML += `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
+    if(rolActual==="admin"){
+      listaProductos.innerHTML +=
+        `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
     }
 
-    if(select){
-      select.innerHTML += `<option value="${id}">
-        ${p.nombre} - Stock: ${p.stock}
-      </option>`;
+    if(p.stock > 0){
+      productoSelect.innerHTML +=
+        `<option value="${id}">
+          ${p.nombre} - $${p.precio} - Stock: ${p.stock}
+        </option>`;
     }
   });
 }
 
-/* VENTAS */
+/* ================= VENTAS ================= */
 
 window.guardarVenta = async function(){
 
-  const cliente = document.getElementById("cliente").value;
-  const metodoPago = document.getElementById("metodoPago").value;
-  const productoId = document.getElementById("productoSelect").value;
+  const cliente = cliente.value;
+  const telefono = telefono.value;
+  const metodoPago = metodoPago.value;
+  const productoId = productoSelect.value;
 
-  if(!cliente || !metodoPago || !productoId){
+  if(!cliente || !telefono || !metodoPago || !productoId){
     alert("Completa todo");
     return;
   }
 
   const productoRef = doc(db,"productos",productoId);
   const productoSnap = await getDoc(productoRef);
-
-  if(!productoSnap.exists()){
-    alert("Producto no encontrado");
-    return;
-  }
-
   const producto = productoSnap.data();
 
   if(producto.stock <= 0){
-    alert("No hay stock disponible");
+    alert("Sin stock");
     return;
   }
 
   await addDoc(collection(db,"ventas"),{
     cliente,
+    telefono,
     producto: producto.nombre,
+    productoId,
     metodoPago,
     precio: producto.precio,
     vendedor: usuarioActual,
@@ -306,9 +286,7 @@ window.guardarVenta = async function(){
 }
 
 async function cargarVentas(){
-
-  const tabla = document.getElementById("tablaVentas");
-  tabla.innerHTML="";
+  tablaVentas.innerHTML="";
   let total=0;
 
   const snapshot = await getDocs(collection(db,"ventas"));
@@ -319,9 +297,9 @@ async function cargarVentas(){
 
     if(rolActual==="admin" || v.vendedor===usuarioActual){
 
-      total += v.precio;
+      total+=v.precio;
 
-      tabla.innerHTML+=`
+      tablaVentas.innerHTML+=`
       <tr>
         <td>${v.fecha}</td>
         <td>${v.vendedor}</td>
@@ -330,22 +308,64 @@ async function cargarVentas(){
         <td>${v.metodoPago}</td>
         <td>$${v.precio}</td>
         <td>
-          <button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>
+          <button onclick="generarFactura('${id}')">PDF</button>
+          <button onclick="enviarWhatsApp('${id}')">WhatsApp</button>
+          ${rolActual==="admin" ?
+          `<button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>`
+          : ""}
         </td>
       </tr>`;
     }
   });
 
-  document.getElementById("total").innerText="Total: $"+total;
+  total.innerText="Total: $"+total;
 }
 
-window.eliminarVenta = async function(id){
-  const confirmar = confirm("¿Seguro que deseas eliminar esta venta?");
-  if(!confirmar) return;
+/* ================= FACTURA PDF ================= */
 
-  await deleteDoc(doc(db,"ventas",id));
-  alert("Venta eliminada");
-  cargarVentas();
+window.generarFactura = async function(id){
+
+  const ventaSnap = await getDoc(doc(db,"ventas",id));
+  const v = ventaSnap.data();
+
+  const { jsPDF } = window.jspdf;
+  const docPDF = new jsPDF();
+
+  docPDF.setFontSize(18);
+  docPDF.text("FACTURA DE VENTA", 60, 20);
+  docPDF.setFontSize(12);
+
+  docPDF.text("Fecha: "+v.fecha, 20, 40);
+  docPDF.text("Vendedor: "+v.vendedor, 20, 50);
+  docPDF.text("Cliente: "+v.cliente, 20, 60);
+  docPDF.text("Producto: "+v.producto, 20, 70);
+  docPDF.text("Metodo: "+v.metodoPago, 20, 80);
+  docPDF.text("Total: $"+v.precio, 20, 90);
+
+  docPDF.save("Factura_"+v.cliente+".pdf");
+}
+
+/* ================= WHATSAPP ================= */
+
+window.enviarWhatsApp = async function(id){
+
+  const ventaSnap = await getDoc(doc(db,"ventas",id));
+  const v = ventaSnap.data();
+
+  const mensaje = `
+🧾 FACTURA
+
+Fecha: ${v.fecha}
+Cliente: ${v.cliente}
+Producto: ${v.producto}
+Metodo: ${v.metodoPago}
+Total: $${v.precio}
+
+Gracias por su compra 🙌
+`;
+
+  const url = `https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, "_blank");
 }
 
 window.logout = function(){
