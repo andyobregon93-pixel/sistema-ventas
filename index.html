@@ -130,21 +130,21 @@ th{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp }
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
   authDomain: "sistema-ventas-64a4c.firebaseapp.com",
   projectId: "sistema-ventas-64a4c",
-  storageBucket: "sistema-ventas-64a4c.appspot.com",
+  storageBucket: "sistema-ventas-64a4c.firebasestorage.app",
   messagingSenderId: "291577824119",
   appId: "1:291577824119:web:894fe9842b427c9ac3d772"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const appFirebase = initializeApp(firebaseConfig);
+const auth = getAuth(appFirebase);
+const db = getFirestore(appFirebase);
 
 let usuarioActual = null;
 let rolActual = null;
@@ -152,24 +152,23 @@ let rolActual = null;
 /* LOGIN */
 
 window.login = async function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const emailValue = document.getElementById("email").value;
+  const passwordValue = document.getElementById("password").value;
 
   try{
-    await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(auth, emailValue, passwordValue);
   }catch(e){
     alert(e.message);
   }
 };
 
-/* CONTROL DE SESIÓN */
+/* CONTROL SESIÓN */
 
 onAuthStateChanged(auth, async (user) => {
 
   if(user){
 
     usuarioActual = user.email;
-
     const snap = await getDoc(doc(db, "usuarios", user.uid));
 
     if(snap.exists()){
@@ -194,10 +193,8 @@ onAuthStateChanged(auth, async (user) => {
     }
 
   } else {
-
     document.getElementById("loginBox").style.display = "block";
     document.getElementById("app").style.display = "none";
-
   }
 
 });
@@ -206,9 +203,9 @@ onAuthStateChanged(auth, async (user) => {
 
 window.crearProducto = async function(){
 
-  const nombre = nombreProducto.value;
-  const precio = parseFloat(precioProducto.value);
-  const stock = parseInt(stockProducto.value);
+  const nombre = document.getElementById("nombreProducto").value;
+  const precio = parseFloat(document.getElementById("precioProducto").value);
+  const stock = parseInt(document.getElementById("stockProducto").value);
 
   if(!nombre || isNaN(precio) || isNaN(stock))
     return alert("Completa todo");
@@ -220,8 +217,8 @@ window.crearProducto = async function(){
 
 async function cargarProductos(){
 
-  listaProductos.innerHTML = "";
-  productoSelect.innerHTML = "<option value=''>Seleccionar producto</option>";
+  document.getElementById("listaProductos").innerHTML = "";
+  document.getElementById("productoSelect").innerHTML = "<option value=''>Seleccionar producto</option>";
 
   const snapshot = await getDocs(collection(db,"productos"));
 
@@ -230,12 +227,12 @@ async function cargarProductos(){
     const id = docSnap.id;
 
     if(rolActual === "admin"){
-      listaProductos.innerHTML +=
+      document.getElementById("listaProductos").innerHTML +=
         `<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
     }
 
     if(p.stock > 0){
-      productoSelect.innerHTML +=
+      document.getElementById("productoSelect").innerHTML +=
         `<option value="${id}">${p.nombre} - $${p.precio} (Stock: ${p.stock})</option>`;
     }
   });
@@ -245,10 +242,10 @@ async function cargarProductos(){
 
 window.guardarVenta = async function(){
 
-  const nombreCliente = cliente.value;
-  const tel = telefono.value;
-  const metodo = metodoPago.value;
-  const productoId = productoSelect.value;
+  const nombreCliente = document.getElementById("cliente").value;
+  const tel = document.getElementById("telefono").value.replace(/\D/g,'');
+  const metodo = document.getElementById("metodoPago").value;
+  const productoId = document.getElementById("productoSelect").value;
 
   if(!nombreCliente || !tel || !metodo || !productoId)
     return alert("Completa todo");
@@ -272,7 +269,7 @@ window.guardarVenta = async function(){
     timestamp:serverTimestamp()
   });
 
-  await setDoc(ref,{...producto,stock:producto.stock-1});
+  await updateDoc(ref,{ stock: producto.stock - 1 });
 
   alert("Venta realizada");
   cargarVentas();
@@ -281,10 +278,11 @@ window.guardarVenta = async function(){
 
 async function cargarVentas(){
 
-  tablaVentas.innerHTML = "";
+  document.getElementById("tablaVentas").innerHTML = "";
   let totalVentas = 0;
 
-  const snapshot = await getDocs(collection(db,"ventas"));
+  const q = query(collection(db,"ventas"), orderBy("timestamp","desc"));
+  const snapshot = await getDocs(q);
 
   snapshot.forEach(docSnap=>{
     const v = docSnap.data();
@@ -294,7 +292,7 @@ async function cargarVentas(){
 
       totalVentas += v.precio;
 
-      tablaVentas.innerHTML += `
+      document.getElementById("tablaVentas").innerHTML += `
       <tr>
         <td>${v.fecha}</td>
         <td>${v.vendedor}</td>
@@ -313,7 +311,7 @@ async function cargarVentas(){
     }
   });
 
-  total.innerText = "Total: $" + totalVentas;
+  document.getElementById("total").innerText = "Total: $" + totalVentas;
 }
 
 /* ELIMINAR */
@@ -325,12 +323,10 @@ window.eliminarVenta = async function(id){
 };
 
 window.eliminarCliente = async function(){
-
-  const nombre = clienteEliminar.value;
+  const nombre = document.getElementById("clienteEliminar").value;
   if(!nombre) return alert("Escribe nombre");
 
   const snapshot = await getDocs(collection(db,"ventas"));
-
   snapshot.forEach(async(docSnap)=>{
     if(docSnap.data().cliente === nombre){
       await deleteDoc(doc(db,"ventas",docSnap.id));
@@ -341,45 +337,34 @@ window.eliminarCliente = async function(){
   cargarVentas();
 };
 
-/* FACTURA */
-
-window.generarFactura = async function(id){
-
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-
-  const {jsPDF} = window.jspdf;
-  const pdf = new jsPDF();
-
-  pdf.text("FACTURA DE VENTA",60,20);
-  pdf.text("Fecha: "+v.fecha,20,40);
-  pdf.text("Cliente: "+v.cliente,20,50);
-  pdf.text("Producto: "+v.producto,20,60);
-  pdf.text("Metodo: "+v.metodoPago,20,70);
-  pdf.text("Total: $"+v.precio,20,80);
-
-  pdf.save("Factura_"+v.cliente+".pdf");
-};
+/* WHATSAPP */
 
 window.enviarWhatsApp = async function(id){
 
   const snap = await getDoc(doc(db,"ventas",id));
   const v = snap.data();
 
-  const mensaje = `
-FACTURA
+  let telefono = v.telefono.replace(/\D/g,'');
+
+  if(!telefono.startsWith("52")){
+    alert("El número debe incluir código país. Ejemplo: 521234567890");
+    return;
+  }
+
+  const mensaje =
+`FACTURA DE VENTA
+
 Fecha: ${v.fecha}
 Cliente: ${v.cliente}
 Producto: ${v.producto}
 Metodo: ${v.metodoPago}
-Total: $${v.precio}
-`;
+Total: $${v.precio}`;
 
-  window.open(
-    `https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,
-    "_blank"
-  );
+  const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url,"_blank");
 };
+
+/* LOGOUT */
 
 window.logout = function(){
   signOut(auth);
