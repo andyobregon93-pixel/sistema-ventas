@@ -50,10 +50,16 @@ th{background:#007bff;color:white;}
 
   <h2>Nueva Venta</h2>
   <input type="text" id="cliente" placeholder="Cliente">
-  <input type="text" id="telefono" placeholder="Teléfono">
+  <input type="text" id="telefono" placeholder="Teléfono (ej: 521234567890)">
   <select id="productoSelect"></select>
   <input type="text" id="metodoPago" placeholder="Método de Pago">
   <button onclick="guardarVenta()">Guardar Venta</button>
+
+  <h3>Eliminar Ventas por Cliente</h3>
+  <input type="text" id="clienteEliminar" placeholder="Nombre del cliente">
+  <button onclick="eliminarCliente()" class="delete-btn">
+    Eliminar Cliente
+  </button>
 
   <h2>Historial de Ventas</h2>
   <table>
@@ -80,10 +86,9 @@ th{background:#007bff;color:white;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot }
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* 🔥 CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
   authDomain: "sistema-ventas-64a4c.firebaseapp.com",
@@ -93,12 +98,10 @@ const firebaseConfig = {
   appId: "1:291577824119:web:894fe9842b427c9ac3d772"
 };
 
-/* 🔥 INICIALIZAR */
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 
-/* 🔥 ELEMENTOS DOM */
 const loginBox = document.getElementById("loginBox");
 const appDiv = document.getElementById("app");
 const infoUsuario = document.getElementById("infoUsuario");
@@ -115,33 +118,24 @@ let rolActual = null;
 window.login = async function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  try{
-    await signInWithEmailAndPassword(auth, email, password);
-  }catch(e){
-    alert(e.message);
-  }
+  try{ await signInWithEmailAndPassword(auth, email, password); }
+  catch(e){ alert(e.message); }
 };
 
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     usuarioActual = user.email;
     const snap = await getDoc(doc(db,"usuarios",user.uid));
-
     if(snap.exists()){
       rolActual = snap.data().role;
       loginBox.style.display="none";
       appDiv.style.display="block";
       infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
-
       if(rolActual==="admin") panelAdmin.style.display="block";
-
       cargarProductos();
       cargarVentas();
-    }else{
-      alert("Usuario no existe");
-      signOut(auth);
-    }
-  }else{
+    } else { alert("Usuario no existe"); signOut(auth); }
+  } else {
     loginBox.style.display="block";
     appDiv.style.display="none";
   }
@@ -153,7 +147,6 @@ window.crearProducto = async function(){
   const precio = parseFloat(precioProducto.value);
   const stock = parseInt(stockProducto.value);
   if(!nombre || isNaN(precio) || isNaN(stock)) return alert("Completa todo");
-
   await addDoc(collection(db,"productos"),{nombre,precio,stock});
   cargarProductos();
 };
@@ -161,20 +154,11 @@ window.crearProducto = async function(){
 async function cargarProductos(){
   listaProductos.innerHTML="";
   productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
-
   const snapshot = await getDocs(collection(db,"productos"));
-
   snapshot.forEach(docSnap=>{
     const p = docSnap.data();
-    const id = docSnap.id;
-
-    if(rolActual==="admin"){
-      listaProductos.innerHTML+=`<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
-    }
-
     if(p.stock>0){
-      productoSelect.innerHTML+=
-        `<option value="${id}">${p.nombre} - $${p.precio}</option>`;
+      productoSelect.innerHTML+=`<option value="${docSnap.id}">${p.nombre} - $${p.precio}</option>`;
     }
   });
 }
@@ -185,15 +169,14 @@ window.guardarVenta = async function(){
   const tel = telefono.value;
   const metodo = metodoPago.value;
   const productoId = productoSelect.value;
-
-  if(!nombreCliente || !tel || !metodo || !productoId)
-    return alert("Completa todo");
+  if(!nombreCliente || !tel || !metodo || !productoId) return alert("Completa todo");
 
   const ref = doc(db,"productos",productoId);
   const snap = await getDoc(ref);
-  const producto = snap.data();
+  if(!snap.exists()) return alert("Producto no existe");
 
-  if(producto.stock<=0) return alert("Sin stock");
+  const producto = snap.data();
+  if(producto.stock <= 0) return alert("Sin stock");
 
   await addDoc(collection(db,"ventas"),{
     cliente:nombreCliente,
@@ -212,15 +195,12 @@ window.guardarVenta = async function(){
 
 function cargarVentas(){
   const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-
   onSnapshot(q,(snapshot)=>{
     tablaVentas.innerHTML="";
     let totalVentas=0;
-
     snapshot.forEach(docSnap=>{
       const v=docSnap.data();
       totalVentas+=v.precio;
-
       tablaVentas.innerHTML+=`
       <tr>
         <td>${v.fecha}</td>
@@ -229,13 +209,33 @@ function cargarVentas(){
         <td>${v.producto}</td>
         <td>${v.metodoPago}</td>
         <td>$${v.precio}</td>
-        <td>-</td>
+        <td>
+          <button onclick="editarVenta('${docSnap.id}')">Editar</button>
+          <button onclick="generarFactura('${docSnap.id}')">PDF</button>
+          <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+          <button onclick="eliminarVenta('${docSnap.id}')" class="delete-btn">Eliminar</button>
+        </td>
       </tr>`;
     });
-
     total.innerText="Total: $"+totalVentas;
   });
 }
+
+window.eliminarCliente = async function(){
+  const nombre = document.getElementById("clienteEliminar").value;
+  if(!nombre) return alert("Escribe el nombre");
+  if(!confirm("¿Eliminar todas las ventas de " + nombre + "?")) return;
+
+  const q = query(collection(db,"ventas"), where("cliente","==",nombre));
+  const snapshot = await getDocs(q);
+
+  const eliminaciones=[];
+  snapshot.forEach(docSnap=>{
+    eliminaciones.push(deleteDoc(doc(db,"ventas",docSnap.id)));
+  });
+
+  await Promise.all(eliminaciones);
+};
 
 window.logout=function(){ signOut(auth); };
 
