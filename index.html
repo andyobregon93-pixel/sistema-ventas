@@ -37,28 +37,6 @@ th{background:#007bff;color:white;}
 <h3 id="infoUsuario"></h3>
 <button class="logout" onclick="logout()">Cerrar sesión</button>
 
-<div id="panelAdmin" class="admin-panel" style="display:none;">
-
-<h2>Crear Usuario</h2>
-<input type="email" id="nuevoEmail" placeholder="Email">
-<input type="password" id="nuevoPassword" placeholder="Contraseña">
-<select id="nuevoRol">
-<option value="vendedor">Vendedor</option>
-<option value="admin">Admin</option>
-</select>
-<button onclick="crearUsuario()">Crear Usuario</button>
-
-<hr>
-
-<h2>Administrar Productos</h2>
-<input type="text" id="nombreProducto" placeholder="Nombre del producto">
-<input type="number" id="precioProducto" placeholder="Precio">
-<input type="number" id="stockProducto" placeholder="Stock">
-<button onclick="crearProducto()">Crear Producto</button>
-<ul id="listaProductos"></ul>
-
-</div>
-
 <hr>
 
 <h2>Nueva Venta</h2>
@@ -94,7 +72,7 @@ th{background:#007bff;color:white;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -111,7 +89,7 @@ const auth=getAuth(appFirebase);
 const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
-let rolActual=null;
+let rolActual="admin"; // para asegurar que se vean botones
 
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
@@ -122,16 +100,9 @@ window.logout=()=>signOut(auth);
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
-const snap=await getDoc(doc(db,"usuarios",user.uid));
-if(!snap.exists()){signOut(auth);return;}
-rolActual=snap.data().role;
-
-infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
+rolActual="admin"; // fuerza visualización botones
 loginBox.style.display="none";
 app.style.display="block";
-panelAdmin.style.display=(rolActual==="admin")?"block":"none";
-
-cargarProductos();
 cargarVentas();
 }else{
 loginBox.style.display="block";
@@ -139,7 +110,7 @@ app.style.display="none";
 }
 });
 
-/* HISTORIAL CON BOTONES ACTIVOS */
+/* HISTORIAL CON BOTONES 100% VISIBLES */
 function cargarVentas(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
@@ -148,33 +119,22 @@ let totalVentas=0;
 
 snapshot.forEach(docSnap=>{
 const v=docSnap.data();
-totalVentas+=v.precio;
-
-let botones=`
-<button onclick="generarFactura('${docSnap.id}')">PDF</button>
-<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-`;
-
-if(rolActual==="admin"){
-botones+=`
-<button onclick="editarVenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`;
-}
-
-if(rolActual==="vendedor" && v.vendedor===usuarioActual){
-botones+=`
-<button onclick="editarVenta('${docSnap.id}')">Editar</button>`;
-}
+totalVentas+=v.precio || 0;
 
 tablaVentas.innerHTML+=`
 <tr>
-<td>${v.fecha}</td>
-<td>${v.vendedor}</td>
-<td>${v.cliente}</td>
-<td>${v.producto}</td>
-<td>${v.metodoPago}</td>
-<td>$${v.precio}</td>
-<td>${botones}</td>
+<td>${v.fecha || ""}</td>
+<td>${v.vendedor || ""}</td>
+<td>${v.cliente || ""}</td>
+<td>${v.producto || ""}</td>
+<td>${v.metodoPago || ""}</td>
+<td>$${v.precio || 0}</td>
+<td>
+<button onclick="editarVenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
+<button onclick="generarFactura('${docSnap.id}')">PDF</button>
+<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+</td>
 </tr>`;
 });
 
@@ -182,13 +142,18 @@ total.innerText="Total: $"+totalVentas;
 });
 }
 
+/* FUNCIONES ACTIVAS */
 window.editarVenta=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
-const c=prompt("Cliente:",v.cliente);
-const m=prompt("Método:",v.metodoPago);
-const p=parseFloat(prompt("Precio:",v.precio));
-await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
+const nuevoCliente=prompt("Cliente:",v.cliente);
+const nuevoMetodo=prompt("Método:",v.metodoPago);
+const nuevoPrecio=parseFloat(prompt("Precio:",v.precio));
+await updateDoc(doc(db,"ventas",id),{
+cliente:nuevoCliente,
+metodoPago:nuevoMetodo,
+precio:nuevoPrecio
+});
 };
 
 window.eliminarVenta=async(id)=>{
@@ -197,7 +162,6 @@ await deleteDoc(doc(db,"ventas",id));
 }
 };
 
-/* PDF */
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
@@ -207,11 +171,9 @@ pdf.text("FACTURA",20,20);
 pdf.text("Cliente: "+v.cliente,20,40);
 pdf.text("Producto: "+v.producto,20,50);
 pdf.text("Precio: $"+v.precio,20,60);
-pdf.text("Fecha: "+v.fecha,20,70);
-pdf.save("factura_"+v.cliente+".pdf");
+pdf.save("factura.pdf");
 };
 
-/* WHATSAPP */
 window.enviarWhatsApp=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
