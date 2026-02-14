@@ -55,12 +55,6 @@ th{background:#007bff;color:white;}
   <input type="text" id="metodoPago" placeholder="Método de Pago">
   <button onclick="guardarVenta()">Guardar Venta</button>
 
-  <h3>Eliminar Ventas por Cliente</h3>
-  <input type="text" id="clienteEliminar" placeholder="Nombre del cliente">
-  <button onclick="eliminarCliente()" class="delete-btn">
-    Eliminar Cliente
-  </button>
-
   <h2>Historial de Ventas</h2>
   <table>
     <thead>
@@ -114,11 +108,21 @@ const total = document.getElementById("total");
 let usuarioActual = null;
 let rolActual = null;
 
+/* ✅ LOGIN CORREGIDO */
 window.login = async function(){
-  const email = email.value;
-  const password = password.value;
-  try{ await signInWithEmailAndPassword(auth, email, password); }
-  catch(e){ alert(e.message); }
+  const emailInput = document.getElementById("email").value;
+  const passwordInput = document.getElementById("password").value;
+
+  if(!emailInput || !passwordInput){
+    alert("Ingresa correo y contraseña");
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+  } catch(e){
+    alert("Error: " + e.message);
+  }
 };
 
 onAuthStateChanged(auth, async (user)=>{
@@ -131,64 +135,18 @@ onAuthStateChanged(auth, async (user)=>{
       appDiv.style.display="block";
       infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
       if(rolActual==="admin") panelAdmin.style.display="block";
-      cargarProductos();
       cargarVentas();
-    } else { alert("Usuario no existe"); signOut(auth); }
+    } else {
+      alert("Usuario no existe en Firestore");
+      signOut(auth);
+    }
   } else {
     loginBox.style.display="block";
     appDiv.style.display="none";
   }
 });
 
-function cargarProductos(){
-  onSnapshot(collection(db,"productos"),(snapshot)=>{
-    listaProductos.innerHTML="";
-    productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
-    snapshot.forEach(docSnap=>{
-      const p=docSnap.data();
-      const id=docSnap.id;
-
-      if(rolActual==="admin"){
-        listaProductos.innerHTML+=`
-        <li>
-        ${p.nombre} - $${p.precio} - Stock: ${p.stock}
-        <button onclick="editarProducto('${id}')">Editar</button>
-        <button onclick="eliminarProducto('${id}')" class="delete-btn">Eliminar</button>
-        </li>`;
-      }
-
-      if(p.stock>0){
-        productoSelect.innerHTML+=
-        `<option value="${id}">${p.nombre} - $${p.precio}</option>`;
-      }
-    });
-  });
-}
-
-window.crearProducto = async function(){
-  if(!nombreProducto.value || !precioProducto.value || !stockProducto.value) return alert("Completa todo");
-  await addDoc(collection(db,"productos"),{
-    nombre:nombreProducto.value,
-    precio:parseFloat(precioProducto.value),
-    stock:parseInt(stockProducto.value)
-  });
-};
-
-window.editarProducto = async function(id){
-  const ref = doc(db,"productos",id);
-  const snap = await getDoc(ref);
-  const p = snap.data();
-  const n = prompt("Nombre:",p.nombre);
-  const pr = parseFloat(prompt("Precio:",p.precio));
-  const st = parseInt(prompt("Stock:",p.stock));
-  if(!n||isNaN(pr)||isNaN(st)) return;
-  await updateDoc(ref,{nombre:n,precio:pr,stock:st});
-};
-
-window.eliminarProducto = async function(id){
-  if(!confirm("¿Eliminar producto?")) return;
-  await deleteDoc(doc(db,"productos",id));
-};
+window.logout=function(){ signOut(auth); };
 
 function cargarVentas(){
   const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
@@ -197,99 +155,21 @@ function cargarVentas(){
     let totalVentas=0;
     snapshot.forEach(docSnap=>{
       const v=docSnap.data();
-      totalVentas+=v.precio;
-
+      totalVentas+=v.precio || 0;
       tablaVentas.innerHTML+=`
       <tr>
-      <td>${v.fecha}</td>
-      <td>${v.vendedor}</td>
-      <td>${v.cliente}</td>
-      <td>${v.producto}</td>
-      <td>${v.metodoPago}</td>
-      <td>$${v.precio}</td>
-      <td>
-        <button onclick="editarVenta('${docSnap.id}')">Editar</button>
-        <button onclick="generarFactura('${docSnap.id}')">PDF</button>
-        <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-        <button onclick="eliminarVenta('${docSnap.id}')" class="delete-btn">Eliminar</button>
-      </td>
+      <td>${v.fecha || ""}</td>
+      <td>${v.vendedor || ""}</td>
+      <td>${v.cliente || ""}</td>
+      <td>${v.producto || ""}</td>
+      <td>${v.metodoPago || ""}</td>
+      <td>$${v.precio || 0}</td>
+      <td></td>
       </tr>`;
     });
     total.innerText="Total: $"+totalVentas;
   });
 }
-
-window.guardarVenta = async function(){
-  if(!cliente.value||!telefono.value||!metodoPago.value||!productoSelect.value) return alert("Completa todo");
-  const ref=doc(db,"productos",productoSelect.value);
-  const snap=await getDoc(ref);
-  const producto=snap.data();
-  if(producto.stock<=0) return alert("Sin stock");
-
-  await addDoc(collection(db,"ventas"),{
-    cliente:cliente.value,
-    telefono:telefono.value,
-    producto:producto.nombre,
-    productoId:productoSelect.value,
-    metodoPago:metodoPago.value,
-    precio:producto.precio,
-    vendedor:usuarioActual,
-    fecha:new Date().toLocaleString(),
-    timestamp:serverTimestamp()
-  });
-
-  await updateDoc(ref,{stock:producto.stock-1});
-};
-
-window.editarVenta = async function(id){
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-  const c = prompt("Cliente:",v.cliente);
-  const t = prompt("Teléfono:",v.telefono);
-  const m = prompt("Método:",v.metodoPago);
-  const p = parseFloat(prompt("Precio:",v.precio));
-  if(!c||!t||!m||isNaN(p)) return;
-  await updateDoc(doc(db,"ventas",id),{cliente:c,telefono:t,metodoPago:m,precio:p});
-};
-
-window.eliminarVenta = async function(id){
-  if(!confirm("¿Eliminar venta?")) return;
-  await deleteDoc(doc(db,"ventas",id));
-};
-
-window.eliminarCliente = async function(){
-  if(!clienteEliminar.value) return alert("Escribe el nombre");
-  if(!confirm("¿Eliminar todas las ventas de este cliente?")) return;
-  const q = query(collection(db,"ventas"), where("cliente","==",clienteEliminar.value));
-  const snapshot = await getDocs(q);
-  snapshot.forEach(async (docSnap)=>{
-    await deleteDoc(doc(db,"ventas",docSnap.id));
-  });
-};
-
-window.generarFactura = async function(id){
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-  pdf.text("FACTURA",20,20);
-  pdf.text("Cliente: "+v.cliente,20,40);
-  pdf.text("Producto: "+v.producto,20,50);
-  pdf.text("Método: "+v.metodoPago,20,60);
-  pdf.text("Precio: $"+v.precio,20,70);
-  pdf.text("Fecha: "+v.fecha,20,80);
-  pdf.save("factura_"+v.cliente+".pdf");
-};
-
-window.enviarWhatsApp = async function(id){
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-  const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
-  const url=`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`;
-  window.open(url,"_blank");
-};
-
-window.logout=function(){ signOut(auth); };
 
 </script>
 </body>
