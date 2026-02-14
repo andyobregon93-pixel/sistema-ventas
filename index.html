@@ -249,14 +249,12 @@ let usuarioActual=null;
 let rolActual=null;
 let permisosUsuario={};
 
-/* LOGIN */
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
 };
 
 window.logout=()=>signOut(auth);
 
-/* AUTH */
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 
@@ -301,7 +299,214 @@ app.style.display="none";
 });
 
 /* ============================= */
-/* GUARDAR VENTA PROFESIONAL */
+/* ADMINISTRAR USUARIOS */
+/* ============================= */
+
+window.crearUsuario=async()=>{
+const passwordPlano=nuevoPassword.value;
+
+const response=await fetch(
+`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:nuevoEmail.value,
+password:passwordPlano,
+returnSecureToken:true
+})
+}
+);
+
+const data=await response.json();
+if(data.error){alert(data.error.message);return;}
+
+await setDoc(doc(db,"usuarios",data.localId),{
+email:nuevoEmail.value,
+password:passwordPlano,
+role:nuevoRol.value,
+activo:true,
+permisos:{
+editarVentas:permEditarVentas.checked,
+eliminarVentas:permEliminarVentas.checked,
+guardarCuentas:permGuardarCuentas.checked
+}
+});
+
+alert("Usuario creado correctamente");
+cargarUsuarios();
+};
+
+function cargarUsuarios(){
+onSnapshot(collection(db,"usuarios"),(snapshot)=>{
+tablaUsuarios.innerHTML="";
+let contador=0;
+
+snapshot.forEach(docSnap=>{
+const u=docSnap.data();
+if(u.role==="vendedor" && u.activo!==false) contador++;
+
+tablaUsuarios.innerHTML+=`
+<tr>
+<td>${u.email}</td>
+<td>${u.role}</td>
+<td>${u.activo===false?"INACTIVO":"ACTIVO"}</td>
+<td>${u.password||"No disponible"}</td>
+<td>
+<button onclick="toggleUsuario('${docSnap.id}',${u.activo===false})">
+${u.activo===false?"Activar":"Desactivar"}
+</button>
+<button class="delete-btn" onclick="eliminarUsuario('${docSnap.id}')">Eliminar</button>
+</td>
+</tr>`;
+});
+
+totalVendedores.innerText=contador;
+});
+}
+
+window.toggleUsuario=async(id,estadoActual)=>{
+await updateDoc(doc(db,"usuarios",id),{ activo:!estadoActual });
+};
+
+window.eliminarUsuario=async(id)=>{
+if(confirm("¿Eliminar usuario?")){
+await deleteDoc(doc(db,"usuarios",id));
+alert("Elimínalo también desde Firebase Authentication");
+}
+};
+
+/* ============================= */
+/* PERMISOS GLOBALES */
+/* ============================= */
+
+async function obtenerPermisosGlobales(){
+const ref=doc(db,"config","permisos");
+const snap=await getDoc(ref);
+
+if(!snap.exists()){
+await setDoc(ref,{verVentas:false,agregarCuentas:false});
+return {verVentas:false,agregarCuentas:false};
+}
+return snap.data();
+}
+
+async function actualizarEstadoPermisos(){
+const p=await obtenerPermisosGlobales();
+estadoPermisos.innerText=
+"Historial completo: "+(p.verVentas?"ACTIVO":"OFF")+
+" | Agregar cuentas: "+(p.agregarCuentas?"ACTIVO":"OFF");
+}
+
+window.toggleVerVentas=async()=>{
+const p=await obtenerPermisosGlobales();
+await updateDoc(doc(db,"config","permisos"),{verVentas:!p.verVentas});
+actualizarEstadoPermisos();
+};
+
+window.toggleAgregarCuentas=async()=>{
+const p=await obtenerPermisosGlobales();
+await updateDoc(doc(db,"config","permisos"),{agregarCuentas:!p.agregarCuentas});
+actualizarEstadoPermisos();
+};
+
+/* ============================= */
+/* CUENTAS */
+/* ============================= */
+
+window.guardarCuenta=async()=>{
+await addDoc(collection(db,"cuentas"),{
+plataforma:cuentaPlataforma.value,
+correo:cuentaCorreo.value,
+clave:cuentaClave.value,
+dueno:usuarioActual
+});
+};
+
+function cargarCuentas(){
+
+let q;
+
+if(rolActual==="admin"){
+q=collection(db,"cuentas");
+}else{
+q=query(collection(db,"cuentas"),where("dueno","==",usuarioActual));
+}
+
+onSnapshot(q,(snapshot)=>{
+listaCuentas.innerHTML="";
+snapshot.forEach(docSnap=>{
+const c=docSnap.data();
+listaCuentas.innerHTML+=`
+<li>
+${c.plataforma} | ${c.correo} | ${c.clave}
+<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
+</li>`;
+});
+});
+}
+
+window.editarCuenta=async(id)=>{
+const snap=await getDoc(doc(db,"cuentas",id));
+const c=snap.data();
+const p=prompt("Plataforma:",c.plataforma);
+const co=prompt("Correo:",c.correo);
+const cl=prompt("Clave:",c.clave);
+
+await updateDoc(doc(db,"cuentas",id),{
+plataforma:p,
+correo:co,
+clave:cl
+});
+};
+
+window.eliminarCuenta=async(id)=>{
+await deleteDoc(doc(db,"cuentas",id));
+};
+
+/* ============================= */
+/* STOCK */
+/* ============================= */
+
+window.guardarStock=async()=>{
+await addDoc(collection(db,"stockCuentas"),{
+plataforma:stockPlataforma.value,
+cantidad:parseInt(stockCantidad.value)
+});
+};
+
+function cargarStock(){
+onSnapshot(collection(db,"stockCuentas"),(snapshot)=>{
+tablaStock.innerHTML="";
+snapshot.forEach(docSnap=>{
+const s=docSnap.data();
+tablaStock.innerHTML+=`
+<tr>
+<td>${s.plataforma}</td>
+<td>${s.cantidad}</td>
+<td>
+<button onclick="editarStock('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
+</td>
+</tr>`;
+});
+});
+}
+
+window.editarStock=async(id)=>{
+const snap=await getDoc(doc(db,"stockCuentas",id));
+const s=snap.data();
+const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
+await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
+};
+
+window.eliminarStock=async(id)=>{
+await deleteDoc(doc(db,"stockCuentas",id));
+};
+
+/* ============================= */
+/* VENTAS */
 /* ============================= */
 
 window.guardarVenta=async()=>{
@@ -333,6 +538,105 @@ producto.value="";
 precio.value="";
 };
 
+function cargarVentasCompleto(){
+const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+onSnapshot(q,(snapshot)=>{renderVentas(snapshot,true);});
+}
+
+function cargarVentasUsuario(){
+const q=query(collection(db,"ventas"),where("vendedor","==",usuarioActual),orderBy("timestamp","desc"));
+onSnapshot(q,(snapshot)=>{renderVentas(snapshot,false);});
+}
+
+function renderVentas(snapshot,mostrarTodo){
+
+tablaVentas.innerHTML="";
+let totalVentas=0;
+let totalGeneral=0;
+let totalHoy=0;
+let totalMes=0;
+
+const hoy=new Date().toLocaleDateString();
+const mesActual=new Date().getMonth();
+let ventasPorVendedor={};
+
+snapshot.forEach(docSnap=>{
+const v=docSnap.data();
+if(!mostrarTodo && v.vendedor!==usuarioActual) return;
+
+const precio=v.total || v.precio || 0;
+
+totalVentas+=precio;
+totalGeneral+=precio;
+
+if(v.timestamp){
+const fecha=new Date(v.timestamp.seconds*1000);
+if(fecha.toLocaleDateString()===hoy) totalHoy+=precio;
+if(fecha.getMonth()===mesActual) totalMes+=precio;
+}
+
+if(!ventasPorVendedor[v.vendedor]){
+ventasPorVendedor[v.vendedor]=0;
+}
+ventasPorVendedor[v.vendedor]+=precio;
+
+tablaVentas.innerHTML+=`
+<tr>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.producto}</td>
+<td>${v.metodoPago}</td>
+<td>$${precio.toFixed(2)}</td>
+<td>
+${rolActual==="admin"||permisosUsuario.editarVentas?
+`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`:""}
+${rolActual==="admin"||permisosUsuario.eliminarVentas?
+`<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`:""}
+<button onclick="generarFactura('${docSnap.id}')">PDF</button>
+<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+</td>
+</tr>`;
+});
+
+total.innerText="Total: $"+totalVentas.toFixed(2);
+dashTotalGeneral.innerText="$"+totalGeneral.toFixed(2);
+dashTotalHoy.innerText="$"+totalHoy.toFixed(2);
+dashTotalMes.innerText="$"+totalMes.toFixed(2);
+
+const ctx=document.getElementById("graficaVentas");
+if(window.miGrafica) window.miGrafica.destroy();
+window.miGrafica=new Chart(ctx,{
+type:"bar",
+data:{
+labels:Object.keys(ventasPorVendedor),
+datasets:[{
+label:"Ventas por vendedor",
+data:Object.values(ventasPorVendedor)
+}]
+}
+});
+}
+
+window.editarVenta=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const c=prompt("Cliente:",v.cliente);
+const m=prompt("Método:",v.metodoPago);
+const p=parseFloat(prompt("Precio:",v.precio));
+await updateDoc(doc(db,"ventas",id),{
+cliente:c,
+metodoPago:m,
+precio:p
+});
+};
+
+window.eliminarVenta=async(id)=>{
+if(confirm("¿Eliminar venta?")){
+await deleteDoc(doc(db,"ventas",id));
+}
+};
+
 /* ============================= */
 /* FACTURA PROFESIONAL */
 /* ============================= */
@@ -340,14 +644,12 @@ precio.value="";
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
-
 const { jsPDF }=window.jspdf;
 const pdf=new jsPDF();
 
 pdf.setFont("helvetica","bold");
-pdf.setFontSize(24);
+pdf.setFontSize(22);
 pdf.text("ANDVIP",20,20);
-
 pdf.setFontSize(10);
 pdf.setFont("helvetica","normal");
 pdf.text("Empresa Digital de Servicios",20,28);
@@ -356,7 +658,6 @@ pdf.text("Email: soporte@andvip.com",20,33);
 pdf.setFontSize(14);
 pdf.setFont("helvetica","bold");
 pdf.text("FACTURA",160,20);
-
 pdf.setFontSize(10);
 pdf.setFont("helvetica","normal");
 pdf.text("Serie: "+v.numeroSerie,150,28);
