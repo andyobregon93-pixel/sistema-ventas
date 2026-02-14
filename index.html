@@ -157,84 +157,49 @@ async function cargarProductos(){
   const snapshot = await getDocs(collection(db,"productos"));
   snapshot.forEach(docSnap=>{
     const p = docSnap.data();
+    const id = docSnap.id;
+
+    if(rolActual==="admin"){
+      listaProductos.innerHTML+=`
+        <li>
+          ${p.nombre} - $${p.precio} - Stock: ${p.stock}
+          <button onclick="editarProducto('${id}')">Editar</button>
+          <button onclick="eliminarProducto('${id}')" class="delete-btn">Eliminar</button>
+        </li>
+      `;
+    }
+
     if(p.stock>0){
-      productoSelect.innerHTML+=`<option value="${docSnap.id}">${p.nombre} - $${p.precio}</option>`;
+      productoSelect.innerHTML+=`<option value="${id}">${p.nombre} - $${p.precio}</option>`;
     }
   });
 }
 
-/* VENTAS */
-window.guardarVenta = async function(){
-  const nombreCliente = cliente.value;
-  const tel = telefono.value;
-  const metodo = metodoPago.value;
-  const productoId = productoSelect.value;
-  if(!nombreCliente || !tel || !metodo || !productoId) return alert("Completa todo");
+window.editarProducto = async function(id){
+  const snap = await getDoc(doc(db,"productos",id));
+  if(!snap.exists()) return alert("Producto no encontrado");
 
-  const ref = doc(db,"productos",productoId);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return alert("Producto no existe");
+  const p = snap.data();
+  const nuevoNombre = prompt("Nombre:", p.nombre);
+  const nuevoPrecio = parseFloat(prompt("Precio:", p.precio));
+  const nuevoStock = parseInt(prompt("Stock:", p.stock));
 
-  const producto = snap.data();
-  if(producto.stock <= 0) return alert("Sin stock");
+  if(!nuevoNombre || isNaN(nuevoPrecio) || isNaN(nuevoStock))
+    return alert("Datos inválidos");
 
-  await addDoc(collection(db,"ventas"),{
-    cliente:nombreCliente,
-    telefono:tel,
-    producto:producto.nombre,
-    productoId,
-    metodoPago:metodo,
-    precio:producto.precio,
-    vendedor:usuarioActual,
-    fecha:new Date().toLocaleString(),
-    timestamp:serverTimestamp()
+  await updateDoc(doc(db,"productos",id),{
+    nombre:nuevoNombre,
+    precio:nuevoPrecio,
+    stock:nuevoStock
   });
 
-  await updateDoc(ref,{stock:producto.stock-1});
+  cargarProductos();
 };
 
-function cargarVentas(){
-  const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-  onSnapshot(q,(snapshot)=>{
-    tablaVentas.innerHTML="";
-    let totalVentas=0;
-    snapshot.forEach(docSnap=>{
-      const v=docSnap.data();
-      totalVentas+=v.precio;
-      tablaVentas.innerHTML+=`
-      <tr>
-        <td>${v.fecha}</td>
-        <td>${v.vendedor}</td>
-        <td>${v.cliente}</td>
-        <td>${v.producto}</td>
-        <td>${v.metodoPago}</td>
-        <td>$${v.precio}</td>
-        <td>
-          <button onclick="editarVenta('${docSnap.id}')">Editar</button>
-          <button onclick="generarFactura('${docSnap.id}')">PDF</button>
-          <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-          <button onclick="eliminarVenta('${docSnap.id}')" class="delete-btn">Eliminar</button>
-        </td>
-      </tr>`;
-    });
-    total.innerText="Total: $"+totalVentas;
-  });
-}
-
-window.eliminarCliente = async function(){
-  const nombre = document.getElementById("clienteEliminar").value;
-  if(!nombre) return alert("Escribe el nombre");
-  if(!confirm("¿Eliminar todas las ventas de " + nombre + "?")) return;
-
-  const q = query(collection(db,"ventas"), where("cliente","==",nombre));
-  const snapshot = await getDocs(q);
-
-  const eliminaciones=[];
-  snapshot.forEach(docSnap=>{
-    eliminaciones.push(deleteDoc(doc(db,"ventas",docSnap.id)));
-  });
-
-  await Promise.all(eliminaciones);
+window.eliminarProducto = async function(id){
+  if(!confirm("¿Eliminar producto?")) return;
+  await deleteDoc(doc(db,"productos",id));
+  cargarProductos();
 };
 
 window.logout=function(){ signOut(auth); };
