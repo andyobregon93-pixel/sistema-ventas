@@ -77,7 +77,6 @@ border-radius:8px;
 <body>
 <div class="container">
 
-<!-- LOGIN -->
 <div id="loginBox">
 <h2>Login</h2>
 <input type="email" id="email" placeholder="Email">
@@ -85,13 +84,11 @@ border-radius:8px;
 <button onclick="login()">Ingresar</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
 <h3 id="infoUsuario"></h3>
 <button class="logout" onclick="logout()">Cerrar sesión</button>
 
-<!-- PANEL ADMIN -->
 <div id="panelAdmin" class="admin-panel" style="display:none;">
 
 <h2>Crear Usuario</h2>
@@ -171,7 +168,6 @@ border-radius:8px;
 
 <hr>
 
-<!-- DASHBOARD -->
 <h2>Dashboard</h2>
 
 <div class="dashboard-cards">
@@ -220,9 +216,6 @@ border-radius:8px;
 
 <h3 id="total"></h3>
 
-</div>
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -252,11 +245,13 @@ let permisosUsuario={};
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
 };
+
 window.logout=()=>signOut(auth);
 
 /* AUTH */
 onAuthStateChanged(auth,async(user)=>{
 if(user){
+
 usuarioActual=user.email;
 const snap=await getDoc(doc(db,"usuarios",user.uid));
 
@@ -270,6 +265,7 @@ rolActual=snap.exists()?snap.data().role:"vendedor";
 permisosUsuario=snap.exists()?snap.data().permisos||{}:{};
 
 infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
+
 loginBox.style.display="none";
 app.style.display="block";
 panelAdmin.style.display=(rolActual==="admin")?"block":"none";
@@ -281,8 +277,14 @@ cargarStock();
 }
 
 cargarCuentas();
-if(rolActual==="admin"){ cargarVentasCompleto(); }
-else{ cargarVentasUsuario(); }
+
+const permisosGlobales=await obtenerPermisosGlobales();
+
+if(rolActual==="admin" || permisosGlobales.verVentas){
+cargarVentasCompleto();
+}else{
+cargarVentasUsuario();
+}
 
 }else{
 loginBox.style.display="block";
@@ -290,7 +292,10 @@ app.style.display="none";
 }
 });
 
-/* CREAR USUARIO */
+/* ============================= */
+/* ADMINISTRAR USUARIOS */
+/* ============================= */
+
 window.crearUsuario=async()=>{
 const passwordPlano=nuevoPassword.value;
 
@@ -326,14 +331,14 @@ alert("Usuario creado correctamente");
 cargarUsuarios();
 };
 
-/* ADMINISTRAR USUARIOS */
 function cargarUsuarios(){
 onSnapshot(collection(db,"usuarios"),(snapshot)=>{
 tablaUsuarios.innerHTML="";
 let contador=0;
+
 snapshot.forEach(docSnap=>{
 const u=docSnap.data();
-if(u.role==="vendedor" && u.activo!==false){ contador++; }
+if(u.role==="vendedor" && u.activo!==false) contador++;
 
 tablaUsuarios.innerHTML+=`
 <tr>
@@ -349,6 +354,7 @@ ${u.activo===false?"Activar":"Desactivar"}
 </td>
 </tr>`;
 });
+
 totalVendedores.innerText=contador;
 });
 }
@@ -362,285 +368,6 @@ if(confirm("¿Eliminar usuario?")){
 await deleteDoc(doc(db,"usuarios",id));
 alert("Elimínalo también desde Firebase Authentication");
 }
-};
-
-/* TODO TU RESTO DEL SISTEMA (ventas, stock, cuentas, dashboard, PDF, WhatsApp)
-   SIGUE EXACTAMENTE IGUAL COMO YA LO TENÍAS */
-</script>
-</body>
-</html>
-/* ============================= */
-/* ====== PERMISOS GLOBALES ===== */
-/* ============================= */
-
-async function obtenerPermisosGlobales(){
-const ref=doc(db,"config","permisos");
-const snap=await getDoc(ref);
-if(!snap.exists()){
-await setDoc(ref,{verVentas:false,agregarCuentas:false});
-return {verVentas:false,agregarCuentas:false};
-}
-return snap.data();
-}
-
-async function actualizarEstadoPermisos(){
-const p=await obtenerPermisosGlobales();
-estadoPermisos.innerText=
-"Historial completo: "+(p.verVentas?"ACTIVO":"OFF")+
-" | Agregar cuentas: "+(p.agregarCuentas?"ACTIVO":"OFF");
-}
-
-window.toggleVerVentas=async()=>{
-const p=await obtenerPermisosGlobales();
-await updateDoc(doc(db,"config","permisos"),{verVentas:!p.verVentas});
-actualizarEstadoPermisos();
-};
-
-window.toggleAgregarCuentas=async()=>{
-const p=await obtenerPermisosGlobales();
-await updateDoc(doc(db,"config","permisos"),{agregarCuentas:!p.agregarCuentas});
-actualizarEstadoPermisos();
-};
-
-
-/* ============================= */
-/* ========= CUENTAS =========== */
-/* ============================= */
-
-window.guardarCuenta=async()=>{
-await addDoc(collection(db,"cuentas"),{
-plataforma:cuentaPlataforma.value,
-correo:cuentaCorreo.value,
-clave:cuentaClave.value,
-dueno:usuarioActual
-});
-};
-
-function cargarCuentas(){
-let q;
-if(rolActual==="admin"){
-q=collection(db,"cuentas");
-}else{
-q=query(collection(db,"cuentas"),where("dueno","==",usuarioActual));
-}
-
-onSnapshot(q,(snapshot)=>{
-listaCuentas.innerHTML="";
-snapshot.forEach(docSnap=>{
-const c=docSnap.data();
-listaCuentas.innerHTML+=`
-<li>
-${c.plataforma} | ${c.correo} | ${c.clave}
-<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
-</li>`;
-});
-});
-}
-
-window.editarCuenta=async(id)=>{
-const snap=await getDoc(doc(db,"cuentas",id));
-const c=snap.data();
-const p=prompt("Plataforma:",c.plataforma);
-const co=prompt("Correo:",c.correo);
-const cl=prompt("Clave:",c.clave);
-await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
-};
-
-window.eliminarCuenta=async(id)=>{
-await deleteDoc(doc(db,"cuentas",id));
-};
-
-
-/* ============================= */
-/* ============ STOCK ========== */
-/* ============================= */
-
-window.guardarStock=async()=>{
-await addDoc(collection(db,"stockCuentas"),{
-plataforma:stockPlataforma.value,
-cantidad:parseInt(stockCantidad.value)
-});
-};
-
-function cargarStock(){
-onSnapshot(collection(db,"stockCuentas"),(snapshot)=>{
-tablaStock.innerHTML="";
-snapshot.forEach(docSnap=>{
-const s=docSnap.data();
-tablaStock.innerHTML+=`
-<tr>
-<td>${s.plataforma}</td>
-<td>${s.cantidad}</td>
-<td>
-<button onclick="editarStock('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
-</td>
-</tr>`;
-});
-});
-}
-
-window.editarStock=async(id)=>{
-const snap=await getDoc(doc(db,"stockCuentas",id));
-const s=snap.data();
-const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
-await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
-};
-
-window.eliminarStock=async(id)=>{
-await deleteDoc(doc(db,"stockCuentas",id));
-};
-
-
-/* ============================= */
-/* ============ VENTAS ========= */
-/* ============================= */
-
-window.guardarVenta=async()=>{
-await addDoc(collection(db,"ventas"),{
-cliente:cliente.value,
-telefono:telefono.value,
-producto:producto.value,
-metodoPago:metodoPago.value,
-precio:parseFloat(precio.value),
-vendedor:usuarioActual,
-fecha:new Date().toLocaleString(),
-timestamp:serverTimestamp()
-});
-
-cliente.value="";
-telefono.value="";
-producto.value="";
-metodoPago.value="";
-precio.value="";
-};
-
-function cargarVentasCompleto(){
-const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-onSnapshot(q,(snapshot)=>{ renderVentas(snapshot,true); });
-}
-
-function cargarVentasUsuario(){
-const q=query(
-collection(db,"ventas"),
-where("vendedor","==",usuarioActual),
-orderBy("timestamp","desc")
-);
-onSnapshot(q,(snapshot)=>{ renderVentas(snapshot,false); });
-}
-
-function renderVentas(snapshot,mostrarTodo){
-
-tablaVentas.innerHTML="";
-let totalVentas=0;
-let totalGeneral=0;
-let totalHoy=0;
-let totalMes=0;
-
-const hoy=new Date().toLocaleDateString();
-const mesActual=new Date().getMonth();
-
-let ventasPorVendedor={};
-
-snapshot.forEach(docSnap=>{
-const v=docSnap.data();
-
-if(!mostrarTodo && v.vendedor!==usuarioActual) return;
-
-const precio=v.precio||0;
-totalVentas+=precio;
-totalGeneral+=precio;
-
-if(v.timestamp){
-const fecha=new Date(v.timestamp.seconds*1000);
-if(fecha.toLocaleDateString()===hoy) totalHoy+=precio;
-if(fecha.getMonth()===mesActual) totalMes+=precio;
-}
-
-if(!ventasPorVendedor[v.vendedor]){
-ventasPorVendedor[v.vendedor]=0;
-}
-ventasPorVendedor[v.vendedor]+=precio;
-
-tablaVentas.innerHTML+=`
-<tr>
-<td>${v.fecha}</td>
-<td>${v.vendedor}</td>
-<td>${v.cliente}</td>
-<td>${v.producto}</td>
-<td>${v.metodoPago}</td>
-<td>$${v.precio}</td>
-<td>
-<button onclick="editarVenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
-<button onclick="generarFactura('${docSnap.id}')">PDF</button>
-<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-</td>
-</tr>`;
-});
-
-total.innerText="Total: $"+totalVentas;
-dashTotalGeneral.innerText="$"+totalGeneral;
-dashTotalHoy.innerText="$"+totalHoy;
-dashTotalMes.innerText="$"+totalMes;
-
-const ctx=document.getElementById("graficaVentas");
-if(window.miGrafica) window.miGrafica.destroy();
-
-window.miGrafica=new Chart(ctx,{
-type:"bar",
-data:{
-labels:Object.keys(ventasPorVendedor),
-datasets:[{
-label:"Ventas por vendedor",
-data:Object.values(ventasPorVendedor)
-}]
-}
-});
-}
-
-window.editarVenta=async(id)=>{
-const snap=await getDoc(doc(db,"ventas",id));
-const v=snap.data();
-const c=prompt("Cliente:",v.cliente);
-const m=prompt("Método:",v.metodoPago);
-const p=parseFloat(prompt("Precio:",v.precio));
-await updateDoc(doc(db,"ventas",id),{
-cliente:c,
-metodoPago:m,
-precio:p
-});
-};
-
-window.eliminarVenta=async(id)=>{
-if(confirm("¿Eliminar venta?")){
-await deleteDoc(doc(db,"ventas",id));
-}
-};
-
-window.generarFactura=async(id)=>{
-const snap=await getDoc(doc(db,"ventas",id));
-const v=snap.data();
-const { jsPDF }=window.jspdf;
-const pdf=new jsPDF();
-pdf.text("FACTURA",20,20);
-pdf.text("Cliente: "+v.cliente,20,40);
-pdf.text("Producto: "+v.producto,20,50);
-pdf.text("Precio: $"+v.precio,20,60);
-pdf.save("factura.pdf");
-};
-
-window.enviarWhatsApp=async(id)=>{
-const snap=await getDoc(doc(db,"ventas",id));
-const v=snap.data();
-const mensaje=`Hola ${v.cliente}
-Producto: ${v.producto}
-Precio: $${v.precio}`;
-window.open(
-`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,
-"_blank"
-);
 };
 
 /* ============================= */
@@ -785,6 +512,117 @@ window.eliminarStock=async(id)=>{
 await deleteDoc(doc(db,"stockCuentas",id));
 };
 
+/* ============================= */
+/* ============ VENTAS ========= */
+/* ============================= */
+
+window.guardarVenta=async()=>{
+await addDoc(collection(db,"ventas"),{
+cliente:cliente.value,
+telefono:telefono.value,
+producto:producto.value,
+metodoPago:metodoPago.value,
+precio:parseFloat(precio.value),
+vendedor:usuarioActual,
+fecha:new Date().toLocaleString(),
+timestamp:serverTimestamp()
+});
+
+cliente.value="";
+telefono.value="";
+producto.value="";
+metodoPago.value="";
+precio.value="";
+};
+
+function cargarVentasCompleto(){
+const q=query(
+collection(db,"ventas"),
+orderBy("timestamp","desc")
+);
+onSnapshot(q,(snapshot)=>{ renderVentas(snapshot,true); });
+}
+
+function cargarVentasUsuario(){
+const q=query(
+collection(db,"ventas"),
+where("vendedor","==",usuarioActual),
+orderBy("timestamp","desc")
+);
+onSnapshot(q,(snapshot)=>{ renderVentas(snapshot,false); });
+}
+
+function renderVentas(snapshot,mostrarTodo){
+
+tablaVentas.innerHTML="";
+let totalVentas=0;
+let totalGeneral=0;
+let totalHoy=0;
+let totalMes=0;
+
+const hoy=new Date().toLocaleDateString();
+const mesActual=new Date().getMonth();
+
+let ventasPorVendedor={};
+
+snapshot.forEach(docSnap=>{
+const v=docSnap.data();
+
+if(!mostrarTodo && v.vendedor!==usuarioActual) return;
+
+const precio=v.precio||0;
+totalVentas+=precio;
+totalGeneral+=precio;
+
+if(v.timestamp){
+const fecha=new Date(v.timestamp.seconds*1000);
+if(fecha.toLocaleDateString()===hoy) totalHoy+=precio;
+if(fecha.getMonth()===mesActual) totalMes+=precio;
+}
+
+if(!ventasPorVendedor[v.vendedor]){
+ventasPorVendedor[v.vendedor]=0;
+}
+ventasPorVendedor[v.vendedor]+=precio;
+
+tablaVentas.innerHTML+=`
+<tr>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.producto}</td>
+<td>${v.metodoPago}</td>
+<td>$${v.precio}</td>
+<td>
+${rolActual==="admin"||permisosUsuario.editarVentas?
+`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`:""}
+${rolActual==="admin"||permisosUsuario.eliminarVentas?
+`<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`:""}
+<button onclick="generarFactura('${docSnap.id}')">PDF</button>
+<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+</td>
+</tr>`;
+});
+
+total.innerText="Total: $"+totalVentas;
+dashTotalGeneral.innerText="$"+totalGeneral;
+dashTotalHoy.innerText="$"+totalHoy;
+dashTotalMes.innerText="$"+totalMes;
+
+const ctx=document.getElementById("graficaVentas");
+if(window.miGrafica) window.miGrafica.destroy();
+
+window.miGrafica=new Chart(ctx,{
+type:"bar",
+data:{
+labels:Object.keys(ventasPorVendedor),
+datasets:[{
+label:"Ventas por vendedor",
+data:Object.values(ventasPorVendedor)
+}]
+}
+});
+}
 
 window.editarVenta=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
@@ -834,129 +672,10 @@ window.open(
 `https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,
 "_blank"
 );
-};/* ============================= */
-/* ============ VENTAS ========= */
-/* ============================= */
-
-window.guardarVenta=async()=>{
-await addDoc(collection(db,"ventas"),{
-cliente:cliente.value,
-telefono:telefono.value,
-producto:producto.value,
-metodoPago:metodoPago.value,
-precio:parseFloat(precio.value),
-vendedor:usuarioActual,
-fecha:new Date().toLocaleString(),
-timestamp:serverTimestamp()
-});
-
-cliente.value="";
-telefono.value="";
-producto.value="";
-metodoPago.value="";
-precio.value="";
 };
 
-function cargarVentasCompleto(){
-const q=query(
-collection(db,"ventas"),
-orderBy("timestamp","desc")
-);
-
-onSnapshot(q,(snapshot)=>{
-renderVentas(snapshot,true);
-});
-}
-
-function cargarVentasUsuario(){
-const q=query(
-collection(db,"ventas"),
-where("vendedor","==",usuarioActual),
-orderBy("timestamp","desc")
-);
-
-onSnapshot(q,(snapshot)=>{
-renderVentas(snapshot,false);
-});
-}
-
-function renderVentas(snapshot,mostrarTodo){
-
-tablaVentas.innerHTML="";
-let totalVentas=0;
-let totalGeneral=0;
-let totalHoy=0;
-let totalMes=0;
-
-const hoy=new Date().toLocaleDateString();
-const mesActual=new Date().getMonth();
-
-let ventasPorVendedor={};
-
-snapshot.forEach(docSnap=>{
-const v=docSnap.data();
-
-if(!mostrarTodo && v.vendedor!==usuarioActual) return;
-
-const precio=v.precio||0;
-totalVentas+=precio;
-totalGeneral+=precio;
-
-if(v.timestamp){
-const fecha=new Date(v.timestamp.seconds*1000);
-
-if(fecha.toLocaleDateString()===hoy){
-totalHoy+=precio;
-}
-
-if(fecha.getMonth()===mesActual){
-totalMes+=precio;
-}
-}
-
-if(!ventasPorVendedor[v.vendedor]){
-ventasPorVendedor[v.vendedor]=0;
-}
-ventasPorVendedor[v.vendedor]+=precio;
-
-tablaVentas.innerHTML+=`
-<tr>
-<td>${v.fecha}</td>
-<td>${v.vendedor}</td>
-<td>${v.cliente}</td>
-<td>${v.producto}</td>
-<td>${v.metodoPago}</td>
-<td>$${v.precio}</td>
-<td>
-${rolActual==="admin"||permisosUsuario.editarVentas?
-`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`:""}
-${rolActual==="admin"||permisosUsuario.eliminarVentas?
-`<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`:""}
-<button onclick="generarFactura('${docSnap.id}')">PDF</button>
-<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-</td>
-</tr>`;
-});
-
-total.innerText="Total: $"+totalVentas;
-dashTotalGeneral.innerText="$"+totalGeneral;
-dashTotalHoy.innerText="$"+totalHoy;
-dashTotalMes.innerText="$"+totalMes;
-
-const ctx=document.getElementById("graficaVentas");
-
-if(window.miGrafica){
-window.miGrafica.destroy();
-}
-
-window.miGrafica=new Chart(ctx,{
-type:"bar",
-data:{
-labels:Object.keys(ventasPorVendedor),
-datasets:[{
-label:"Ventas por vendedor",
-data:Object.values(ventasPorVendedor)
-}]
-}
-});
-}
+</script>
+</div>
+</div>
+</body>
+</html>
