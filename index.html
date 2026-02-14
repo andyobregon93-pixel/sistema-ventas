@@ -37,13 +37,36 @@ th{background:#007bff;color:white;}
 <h3 id="infoUsuario"></h3>
 <button class="logout" onclick="logout()">Cerrar sesión</button>
 
+<div id="panelAdmin" class="admin-panel" style="display:none;">
+
+<h2>Crear Usuario</h2>
+<input type="email" id="nuevoEmail" placeholder="Email">
+<input type="password" id="nuevoPassword" placeholder="Contraseña">
+<select id="nuevoRol">
+<option value="vendedor">Vendedor</option>
+<option value="admin">Admin</option>
+</select>
+<button onclick="crearUsuario()">Crear Usuario</button>
+
+<hr>
+
+<h2>Mis Cuentas</h2>
+<input type="text" id="cuentaPlataforma" placeholder="Plataforma">
+<input type="text" id="cuentaCorreo" placeholder="Correo">
+<input type="text" id="cuentaClave" placeholder="Clave">
+<button onclick="guardarCuenta()">Guardar Cuenta</button>
+<ul id="listaCuentas"></ul>
+
+</div>
+
 <hr>
 
 <h2>Nueva Venta</h2>
 <input type="text" id="cliente" placeholder="Cliente">
 <input type="text" id="telefono" placeholder="Teléfono">
-<select id="productoSelect"></select>
+<input type="text" id="producto" placeholder="Producto">
 <input type="text" id="metodoPago" placeholder="Método de Pago">
+<input type="number" id="precio" placeholder="Precio">
 <button onclick="guardarVenta()">Guardar Venta</button>
 
 <h2>Historial de Ventas</h2>
@@ -72,7 +95,7 @@ th{background:#007bff;color:white;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig={
@@ -89,6 +112,7 @@ const auth=getAuth(appFirebase);
 const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
+let rolActual=null;
 
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
@@ -96,37 +120,100 @@ await signInWithEmailAndPassword(auth,email.value,password.value);
 
 window.logout=()=>signOut(auth);
 
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
-infoUsuario.innerText="Usuario: "+usuarioActual;
+const snap=await getDoc(doc(db,"usuarios",user.uid));
+rolActual=snap.exists()?snap.data().role:"vendedor";
+
+infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
 loginBox.style.display="none";
 app.style.display="block";
+panelAdmin.style.display=(rolActual==="admin")?"block":"none";
+
 cargarVentas();
+if(rolActual==="admin") cargarCuentas();
 }else{
 loginBox.style.display="block";
 app.style.display="none";
 }
 });
 
-/* GUARDAR VENTA */
-window.guardarVenta=async()=>{
-if(!cliente.value||!telefono.value||!productoSelect.value||!metodoPago.value)
-return alert("Completa todos los campos");
+/* CREAR USUARIO */
+window.crearUsuario=async()=>{
+const response=await fetch(
+`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:nuevoEmail.value,
+password:nuevoPassword.value,
+returnSecureToken:true
+})
+}
+);
+const data=await response.json();
+if(data.error){alert(data.error.message);return;}
 
+await setDoc(doc(db,"usuarios",data.localId),{
+email:nuevoEmail.value,
+role:nuevoRol.value
+});
+alert("Usuario creado correctamente");
+};
+
+/* CUENTAS */
+window.guardarCuenta=async()=>{
+await addDoc(collection(db,"cuentas"),{
+plataforma:cuentaPlataforma.value,
+correo:cuentaCorreo.value,
+clave:cuentaClave.value
+});
+};
+
+function cargarCuentas(){
+onSnapshot(collection(db,"cuentas"),(snapshot)=>{
+listaCuentas.innerHTML="";
+snapshot.forEach(docSnap=>{
+const c=docSnap.data();
+listaCuentas.innerHTML+=`
+<li>
+${c.plataforma} | ${c.correo} | ${c.clave}
+<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
+</li>`;
+});
+});
+}
+
+window.editarCuenta=async(id)=>{
+const snap=await getDoc(doc(db,"cuentas",id));
+const c=snap.data();
+const p=prompt("Plataforma:",c.plataforma);
+const co=prompt("Correo:",c.correo);
+const cl=prompt("Clave:",c.clave);
+await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
+};
+
+window.eliminarCuenta=async(id)=>{
+await deleteDoc(doc(db,"cuentas",id));
+};
+
+/* VENTAS */
+window.guardarVenta=async()=>{
 await addDoc(collection(db,"ventas"),{
 cliente:cliente.value,
 telefono:telefono.value,
-producto:productoSelect.value,
+producto:producto.value,
 metodoPago:metodoPago.value,
-precio:100,
+precio:parseFloat(precio.value),
 vendedor:usuarioActual,
 fecha:new Date().toLocaleString(),
 timestamp:serverTimestamp()
 });
 };
 
-/* HISTORIAL CON TODOS LOS BOTONES */
 function cargarVentas(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
@@ -139,12 +226,12 @@ totalVentas+=v.precio||0;
 
 tablaVentas.innerHTML+=`
 <tr>
-<td>${v.fecha||""}</td>
-<td>${v.vendedor||""}</td>
-<td>${v.cliente||""}</td>
-<td>${v.producto||""}</td>
-<td>${v.metodoPago||""}</td>
-<td>$${v.precio||0}</td>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.producto}</td>
+<td>${v.metodoPago}</td>
+<td>$${v.precio}</td>
 <td>
 <button onclick="editarVenta('${docSnap.id}')">Editar</button>
 <button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
@@ -158,28 +245,21 @@ total.innerText="Total: $"+totalVentas;
 });
 }
 
-/* EDITAR */
 window.editarVenta=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
-const nuevoCliente=prompt("Cliente:",v.cliente);
-const nuevoMetodo=prompt("Método:",v.metodoPago);
-const nuevoPrecio=parseFloat(prompt("Precio:",v.precio));
-await updateDoc(doc(db,"ventas",id),{
-cliente:nuevoCliente,
-metodoPago:nuevoMetodo,
-precio:nuevoPrecio
-});
+const c=prompt("Cliente:",v.cliente);
+const m=prompt("Método:",v.metodoPago);
+const p=parseFloat(prompt("Precio:",v.precio));
+await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
 };
 
-/* ELIMINAR */
 window.eliminarVenta=async(id)=>{
 if(confirm("¿Eliminar venta?")){
 await deleteDoc(doc(db,"ventas",id));
 }
 };
 
-/* PDF */
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
@@ -189,10 +269,9 @@ pdf.text("FACTURA",20,20);
 pdf.text("Cliente: "+v.cliente,20,40);
 pdf.text("Producto: "+v.producto,20,50);
 pdf.text("Precio: $"+v.precio,20,60);
-pdf.save("factura_"+v.cliente+".pdf");
+pdf.save("factura.pdf");
 };
 
-/* WHATSAPP */
 window.enviarWhatsApp=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
