@@ -143,7 +143,7 @@ border-radius:8px;
 <input type="text" id="cuentaPlataforma" placeholder="Plataforma">
 <input type="text" id="cuentaCorreo" placeholder="Correo">
 <input type="text" id="cuentaClave" placeholder="Clave">
-<button onclick="guardarCuenta()">Guardar Cuenta</button>
+<button id="btnGuardarCuenta" onclick="guardarCuenta()">Guardar Cuenta</button>
 <ul id="listaCuentas"></ul>
 
 <hr>
@@ -229,16 +229,18 @@ border-radius:8px;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+collection, addDoc, serverTimestamp,
+query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig={
-apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-authDomain:"sistema-ventas-64a4c.firebaseapp.com",
-projectId:"sistema-ventas-64a4c",
-storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
-messagingSenderId:"291577824119",
-appId:"1:291577824119:web:894fe9842b427c9ac3d772"
+apiKey:"TU_API_KEY",
+authDomain:"TU_AUTH_DOMAIN",
+projectId:"TU_PROJECT_ID",
+storageBucket:"TU_BUCKET",
+messagingSenderId:"TU_SENDER",
+appId:"TU_APP_ID"
 };
 
 const appFirebase=initializeApp(firebaseConfig);
@@ -249,11 +251,19 @@ let usuarioActual=null;
 let rolActual=null;
 let permisosUsuario={};
 
+/* ============================= */
+/* LOGIN */
+/* ============================= */
+
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
 };
 
 window.logout=()=>signOut(auth);
+
+/* ============================= */
+/* AUTH STATE */
+/* ============================= */
 
 onAuthStateChanged(auth,async(user)=>{
 if(user){
@@ -388,6 +398,7 @@ if(!snap.exists()){
 await setDoc(ref,{verVentas:false,agregarCuentas:false});
 return {verVentas:false,agregarCuentas:false};
 }
+
 return snap.data();
 }
 
@@ -437,6 +448,7 @@ onSnapshot(q,(snapshot)=>{
 listaCuentas.innerHTML="";
 snapshot.forEach(docSnap=>{
 const c=docSnap.data();
+
 listaCuentas.innerHTML+=`
 <li>
 ${c.plataforma} | ${c.correo} | ${c.clave}
@@ -450,6 +462,7 @@ ${c.plataforma} | ${c.correo} | ${c.clave}
 window.editarCuenta=async(id)=>{
 const snap=await getDoc(doc(db,"cuentas",id));
 const c=snap.data();
+
 const p=prompt("Plataforma:",c.plataforma);
 const co=prompt("Correo:",c.correo);
 const cl=prompt("Clave:",c.clave);
@@ -479,8 +492,10 @@ cantidad:parseInt(stockCantidad.value)
 function cargarStock(){
 onSnapshot(collection(db,"stockCuentas"),(snapshot)=>{
 tablaStock.innerHTML="";
+
 snapshot.forEach(docSnap=>{
 const s=docSnap.data();
+
 tablaStock.innerHTML+=`
 <tr>
 <td>${s.plataforma}</td>
@@ -498,7 +513,10 @@ window.editarStock=async(id)=>{
 const snap=await getDoc(doc(db,"stockCuentas",id));
 const s=snap.data();
 const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
-await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
+
+await updateDoc(doc(db,"stockCuentas",id),{
+cantidad:nuevaCantidad
+});
 };
 
 window.eliminarStock=async(id)=>{
@@ -513,6 +531,8 @@ window.guardarVenta=async()=>{
 
 const ivaPorcentaje=0.16;
 const subtotal=parseFloat(precio.value);
+if(isNaN(subtotal)){ alert("Precio inválido"); return; }
+
 const iva=subtotal*ivaPorcentaje;
 const total=subtotal+iva;
 const numeroSerie="ANDVIP-"+Date.now();
@@ -538,15 +558,27 @@ producto.value="";
 precio.value="";
 };
 
+/* ============================= */
+/* CARGAR VENTAS */
+/* ============================= */
+
 function cargarVentasCompleto(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-onSnapshot(q,(snapshot)=>{renderVentas(snapshot,true);});
+onSnapshot(q,(snapshot)=>{ renderVentas(snapshot,true); });
 }
 
 function cargarVentasUsuario(){
-const q=query(collection(db,"ventas"),where("vendedor","==",usuarioActual),orderBy("timestamp","desc"));
-onSnapshot(q,(snapshot)=>{renderVentas(snapshot,false);});
+const q=query(
+collection(db,"ventas"),
+where("vendedor","==",usuarioActual),
+orderBy("timestamp","desc")
+);
+onSnapshot(q,(snapshot)=>{ renderVentas(snapshot,false); });
 }
+
+/* ============================= */
+/* RENDER VENTAS */
+/* ============================= */
 
 function renderVentas(snapshot,mostrarTodo){
 
@@ -562,23 +594,26 @@ let ventasPorVendedor={};
 
 snapshot.forEach(docSnap=>{
 const v=docSnap.data();
+
 if(!mostrarTodo && v.vendedor!==usuarioActual) return;
 
-const precio=v.total || v.precio || 0;
+const subtotal=v.subtotal ?? v.precio ?? 0;
+const iva=v.iva ?? (subtotal*0.16);
+const total=v.total ?? (subtotal+iva);
 
-totalVentas+=precio;
-totalGeneral+=precio;
+totalVentas+=total;
+totalGeneral+=total;
 
 if(v.timestamp){
 const fecha=new Date(v.timestamp.seconds*1000);
-if(fecha.toLocaleDateString()===hoy) totalHoy+=precio;
-if(fecha.getMonth()===mesActual) totalMes+=precio;
+if(fecha.toLocaleDateString()===hoy) totalHoy+=total;
+if(fecha.getMonth()===mesActual) totalMes+=total;
 }
 
 if(!ventasPorVendedor[v.vendedor]){
 ventasPorVendedor[v.vendedor]=0;
 }
-ventasPorVendedor[v.vendedor]+=precio;
+ventasPorVendedor[v.vendedor]+=total;
 
 tablaVentas.innerHTML+=`
 <tr>
@@ -587,7 +622,7 @@ tablaVentas.innerHTML+=`
 <td>${v.cliente}</td>
 <td>${v.producto}</td>
 <td>${v.metodoPago}</td>
-<td>$${precio.toFixed(2)}</td>
+<td>$${total.toFixed(2)}</td>
 <td>
 ${rolActual==="admin"||permisosUsuario.editarVentas?
 `<button onclick="editarVenta('${docSnap.id}')">Editar</button>`:""}
@@ -606,6 +641,7 @@ dashTotalMes.innerText="$"+totalMes.toFixed(2);
 
 const ctx=document.getElementById("graficaVentas");
 if(window.miGrafica) window.miGrafica.destroy();
+
 window.miGrafica=new Chart(ctx,{
 type:"bar",
 data:{
@@ -618,16 +654,30 @@ data:Object.values(ventasPorVendedor)
 });
 }
 
+/* ============================= */
+/* EDITAR / ELIMINAR */
+/* ============================= */
+
 window.editarVenta=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
-const c=prompt("Cliente:",v.cliente);
-const m=prompt("Método:",v.metodoPago);
-const p=parseFloat(prompt("Precio:",v.precio));
+
+const nuevoCliente=prompt("Cliente:",v.cliente);
+const nuevoMetodo=prompt("Método:",v.metodoPago);
+const nuevoPrecio=parseFloat(prompt("Precio:",v.subtotal ?? v.precio));
+
+if(isNaN(nuevoPrecio)){ alert("Precio inválido"); return; }
+
+const nuevoIva=nuevoPrecio*0.16;
+const nuevoTotal=nuevoPrecio+nuevoIva;
+
 await updateDoc(doc(db,"ventas",id),{
-cliente:c,
-metodoPago:m,
-precio:p
+cliente:nuevoCliente,
+metodoPago:nuevoMetodo,
+precio:nuevoPrecio,
+subtotal:nuevoPrecio,
+iva:nuevoIva,
+total:nuevoTotal
 });
 };
 
@@ -644,12 +694,19 @@ await deleteDoc(doc(db,"ventas",id));
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
+
+const subtotal=v.subtotal ?? v.precio ?? 0;
+const iva=v.iva ?? (subtotal*0.16);
+const total=v.total ?? (subtotal+iva);
+const numeroSerie=v.numeroSerie ?? "SIN-SERIE";
+
 const { jsPDF }=window.jspdf;
 const pdf=new jsPDF();
 
 pdf.setFont("helvetica","bold");
 pdf.setFontSize(22);
 pdf.text("ANDVIP",20,20);
+
 pdf.setFontSize(10);
 pdf.setFont("helvetica","normal");
 pdf.text("Empresa Digital de Servicios",20,28);
@@ -658,9 +715,10 @@ pdf.text("Email: soporte@andvip.com",20,33);
 pdf.setFontSize(14);
 pdf.setFont("helvetica","bold");
 pdf.text("FACTURA",160,20);
+
 pdf.setFontSize(10);
 pdf.setFont("helvetica","normal");
-pdf.text("Serie: "+v.numeroSerie,150,28);
+pdf.text("Serie: "+numeroSerie,150,28);
 pdf.text("Fecha: "+v.fecha,150,33);
 
 pdf.line(20,40,190,40);
@@ -679,40 +737,49 @@ pdf.line(20,85,190,85);
 
 pdf.text(v.producto,20,95);
 pdf.text("1",120,95);
-pdf.text("$"+v.subtotal.toFixed(2),140,95);
-pdf.text("$"+v.subtotal.toFixed(2),170,95);
+pdf.text("$"+subtotal.toFixed(2),140,95);
+pdf.text("$"+subtotal.toFixed(2),170,95);
 
 pdf.line(20,105,190,105);
 
 pdf.text("Subtotal:",130,120);
-pdf.text("$"+v.subtotal.toFixed(2),170,120);
+pdf.text("$"+subtotal.toFixed(2),170,120);
 
 pdf.text("IVA (16%):",130,130);
-pdf.text("$"+v.iva.toFixed(2),170,130);
+pdf.text("$"+iva.toFixed(2),170,130);
 
 pdf.setFontSize(14);
 pdf.text("TOTAL:",130,145);
-pdf.text("$"+v.total.toFixed(2),170,145);
+pdf.text("$"+total.toFixed(2),170,145);
 
-pdf.save("Factura_"+v.numeroSerie+".pdf");
+pdf.save("Factura_"+numeroSerie+".pdf");
 };
+
+/* ============================= */
+/* WHATSAPP */
+/* ============================= */
 
 window.enviarWhatsApp=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
 
+const subtotal=v.subtotal ?? v.precio ?? 0;
+const iva=v.iva ?? (subtotal*0.16);
+const total=v.total ?? (subtotal+iva);
+const numeroSerie=v.numeroSerie ?? "SIN-SERIE";
+
 const mensaje=
 `🧾 FACTURA ANDVIP
-Serie: ${v.numeroSerie}
+Serie: ${numeroSerie}
 Fecha: ${v.fecha}
 
 Cliente: ${v.cliente}
 Producto: ${v.producto}
 Método de pago: ${v.metodoPago}
 
-Subtotal: $${v.subtotal.toFixed(2)}
-IVA (16%): $${v.iva.toFixed(2)}
-TOTAL: $${v.total.toFixed(2)}
+Subtotal: $${subtotal.toFixed(2)}
+IVA (16%): $${iva.toFixed(2)}
+TOTAL: $${total.toFixed(2)}
 
 Gracias por confiar en ANDVIP 🙌`;
 
