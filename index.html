@@ -123,7 +123,14 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig={ /* TU CONFIG */ };
+const firebaseConfig={
+apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+authDomain:"sistema-ventas-64a4c.firebaseapp.com",
+projectId:"sistema-ventas-64a4c",
+storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
+messagingSenderId:"291577824119",
+appId:"1:291577824119:web:894fe9842b427c9ac3d772"
+};
 
 const appFirebase=initializeApp(firebaseConfig);
 const auth=getAuth(appFirebase);
@@ -133,40 +140,36 @@ let usuarioActual=null;
 let rolActual=null;
 
 /* LOGIN */
-window.login=async()=>{ await signInWithEmailAndPassword(auth,email.value,password.value); };
+window.login=async()=>{
+await signInWithEmailAndPassword(auth,email.value,password.value);
+};
 window.logout=()=>signOut(auth);
 
-/* PERMISOS */
-async function obtenerPermisos(){
-const ref=doc(db,"config","permisos");
-const snap=await getDoc(ref);
-if(!snap.exists()){
-await setDoc(ref,{verVentas:false,agregarCuentas:false});
-return {verVentas:false,agregarCuentas:false};
+/* CREAR USUARIO */
+window.crearUsuario=async()=>{
+const response=await fetch(
+`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:nuevoEmail.value,
+password:nuevoPassword.value,
+returnSecureToken:true
+})
 }
-return snap.data();
-}
+);
+const data=await response.json();
+if(data.error){alert(data.error.message);return;}
 
-async function actualizarEstadoPermisos(){
-const p=await obtenerPermisos();
-estadoPermisos.innerText=
-"Historial completo: "+(p.verVentas?"ACTIVO":"OFF")+
-" | Agregar cuentas: "+(p.agregarCuentas?"ACTIVO":"OFF");
-}
-
-window.toggleVerVentas=async()=>{
-const p=await obtenerPermisos();
-await updateDoc(doc(db,"config","permisos"),{verVentas:!p.verVentas});
-actualizarEstadoPermisos();
+await setDoc(doc(db,"usuarios",data.localId),{
+email:nuevoEmail.value,
+role:nuevoRol.value
+});
+alert("Usuario creado correctamente");
 };
 
-window.toggleAgregarCuentas=async()=>{
-const p=await obtenerPermisos();
-await updateDoc(doc(db,"config","permisos"),{agregarCuentas:!p.agregarCuentas});
-actualizarEstadoPermisos();
-};
-
-/* AUTH STATE */
+/* AUTH */
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
@@ -178,22 +181,10 @@ loginBox.style.display="none";
 app.style.display="block";
 panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
-if(rolActual==="admin"){
 cargarVentas();
 cargarCuentas();
-cargarStock();
-actualizarEstadoPermisos();
-}else{
-const permisos=await obtenerPermisos();
-if(permisos.verVentas){ cargarVentas(); }
-else{ cargarVentasUsuario(); }
+if(rolActual==="admin") cargarStock();
 
-if(permisos.agregarCuentas){ cargarCuentas(); }
-else{
-cargarCuentas();
-btnGuardarCuenta.disabled=true;
-}
-}
 }else{
 loginBox.style.display="block";
 app.style.display="none";
@@ -317,30 +308,6 @@ tablaVentas.innerHTML+=`
 <button onclick="generarFactura('${docSnap.id}')">PDF</button>
 <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
 </td>
-</tr>`;
-});
-total.innerText="Total: $"+totalVentas;
-});
-}
-
-function cargarVentasUsuario(){
-const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-onSnapshot(q,(snapshot)=>{
-tablaVentas.innerHTML="";
-let totalVentas=0;
-snapshot.forEach(docSnap=>{
-const v=docSnap.data();
-if(v.vendedor!==usuarioActual) return;
-totalVentas+=v.precio||0;
-tablaVentas.innerHTML+=`
-<tr>
-<td>${v.fecha}</td>
-<td>${v.vendedor}</td>
-<td>${v.cliente}</td>
-<td>${v.producto}</td>
-<td>${v.metodoPago}</td>
-<td>$${v.precio}</td>
-<td></td>
 </tr>`;
 });
 total.innerText="Total: $"+totalVentas;
