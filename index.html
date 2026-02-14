@@ -9,16 +9,16 @@
 
 <style>
 body{font-family:Arial;background:#f4f6f9;margin:0;}
-.container{width:90%;max-width:1000px;margin:30px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-input,select,button{width:100%;padding:10px;margin:6px 0;}
-button{background:#007bff;color:white;border:none;cursor:pointer;}
-button:hover{background:#0056b3;}
+.container{width:90%;max-width:1100px;margin:30px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+input,select,button{width:100%;padding:8px;margin:5px 0;}
+button{background:#007bff;color:white;border:none;cursor:pointer;border-radius:5px;}
+button:hover{opacity:0.9;}
 .delete-btn{background:#dc3545;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
+.logout{background:#dc3545;}
+table{width:100%;border-collapse:collapse;margin-top:15px;}
 th,td{border:1px solid #ddd;padding:8px;text-align:center;}
 th{background:#007bff;color:white;}
-.logout{background:#dc3545;}
-.admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:20px;}
+.admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:15px;}
 </style>
 </head>
 
@@ -33,54 +33,69 @@ th{background:#007bff;color:white;}
 </div>
 
 <div id="app" style="display:none;">
-  <h3 id="infoUsuario"></h3>
-  <button class="logout" onclick="logout()">Cerrar sesión</button>
 
-  <div id="panelAdmin" class="admin-panel" style="display:none;">
-    <h2>Administrar Productos</h2>
-    <input type="text" id="nombreProducto" placeholder="Nombre del producto">
-    <input type="number" id="precioProducto" placeholder="Precio">
-    <input type="number" id="stockProducto" placeholder="Stock inicial">
-    <button onclick="crearProducto()">Crear Producto</button>
-    <h3>Lista de Productos</h3>
-    <ul id="listaProductos"></ul>
-  </div>
+<h3 id="infoUsuario"></h3>
+<button class="logout" onclick="logout()">Cerrar sesión</button>
 
-  <hr>
+<!-- PANEL ADMIN -->
+<div id="panelAdmin" class="admin-panel" style="display:none;">
 
-  <h2>Nueva Venta</h2>
-  <input type="text" id="cliente" placeholder="Cliente">
-  <input type="text" id="telefono" placeholder="Teléfono">
-  <select id="productoSelect"></select>
-  <input type="text" id="metodoPago" placeholder="Método de Pago">
-  <button onclick="guardarVenta()">Guardar Venta</button>
+<h2>Crear Usuario</h2>
+<input type="email" id="nuevoEmail" placeholder="Email nuevo usuario">
+<input type="password" id="nuevoPassword" placeholder="Contraseña">
+<select id="nuevoRol">
+  <option value="vendedor">Vendedor</option>
+  <option value="admin">Admin</option>
+</select>
+<button onclick="crearUsuario()">Crear Usuario</button>
 
-  <h2>Historial de Ventas</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Vendedor</th>
-        <th>Cliente</th>
-        <th>Producto</th>
-        <th>Método</th>
-        <th>Precio</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody id="tablaVentas"></tbody>
-  </table>
+<hr>
 
-  <h3 id="total"></h3>
+<h2>Administrar Productos</h2>
+<input type="text" id="nombreProducto" placeholder="Nombre del producto">
+<input type="number" id="precioProducto" placeholder="Precio">
+<input type="number" id="stockProducto" placeholder="Stock">
+<button onclick="crearProducto()">Crear Producto</button>
+<ul id="listaProductos"></ul>
+
+</div>
+
+<hr>
+
+<h2>Nueva Venta</h2>
+<input type="text" id="cliente" placeholder="Cliente">
+<input type="text" id="telefono" placeholder="Teléfono">
+<select id="productoSelect"></select>
+<input type="text" id="metodoPago" placeholder="Método de Pago">
+<button onclick="guardarVenta()">Guardar Venta</button>
+
+<h2>Historial de Ventas</h2>
+<table>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Vendedor</th>
+<th>Cliente</th>
+<th>Producto</th>
+<th>Método</th>
+<th>Precio</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tablaVentas"></tbody>
+</table>
+
+<h3 id="total"></h3>
+
 </div>
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, where }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -92,84 +107,212 @@ const firebaseConfig = {
   appId: "1:291577824119:web:894fe9842b427c9ac3d772"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const loginBox = document.getElementById("loginBox");
-const appDiv = document.getElementById("app");
-const infoUsuario = document.getElementById("infoUsuario");
-const panelAdmin = document.getElementById("panelAdmin");
-const listaProductos = document.getElementById("listaProductos");
-const productoSelect = document.getElementById("productoSelect");
-const tablaVentas = document.getElementById("tablaVentas");
-const total = document.getElementById("total");
+let usuarioActual=null;
+let rolActual=null;
 
-let usuarioActual = null;
-let rolActual = null;
-
-/* ✅ LOGIN CORREGIDO */
+/* LOGIN */
 window.login = async function(){
-  const emailInput = document.getElementById("email").value;
-  const passwordInput = document.getElementById("password").value;
-
-  if(!emailInput || !passwordInput){
-    alert("Ingresa correo y contraseña");
-    return;
-  }
-
-  try {
-    await signInWithEmailAndPassword(auth, emailInput, passwordInput);
-  } catch(e){
-    alert("Error: " + e.message);
-  }
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
+  await signInWithEmailAndPassword(auth,email,password);
 };
-
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
-    usuarioActual = user.email;
-    const snap = await getDoc(doc(db,"usuarios",user.uid));
-    if(snap.exists()){
-      rolActual = snap.data().role;
-      loginBox.style.display="none";
-      appDiv.style.display="block";
-      infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
-      if(rolActual==="admin") panelAdmin.style.display="block";
-      cargarVentas();
-    } else {
-      alert("Usuario no existe en Firestore");
-      signOut(auth);
-    }
-  } else {
-    loginBox.style.display="block";
-    appDiv.style.display="none";
-  }
-});
 
 window.logout=function(){ signOut(auth); };
 
+onAuthStateChanged(auth, async(user)=>{
+  if(user){
+    usuarioActual=user.email;
+    const snap=await getDoc(doc(db,"usuarios",user.uid));
+    if(!snap.exists()){ alert("Usuario no registrado"); signOut(auth); return;}
+    rolActual=snap.data().role;
+
+    document.getElementById("infoUsuario").innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
+    loginBox.style.display="none";
+    app.style.display="block";
+    if(rolActual==="admin") panelAdmin.style.display="block";
+    else panelAdmin.style.display="none";
+
+    cargarProductos();
+    cargarVentas();
+  }else{
+    loginBox.style.display="block";
+    app.style.display="none";
+  }
+});
+
+/* CREAR USUARIO (SOLO ADMIN) */
+window.crearUsuario=async()=>{
+  if(rolActual!=="admin") return alert("Solo admin puede crear usuarios");
+
+  const email=nuevoEmail.value;
+  const password=nuevoPassword.value;
+  const rol=nuevoRol.value;
+
+  if(!email||!password) return alert("Completa datos");
+
+  const cred=await createUserWithEmailAndPassword(auth,email,password);
+
+  await setDoc(doc(db,"usuarios",cred.user.uid),{
+    email:email,
+    role:rol
+  });
+
+  alert("Usuario creado correctamente");
+
+  // volver a iniciar sesión como admin
+  await signOut(auth);
+  alert("Vuelve a iniciar sesión como admin");
+};
+
+/* PRODUCTOS */
+function cargarProductos(){
+  onSnapshot(collection(db,"productos"),(snapshot)=>{
+    listaProductos.innerHTML="";
+    productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
+
+    snapshot.forEach(docSnap=>{
+      const p=docSnap.data();
+      const id=docSnap.id;
+
+      if(rolActual==="admin"){
+        listaProductos.innerHTML+=`
+        <li>
+        ${p.nombre} - $${p.precio} - Stock: ${p.stock}
+        <button onclick="editarProducto('${id}')">Editar</button>
+        <button class="delete-btn" onclick="eliminarProducto('${id}')">Eliminar</button>
+        </li>`;
+      }
+
+      if(p.stock>0){
+        productoSelect.innerHTML+=`<option value="${id}">${p.nombre} - $${p.precio}</option>`;
+      }
+    });
+  });
+}
+
+window.crearProducto=async()=>{
+  await addDoc(collection(db,"productos"),{
+    nombre:nombreProducto.value,
+    precio:parseFloat(precioProducto.value),
+    stock:parseInt(stockProducto.value)
+  });
+};
+
+window.editarProducto=async(id)=>{
+  const ref=doc(db,"productos",id);
+  const snap=await getDoc(ref);
+  const p=snap.data();
+  const n=prompt("Nombre:",p.nombre);
+  const pr=parseFloat(prompt("Precio:",p.precio));
+  const st=parseInt(prompt("Stock:",p.stock));
+  await updateDoc(ref,{nombre:n,precio:pr,stock:st});
+};
+
+window.eliminarProducto=async(id)=>{
+  if(confirm("¿Eliminar producto?")){
+    await deleteDoc(doc(db,"productos",id));
+  }
+};
+
+/* VENTAS */
 function cargarVentas(){
   const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
   onSnapshot(q,(snapshot)=>{
     tablaVentas.innerHTML="";
     let totalVentas=0;
+
     snapshot.forEach(docSnap=>{
       const v=docSnap.data();
-      totalVentas+=v.precio || 0;
+      totalVentas+=v.precio;
+
+      let botones=`
+      <button onclick="generarFactura('${docSnap.id}')">PDF</button>
+      <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+      `;
+
+      if(rolActual==="admin"){
+        botones+=`
+        <button onclick="editarVenta('${docSnap.id}')">Editar</button>
+        <button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`;
+      }
+
+      if(rolActual==="vendedor" && v.vendedor===usuarioActual){
+        botones+=`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`;
+      }
+
       tablaVentas.innerHTML+=`
       <tr>
-      <td>${v.fecha || ""}</td>
-      <td>${v.vendedor || ""}</td>
-      <td>${v.cliente || ""}</td>
-      <td>${v.producto || ""}</td>
-      <td>${v.metodoPago || ""}</td>
-      <td>$${v.precio || 0}</td>
-      <td></td>
+      <td>${v.fecha}</td>
+      <td>${v.vendedor}</td>
+      <td>${v.cliente}</td>
+      <td>${v.producto}</td>
+      <td>${v.metodoPago}</td>
+      <td>$${v.precio}</td>
+      <td>${botones}</td>
       </tr>`;
     });
+
     total.innerText="Total: $"+totalVentas;
   });
 }
+
+window.guardarVenta=async()=>{
+  const ref=doc(db,"productos",productoSelect.value);
+  const snap=await getDoc(ref);
+  const producto=snap.data();
+
+  await addDoc(collection(db,"ventas"),{
+    cliente:cliente.value,
+    telefono:telefono.value,
+    producto:producto.nombre,
+    metodoPago:metodoPago.value,
+    precio:producto.precio,
+    vendedor:usuarioActual,
+    fecha:new Date().toLocaleString(),
+    timestamp:serverTimestamp()
+  });
+
+  await updateDoc(ref,{stock:producto.stock-1});
+};
+
+window.editarVenta=async(id)=>{
+  const snap=await getDoc(doc(db,"ventas",id));
+  const v=snap.data();
+  const c=prompt("Cliente:",v.cliente);
+  const m=prompt("Método:",v.metodoPago);
+  const p=parseFloat(prompt("Precio:",v.precio));
+  await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
+};
+
+window.eliminarVenta=async(id)=>{
+  if(confirm("¿Eliminar venta?")){
+    await deleteDoc(doc(db,"ventas",id));
+  }
+};
+
+window.generarFactura=async(id)=>{
+  const snap=await getDoc(doc(db,"ventas",id));
+  const v=snap.data();
+  const { jsPDF }=window.jspdf;
+  const pdf=new jsPDF();
+  pdf.text("FACTURA",20,20);
+  pdf.text("Cliente: "+v.cliente,20,40);
+  pdf.text("Producto: "+v.producto,20,50);
+  pdf.text("Precio: $"+v.precio,20,60);
+  pdf.save("factura_"+v.cliente+".pdf");
+};
+
+window.enviarWhatsApp=async(id)=>{
+  const snap=await getDoc(doc(db,"ventas",id));
+  const v=snap.data();
+  const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
+  const url=`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url,"_blank");
+};
 
 </script>
 </body>
