@@ -6,7 +6,6 @@
 <title>Sistema de Ventas</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
@@ -63,6 +62,12 @@ th{background:#007bff;color:white;}
 <option value="vendedor">Vendedor</option>
 <option value="admin">Admin</option>
 </select>
+
+<h4>Permisos del Vendedor</h4>
+<label><input type="checkbox" id="permEditarVentas"> Puede editar sus ventas</label>
+<label><input type="checkbox" id="permEliminarVentas"> Puede eliminar ventas</label>
+<label><input type="checkbox" id="permGuardarCuentas"> Puede guardar cuentas</label>
+
 <button onclick="crearUsuario()">Crear Usuario</button>
 
 <hr>
@@ -71,7 +76,7 @@ th{background:#007bff;color:white;}
 <input type="text" id="cuentaPlataforma" placeholder="Plataforma">
 <input type="text" id="cuentaCorreo" placeholder="Correo">
 <input type="text" id="cuentaClave" placeholder="Clave">
-<button onclick="guardarCuenta()">Guardar Cuenta</button>
+<button id="btnGuardarCuenta" onclick="guardarCuenta()">Guardar Cuenta</button>
 <ul id="listaCuentas"></ul>
 
 <hr>
@@ -93,30 +98,6 @@ th{background:#007bff;color:white;}
 </table>
 
 </div>
-
-<hr>
-
-<h2>Dashboard</h2>
-
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
-<div style="background:#e3f2fd;padding:15px;border-radius:8px;">
-<h4>Total General</h4>
-<h2 id="dashTotalGeneral">$0</h2>
-</div>
-
-<div style="background:#e8f5e9;padding:15px;border-radius:8px;">
-<h4>Total Hoy</h4>
-<h2 id="dashTotalHoy">$0</h2>
-</div>
-
-<div style="background:#fff3e0;padding:15px;border-radius:8px;">
-<h4>Total Mes</h4>
-<h2 id="dashTotalMes">$0</h2>
-</div>
-</div>
-
-<br>
-<canvas id="graficaVentas" height="100"></canvas>
 
 <hr>
 
@@ -172,6 +153,7 @@ const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
 let rolActual=null;
+let permisosUsuario={};
 
 /* LOGIN */
 window.login=async()=>{
@@ -183,13 +165,29 @@ window.logout=()=>signOut(auth);
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
+
 const snap=await getDoc(doc(db,"usuarios",user.uid));
-rolActual=snap.exists()?snap.data().role:"vendedor";
+
+if(snap.exists()){
+rolActual=snap.data().role;
+permisosUsuario=snap.data().permisos || {};
+}else{
+rolActual="vendedor";
+}
 
 infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
+
 loginBox.style.display="none";
 app.style.display="block";
 panelAdmin.style.display=(rolActual==="admin")?"block":"none";
+
+/* Bloquear guardar cuentas si no tiene permiso */
+if(rolActual==="vendedor" && !permisosUsuario.guardarCuentas){
+cuentaPlataforma.disabled=true;
+cuentaCorreo.disabled=true;
+cuentaClave.disabled=true;
+btnGuardarCuenta.disabled=true;
+}
 
 cargarVentas();
 cargarCuentas();
@@ -215,13 +213,20 @@ returnSecureToken:true
 })
 }
 );
+
 const data=await response.json();
 if(data.error){alert(data.error.message);return;}
 
 await setDoc(doc(db,"usuarios",data.localId),{
 email:nuevoEmail.value,
-role:nuevoRol.value
+role:nuevoRol.value,
+permisos:{
+editarVentas:permEditarVentas.checked,
+eliminarVentas:permEliminarVentas.checked,
+guardarCuentas:permGuardarCuentas.checked
+}
 });
+
 alert("Usuario creado correctamente");
 };
 
@@ -249,25 +254,10 @@ const c=docSnap.data();
 listaCuentas.innerHTML+=`
 <li>
 ${c.plataforma} | ${c.correo} | ${c.clave}
-<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
 </li>`;
 });
 });
 }
-
-window.editarCuenta=async(id)=>{
-const snap=await getDoc(doc(db,"cuentas",id));
-const c=snap.data();
-const p=prompt("Plataforma:",c.plataforma);
-const co=prompt("Correo:",c.correo);
-const cl=prompt("Clave:",c.clave);
-await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
-};
-
-window.eliminarCuenta=async(id)=>{
-await deleteDoc(doc(db,"cuentas",id));
-};
 
 /* STOCK */
 window.guardarStock=async()=>{
@@ -286,61 +276,9 @@ tablaStock.innerHTML+=`
 <tr>
 <td>${s.plataforma}</td>
 <td>${s.cantidad}</td>
-<td>
-<button onclick="editarStock('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
-</td>
+<td></td>
 </tr>`;
 });
-});
-}
-
-window.editarStock=async(id)=>{
-const snap=await getDoc(doc(db,"stockCuentas",id));
-const s=snap.data();
-const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
-await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
-};
-
-window.eliminarStock=async(id)=>{
-await deleteDoc(doc(db,"stockCuentas",id));
-};
-
-/* DASHBOARD */
-function cargarDashboard(snapshot){
-let totalGeneral=0,totalHoy=0,totalMes=0;
-const hoy=new Date().toLocaleDateString();
-const mesActual=new Date().getMonth();
-let ventasPorVendedor={};
-
-snapshot.forEach(docSnap=>{
-const v=docSnap.data();
-const precio=v.precio||0;
-totalGeneral+=precio;
-
-if(v.timestamp){
-const fecha=new Date(v.timestamp.seconds*1000);
-if(fecha.toLocaleDateString()===hoy) totalHoy+=precio;
-if(fecha.getMonth()===mesActual) totalMes+=precio;
-}
-
-if(!ventasPorVendedor[v.vendedor]) ventasPorVendedor[v.vendedor]=0;
-ventasPorVendedor[v.vendedor]+=precio;
-});
-
-dashTotalGeneral.innerText="$"+totalGeneral;
-dashTotalHoy.innerText="$"+totalHoy;
-dashTotalMes.innerText="$"+totalMes;
-
-const ctx=document.getElementById("graficaVentas");
-if(window.miGrafica) window.miGrafica.destroy();
-
-window.miGrafica=new Chart(ctx,{
-type:"bar",
-data:{
-labels:Object.keys(ventasPorVendedor),
-datasets:[{label:"Ventas por vendedor",data:Object.values(ventasPorVendedor)}]
-}
 });
 }
 
@@ -377,8 +315,10 @@ tablaVentas.innerHTML+=`
 <td>${v.metodoPago}</td>
 <td>$${v.precio}</td>
 <td>
-<button onclick="editarVenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
+${rolActual==="admin"||permisosUsuario.editarVentas?
+`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`:""}
+${rolActual==="admin"||permisosUsuario.eliminarVentas?
+`<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`:""}
 <button onclick="generarFactura('${docSnap.id}')">PDF</button>
 <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
 </td>
@@ -386,7 +326,6 @@ tablaVentas.innerHTML+=`
 });
 
 total.innerText="Total: $"+totalVentas;
-cargarDashboard(snapshot);
 });
 }
 
