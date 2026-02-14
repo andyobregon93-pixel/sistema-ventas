@@ -8,65 +8,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{
-  font-family: Arial;
-  background:#f4f6f9;
-  margin:0;
-}
-.container{
-  width:90%;
-  max-width:1000px;
-  margin:30px auto;
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-input,select,button{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-}
-button{
-  background:#007bff;
-  color:white;
-  border:none;
-  cursor:pointer;
-}
-button:hover{
-  background:#0056b3;
-}
-.delete-btn{
-  background:#dc3545;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-th,td{
-  border:1px solid #ddd;
-  padding:8px;
-  text-align:center;
-}
-th{
-  background:#007bff;
-  color:white;
-}
-.logout{
-  background:#dc3545;
-}
-.admin-panel{
-  background:#f1f1f1;
-  padding:15px;
-  border-radius:8px;
-  margin-top:20px;
-}
+body{font-family:Arial;background:#f4f6f9;margin:0;}
+.container{width:90%;max-width:1000px;margin:30px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+input,select,button{width:100%;padding:10px;margin:6px 0;}
+button{background:#007bff;color:white;border:none;cursor:pointer;}
+button:hover{background:#0056b3;}
+.delete-btn{background:#dc3545;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid #ddd;padding:8px;text-align:center;}
+th{background:#007bff;color:white;}
+.logout{background:#dc3545;}
+.admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:20px;}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
 <div id="loginBox">
@@ -94,14 +50,10 @@ th{
 
   <h2>Nueva Venta</h2>
   <input type="text" id="cliente" placeholder="Cliente">
-  <input type="text" id="telefono" placeholder="Teléfono (ej: 521234567890)">
+  <input type="text" id="telefono" placeholder="Teléfono">
   <select id="productoSelect"></select>
   <input type="text" id="metodoPago" placeholder="Método de Pago">
   <button onclick="guardarVenta()">Guardar Venta</button>
-
-  <h3>Eliminar Ventas por Cliente</h3>
-  <input type="text" id="clienteEliminar" placeholder="Nombre del cliente">
-  <button onclick="eliminarCliente()">Eliminar Cliente</button>
 
   <h2>Historial de Ventas</h2>
   <table>
@@ -128,9 +80,10 @@ th{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot }
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* 🔥 CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
   authDomain: "sistema-ventas-64a4c.firebaseapp.com",
@@ -140,13 +93,25 @@ const firebaseConfig = {
   appId: "1:291577824119:web:894fe9842b427c9ac3d772"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+/* 🔥 INICIALIZAR */
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
+/* 🔥 ELEMENTOS DOM */
+const loginBox = document.getElementById("loginBox");
+const appDiv = document.getElementById("app");
+const infoUsuario = document.getElementById("infoUsuario");
+const panelAdmin = document.getElementById("panelAdmin");
+const listaProductos = document.getElementById("listaProductos");
+const productoSelect = document.getElementById("productoSelect");
+const tablaVentas = document.getElementById("tablaVentas");
+const total = document.getElementById("total");
 
 let usuarioActual = null;
 let rolActual = null;
 
+/* LOGIN */
 window.login = async function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -157,47 +122,39 @@ window.login = async function(){
   }
 };
 
-onAuthStateChanged(auth, async (user) => {
-
+onAuthStateChanged(auth, async (user)=>{
   if(user){
     usuarioActual = user.email;
-    const snap = await getDoc(doc(db, "usuarios", user.uid));
+    const snap = await getDoc(doc(db,"usuarios",user.uid));
 
     if(snap.exists()){
       rolActual = snap.data().role;
       loginBox.style.display="none";
-      app.style.display="block";
+      appDiv.style.display="block";
       infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
 
-      if(rolActual==="admin"){
-        panelAdmin.style.display="block";
-      }
+      if(rolActual==="admin") panelAdmin.style.display="block";
 
       cargarProductos();
       cargarVentas();
     }else{
-      alert("Usuario no existe en Firestore");
+      alert("Usuario no existe");
       signOut(auth);
     }
-
   }else{
     loginBox.style.display="block";
-    app.style.display="none";
+    appDiv.style.display="none";
   }
 });
 
 /* PRODUCTOS */
-
 window.crearProducto = async function(){
   const nombre = nombreProducto.value;
   const precio = parseFloat(precioProducto.value);
   const stock = parseInt(stockProducto.value);
-
-  if(!nombre || isNaN(precio) || isNaN(stock))
-    return alert("Completa todo");
+  if(!nombre || isNaN(precio) || isNaN(stock)) return alert("Completa todo");
 
   await addDoc(collection(db,"productos"),{nombre,precio,stock});
-  alert("Producto creado");
   cargarProductos();
 };
 
@@ -212,49 +169,18 @@ async function cargarProductos(){
     const id = docSnap.id;
 
     if(rolActual==="admin"){
-      listaProductos.innerHTML+=`
-        <li>
-          ${p.nombre} - $${p.precio} - Stock: ${p.stock}
-          <button onclick="editarProducto('${id}','${p.nombre}',${p.precio},${p.stock})">Editar</button>
-          <button class="delete-btn" onclick="eliminarProducto('${id}')">Eliminar</button>
-        </li>`;
+      listaProductos.innerHTML+=`<li>${p.nombre} - $${p.precio} - Stock: ${p.stock}</li>`;
     }
 
     if(p.stock>0){
       productoSelect.innerHTML+=
-        `<option value="${id}">${p.nombre} - $${p.precio} (Stock: ${p.stock})</option>`;
+        `<option value="${id}">${p.nombre} - $${p.precio}</option>`;
     }
   });
 }
 
-window.editarProducto = async function(id,nombre,precio,stock){
-  const nuevoNombre = prompt("Nuevo nombre:",nombre);
-  const nuevoPrecio = parseFloat(prompt("Nuevo precio:",precio));
-  const nuevoStock = parseInt(prompt("Nuevo stock:",stock));
-
-  if(!nuevoNombre || isNaN(nuevoPrecio) || isNaN(nuevoStock))
-    return alert("Datos inválidos");
-
-  await updateDoc(doc(db,"productos",id),{
-    nombre:nuevoNombre,
-    precio:nuevoPrecio,
-    stock:nuevoStock
-  });
-
-  alert("Producto actualizado");
-  cargarProductos();
-};
-
-window.eliminarProducto = async function(id){
-  if(!confirm("Eliminar producto?")) return;
-  await deleteDoc(doc(db,"productos",id));
-  cargarProductos();
-};
-
 /* VENTAS */
-
 window.guardarVenta = async function(){
-
   const nombreCliente = cliente.value;
   const tel = telefono.value;
   const metodo = metodoPago.value;
@@ -267,8 +193,7 @@ window.guardarVenta = async function(){
   const snap = await getDoc(ref);
   const producto = snap.data();
 
-  if(producto.stock<=0)
-    return alert("Sin stock");
+  if(producto.stock<=0) return alert("Sin stock");
 
   await addDoc(collection(db,"ventas"),{
     cliente:nombreCliente,
@@ -283,8 +208,6 @@ window.guardarVenta = async function(){
   });
 
   await updateDoc(ref,{stock:producto.stock-1});
-  alert("Venta realizada");
-  cargarProductos();
 };
 
 function cargarVentas(){
@@ -296,66 +219,25 @@ function cargarVentas(){
 
     snapshot.forEach(docSnap=>{
       const v=docSnap.data();
-      const id=docSnap.id;
+      totalVentas+=v.precio;
 
-      if(rolActual==="admin" || v.vendedor===usuarioActual){
-
-        totalVentas+=v.precio;
-
-        tablaVentas.innerHTML+=`
-        <tr>
-          <td>${v.fecha}</td>
-          <td>${v.vendedor}</td>
-          <td>${v.cliente}</td>
-          <td>${v.producto}</td>
-          <td>${v.metodoPago}</td>
-          <td>$${v.precio}</td>
-          <td>
-            <button onclick="editarVenta('${id}')">Editar</button>
-            <button onclick="generarFactura('${id}')">PDF</button>
-            <button onclick="enviarWhatsApp('${id}')">WhatsApp</button>
-            ${rolActual==="admin"
-              ? `<button class="delete-btn" onclick="eliminarVenta('${id}')">Eliminar</button>`
-              : ""}
-          </td>
-        </tr>`;
-      }
+      tablaVentas.innerHTML+=`
+      <tr>
+        <td>${v.fecha}</td>
+        <td>${v.vendedor}</td>
+        <td>${v.cliente}</td>
+        <td>${v.producto}</td>
+        <td>${v.metodoPago}</td>
+        <td>$${v.precio}</td>
+        <td>-</td>
+      </tr>`;
     });
 
     total.innerText="Total: $"+totalVentas;
   });
 }
 
-window.editarVenta = async function(id){
-  const snap = await getDoc(doc(db,"ventas",id));
-  const v = snap.data();
-
-  const nuevoCliente = prompt("Cliente:",v.cliente);
-  const nuevoTelefono = prompt("Teléfono:",v.telefono);
-  const nuevoMetodo = prompt("Método de pago:",v.metodoPago);
-  const nuevoPrecio = parseFloat(prompt("Precio:",v.precio));
-
-  if(!nuevoCliente || !nuevoTelefono || !nuevoMetodo || isNaN(nuevoPrecio))
-    return alert("Datos inválidos");
-
-  await updateDoc(doc(db,"ventas",id),{
-    cliente:nuevoCliente,
-    telefono:nuevoTelefono,
-    metodoPago:nuevoMetodo,
-    precio:nuevoPrecio
-  });
-
-  alert("Venta actualizada");
-};
-
-window.eliminarVenta=async function(id){
-  if(!confirm("Eliminar venta?")) return;
-  await deleteDoc(doc(db,"ventas",id));
-};
-
-window.logout=function(){
-  signOut(auth);
-};
+window.logout=function(){ signOut(auth); };
 
 </script>
 </body>
