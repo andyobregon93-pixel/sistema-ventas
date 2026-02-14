@@ -6,6 +6,7 @@
 <title>Sistema de Ventas</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
@@ -16,8 +17,8 @@ background-size:cover;
 }
 
 .container{
-width:90%;
-max-width:1100px;
+width:95%;
+max-width:1200px;
 margin:30px auto;
 background:rgba(255,255,255,0.95);
 padding:20px;
@@ -26,21 +27,71 @@ box-shadow:0 0 20px rgba(0,0,0,0.4);
 backdrop-filter:blur(6px);
 }
 
-input,select,button{width:100%;padding:8px;margin:5px 0;}
-button{background:#007bff;color:white;border:none;cursor:pointer;border-radius:5px;}
+input,select,button{
+width:100%;
+padding:8px;
+margin:5px 0;
+}
+
+button{
+background:#007bff;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:5px;
+}
+
 button:hover{opacity:0.9;}
+
 .delete-btn{background:#dc3545;}
 .logout{background:#dc3545;}
-table{width:100%;border-collapse:collapse;margin-top:15px;}
-th,td{border:1px solid #ddd;padding:8px;text-align:center;}
-th{background:#007bff;color:white;}
-.admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:15px;}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#007bff;
+color:white;
+}
+
+.admin-panel{
+background:#f1f1f1;
+padding:15px;
+border-radius:8px;
+margin-top:15px;
+}
+
+.dashboard-cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+}
+
+.card{
+padding:15px;
+border-radius:8px;
+color:#000;
+}
+
+.card-blue{background:#e3f2fd;}
+.card-green{background:#e8f5e9;}
+.card-orange{background:#fff3e0;}
 </style>
 </head>
 
 <body>
 <div class="container">
 
+<!-- LOGIN -->
 <div id="loginBox">
 <h2>Login</h2>
 <input type="email" id="email" placeholder="Email">
@@ -48,27 +99,37 @@ th{background:#007bff;color:white;}
 <button onclick="login()">Ingresar</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
 <h3 id="infoUsuario"></h3>
 <button class="logout" onclick="logout()">Cerrar sesión</button>
 
+<!-- PANEL ADMIN -->
 <div id="panelAdmin" class="admin-panel" style="display:none;">
 
 <h2>Crear Usuario</h2>
 <input type="email" id="nuevoEmail" placeholder="Email">
 <input type="password" id="nuevoPassword" placeholder="Contraseña">
+
 <select id="nuevoRol">
 <option value="vendedor">Vendedor</option>
 <option value="admin">Admin</option>
 </select>
 
-<h4>Permisos del Vendedor</h4>
-<label><input type="checkbox" id="permEditarVentas"> Puede editar sus ventas</label>
+<h4>Permisos Individuales</h4>
+<label><input type="checkbox" id="permEditarVentas"> Puede editar ventas</label>
 <label><input type="checkbox" id="permEliminarVentas"> Puede eliminar ventas</label>
 <label><input type="checkbox" id="permGuardarCuentas"> Puede guardar cuentas</label>
 
 <button onclick="crearUsuario()">Crear Usuario</button>
+
+<hr>
+
+<h3>Permisos Globales</h3>
+<button onclick="toggleVerVentas()">Permitir / Quitar historial completo</button>
+<button onclick="toggleAgregarCuentas()">Permitir / Quitar agregar cuentas</button>
+<p id="estadoPermisos"></p>
 
 <hr>
 
@@ -101,6 +162,32 @@ th{background:#007bff;color:white;}
 
 <hr>
 
+<!-- DASHBOARD -->
+<h2>Dashboard</h2>
+
+<div class="dashboard-cards">
+<div class="card card-blue">
+<h4>Total General</h4>
+<h2 id="dashTotalGeneral">$0</h2>
+</div>
+
+<div class="card card-green">
+<h4>Total Hoy</h4>
+<h2 id="dashTotalHoy">$0</h2>
+</div>
+
+<div class="card card-orange">
+<h4>Total Mes</h4>
+<h2 id="dashTotalMes">$0</h2>
+</div>
+</div>
+
+<br>
+<canvas id="graficaVentas" height="100"></canvas>
+
+<hr>
+
+<!-- NUEVA VENTA -->
 <h2>Nueva Venta</h2>
 <input type="text" id="cliente" placeholder="Cliente">
 <input type="text" id="telefono" placeholder="Teléfono">
@@ -109,6 +196,7 @@ th{background:#007bff;color:white;}
 <input type="number" id="precio" placeholder="Precio">
 <button onclick="guardarVenta()">Guardar Venta</button>
 
+<!-- HISTORIAL -->
 <h2>Historial de Ventas</h2>
 <table>
 <thead>
@@ -129,7 +217,6 @@ th{background:#007bff;color:white;}
 
 </div>
 </div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -159,21 +246,47 @@ let permisosUsuario={};
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
 };
+
 window.logout=()=>signOut(auth);
 
-/* AUTH */
+/* PERMISOS GLOBALES */
+async function obtenerPermisosGlobales(){
+const ref=doc(db,"config","permisos");
+const snap=await getDoc(ref);
+if(!snap.exists()){
+await setDoc(ref,{verVentas:false,agregarCuentas:false});
+return {verVentas:false,agregarCuentas:false};
+}
+return snap.data();
+}
+
+async function actualizarEstadoPermisos(){
+const p=await obtenerPermisosGlobales();
+estadoPermisos.innerText=
+"Historial completo: "+(p.verVentas?"ACTIVO":"OFF")+
+" | Agregar cuentas: "+(p.agregarCuentas?"ACTIVO":"OFF");
+}
+
+window.toggleVerVentas=async()=>{
+const p=await obtenerPermisosGlobales();
+await updateDoc(doc(db,"config","permisos"),{verVentas:!p.verVentas});
+actualizarEstadoPermisos();
+};
+
+window.toggleAgregarCuentas=async()=>{
+const p=await obtenerPermisosGlobales();
+await updateDoc(doc(db,"config","permisos"),{agregarCuentas:!p.agregarCuentas});
+actualizarEstadoPermisos();
+};
+
+/* AUTH STATE */
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
 
 const snap=await getDoc(doc(db,"usuarios",user.uid));
-
-if(snap.exists()){
-rolActual=snap.data().role;
-permisosUsuario=snap.data().permisos || {};
-}else{
-rolActual="vendedor";
-}
+rolActual=snap.exists()?snap.data().role:"vendedor";
+permisosUsuario=snap.exists()?snap.data().permisos||{}:{};
 
 infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
 
@@ -181,17 +294,27 @@ loginBox.style.display="none";
 app.style.display="block";
 panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
-/* Bloquear guardar cuentas si no tiene permiso */
-if(rolActual==="vendedor" && !permisosUsuario.guardarCuentas){
+if(rolActual==="admin"){
+actualizarEstadoPermisos();
+cargarStock();
+}
+
+const permisosGlobales=await obtenerPermisosGlobales();
+
+if(rolActual==="vendedor" && !permisosGlobales.agregarCuentas && !permisosUsuario.guardarCuentas){
 cuentaPlataforma.disabled=true;
 cuentaCorreo.disabled=true;
 cuentaClave.disabled=true;
 btnGuardarCuenta.disabled=true;
 }
 
-cargarVentas();
 cargarCuentas();
-if(rolActual==="admin") cargarStock();
+
+if(rolActual==="admin" || permisosGlobales.verVentas){
+cargarVentasCompleto();
+}else{
+cargarVentasUsuario();
+}
 
 }else{
 loginBox.style.display="block";
@@ -247,6 +370,7 @@ q=collection(db,"cuentas");
 }else{
 q=query(collection(db,"cuentas"),where("dueno","==",usuarioActual));
 }
+
 onSnapshot(q,(snapshot)=>{
 listaCuentas.innerHTML="";
 snapshot.forEach(docSnap=>{
@@ -254,10 +378,25 @@ const c=docSnap.data();
 listaCuentas.innerHTML+=`
 <li>
 ${c.plataforma} | ${c.correo} | ${c.clave}
+<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
 </li>`;
 });
 });
 }
+
+window.editarCuenta=async(id)=>{
+const snap=await getDoc(doc(db,"cuentas",id));
+const c=snap.data();
+const p=prompt("Plataforma:",c.plataforma);
+const co=prompt("Correo:",c.correo);
+const cl=prompt("Clave:",c.clave);
+await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
+};
+
+window.eliminarCuenta=async(id)=>{
+await deleteDoc(doc(db,"cuentas",id));
+};
 
 /* STOCK */
 window.guardarStock=async()=>{
@@ -276,13 +415,30 @@ tablaStock.innerHTML+=`
 <tr>
 <td>${s.plataforma}</td>
 <td>${s.cantidad}</td>
-<td></td>
+<td>
+<button onclick="editarStock('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
+</td>
 </tr>`;
 });
 });
 }
 
-/* VENTAS */
+window.editarStock=async(id)=>{
+const snap=await getDoc(doc(db,"stockCuentas",id));
+const s=snap.data();
+const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
+await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
+};
+
+window.eliminarStock=async(id)=>{
+await deleteDoc(doc(db,"stockCuentas",id));
+};
+
+/* ============================= */
+/* ========= VENTAS ============ */
+/* ============================= */
+
 window.guardarVenta=async()=>{
 await addDoc(collection(db,"ventas"),{
 cliente:cliente.value,
@@ -296,15 +452,58 @@ timestamp:serverTimestamp()
 });
 };
 
-function cargarVentas(){
+/* VENTAS COMPLETAS (admin o permiso global) */
+function cargarVentasCompleto(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+
 onSnapshot(q,(snapshot)=>{
+renderVentas(snapshot,true);
+});
+}
+
+/* SOLO VENTAS DEL USUARIO */
+function cargarVentasUsuario(){
+const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+
+onSnapshot(q,(snapshot)=>{
+renderVentas(snapshot,false);
+});
+}
+
+/* RENDER GENERAL */
+function renderVentas(snapshot,mostrarTodo){
+
 tablaVentas.innerHTML="";
 let totalVentas=0;
 
+let totalGeneral=0;
+let totalHoy=0;
+let totalMes=0;
+
+const hoy=new Date().toLocaleDateString();
+const mesActual=new Date().getMonth();
+
+let ventasPorVendedor={};
+
 snapshot.forEach(docSnap=>{
 const v=docSnap.data();
-totalVentas+=v.precio||0;
+
+if(!mostrarTodo && v.vendedor!==usuarioActual) return;
+
+const precio=v.precio||0;
+totalVentas+=precio;
+totalGeneral+=precio;
+
+if(v.timestamp){
+const fecha=new Date(v.timestamp.seconds*1000);
+if(fecha.toLocaleDateString()===hoy) totalHoy+=precio;
+if(fecha.getMonth()===mesActual) totalMes+=precio;
+}
+
+if(!ventasPorVendedor[v.vendedor]){
+ventasPorVendedor[v.vendedor]=0;
+}
+ventasPorVendedor[v.vendedor]+=precio;
 
 tablaVentas.innerHTML+=`
 <tr>
@@ -326,41 +525,76 @@ ${rolActual==="admin"||permisosUsuario.eliminarVentas?
 });
 
 total.innerText="Total: $"+totalVentas;
+
+/* DASHBOARD */
+dashTotalGeneral.innerText="$"+totalGeneral;
+dashTotalHoy.innerText="$"+totalHoy;
+dashTotalMes.innerText="$"+totalMes;
+
+const ctx=document.getElementById("graficaVentas");
+if(window.miGrafica) window.miGrafica.destroy();
+
+window.miGrafica=new Chart(ctx,{
+type:"bar",
+data:{
+labels:Object.keys(ventasPorVendedor),
+datasets:[{
+label:"Ventas por vendedor",
+data:Object.values(ventasPorVendedor)
+}]
+}
 });
 }
 
+/* EDITAR VENTA */
 window.editarVenta=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
 const c=prompt("Cliente:",v.cliente);
 const m=prompt("Método:",v.metodoPago);
 const p=parseFloat(prompt("Precio:",v.precio));
-await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
+await updateDoc(doc(db,"ventas",id),{
+cliente:c,
+metodoPago:m,
+precio:p
+});
 };
 
+/* ELIMINAR VENTA */
 window.eliminarVenta=async(id)=>{
 if(confirm("¿Eliminar venta?")){
 await deleteDoc(doc(db,"ventas",id));
 }
 };
 
+/* PDF */
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
 const { jsPDF }=window.jspdf;
 const pdf=new jsPDF();
+
 pdf.text("FACTURA",20,20);
 pdf.text("Cliente: "+v.cliente,20,40);
 pdf.text("Producto: "+v.producto,20,50);
 pdf.text("Precio: $"+v.precio,20,60);
+
 pdf.save("factura.pdf");
 };
 
+/* WHATSAPP */
 window.enviarWhatsApp=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
-const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
-window.open(`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,"_blank");
+
+const mensaje=`Hola ${v.cliente}
+Producto: ${v.producto}
+Precio: $${v.precio}`;
+
+window.open(
+`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,
+"_blank"
+);
 };
 
 </script>
