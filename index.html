@@ -10,7 +10,7 @@
 <style>
 body{font-family:Arial;background:#f4f6f9;margin:0;}
 .container{width:90%;max-width:1100px;margin:30px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-input,select,button,textarea{width:100%;padding:8px;margin:5px 0;}
+input,select,button{width:100%;padding:8px;margin:5px 0;}
 button{background:#007bff;color:white;border:none;cursor:pointer;border-radius:5px;}
 button:hover{opacity:0.9;}
 .delete-btn{background:#dc3545;}
@@ -19,7 +19,6 @@ table{width:100%;border-collapse:collapse;margin-top:15px;}
 th,td{border:1px solid #ddd;padding:8px;text-align:center;}
 th{background:#007bff;color:white;}
 .admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:15px;}
-.note-box{background:#fff3cd;padding:15px;border-radius:8px;margin-top:15px;}
 </style>
 </head>
 
@@ -27,10 +26,10 @@ th{background:#007bff;color:white;}
 <div class="container">
 
 <div id="loginBox">
-  <h2>Login</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="login()">Ingresar</button>
+<h2>Login</h2>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Contraseña">
+<button onclick="login()">Ingresar</button>
 </div>
 
 <div id="app" style="display:none;">
@@ -57,17 +56,6 @@ th{background:#007bff;color:white;}
 <input type="number" id="stockProducto" placeholder="Stock">
 <button onclick="crearProducto()">Crear Producto</button>
 <ul id="listaProductos"></ul>
-
-<hr>
-
-<h2>Bloc de Notas Privado</h2>
-<div class="note-box">
-<input type="text" id="notaPlataforma" placeholder="Plataforma">
-<input type="text" id="notaCorreo" placeholder="Correo">
-<input type="text" id="notaClave" placeholder="Clave">
-<button onclick="guardarNota()">Guardar Nota</button>
-<ul id="listaNotas"></ul>
-</div>
 
 </div>
 
@@ -135,6 +123,7 @@ onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
 const snap=await getDoc(doc(db,"usuarios",user.uid));
+if(!snap.exists()){signOut(auth);return;}
 rolActual=snap.data().role;
 
 infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
@@ -144,15 +133,13 @@ panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
 cargarProductos();
 cargarVentas();
-if(rolActual==="admin") cargarNotas();
-
 }else{
 loginBox.style.display="block";
 app.style.display="none";
 }
 });
 
-/* VENTAS */
+/* HISTORIAL CON BOTONES ACTIVOS */
 function cargarVentas(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
@@ -175,7 +162,8 @@ botones+=`
 }
 
 if(rolActual==="vendedor" && v.vendedor===usuarioActual){
-botones+=`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`;
+botones+=`
+<button onclick="editarVenta('${docSnap.id}')">Editar</button>`;
 }
 
 tablaVentas.innerHTML+=`
@@ -209,32 +197,26 @@ await deleteDoc(doc(db,"ventas",id));
 }
 };
 
-/* NOTAS PRIVADAS */
-window.guardarNota=async()=>{
-await addDoc(collection(db,"notas"),{
-plataforma:notaPlataforma.value,
-correo:notaCorreo.value,
-clave:notaClave.value,
-fecha:new Date().toLocaleString()
-});
+/* PDF */
+window.generarFactura=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const { jsPDF }=window.jspdf;
+const pdf=new jsPDF();
+pdf.text("FACTURA",20,20);
+pdf.text("Cliente: "+v.cliente,20,40);
+pdf.text("Producto: "+v.producto,20,50);
+pdf.text("Precio: $"+v.precio,20,60);
+pdf.text("Fecha: "+v.fecha,20,70);
+pdf.save("factura_"+v.cliente+".pdf");
 };
 
-function cargarNotas(){
-onSnapshot(collection(db,"notas"),(snapshot)=>{
-listaNotas.innerHTML="";
-snapshot.forEach(docSnap=>{
-const n=docSnap.data();
-listaNotas.innerHTML+=`
-<li>
-${n.plataforma} | ${n.correo} | ${n.clave}
-<button class="delete-btn" onclick="eliminarNota('${docSnap.id}')">Eliminar</button>
-</li>`;
-});
-});
-}
-
-window.eliminarNota=async(id)=>{
-await deleteDoc(doc(db,"notas",id));
+/* WHATSAPP */
+window.enviarWhatsApp=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
+window.open(`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,"_blank");
 };
 
 </script>
