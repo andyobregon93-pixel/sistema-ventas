@@ -86,7 +86,7 @@ th{background:#007bff;color:white;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot }
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -114,10 +114,9 @@ const total = document.getElementById("total");
 let usuarioActual = null;
 let rolActual = null;
 
-/* LOGIN */
 window.login = async function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = email.value;
+  const password = password.value;
   try{ await signInWithEmailAndPassword(auth, email, password); }
   catch(e){ alert(e.message); }
 };
@@ -141,7 +140,6 @@ onAuthStateChanged(auth, async (user)=>{
   }
 });
 
-/* PRODUCTOS TIEMPO REAL */
 function cargarProductos(){
   onSnapshot(collection(db,"productos"),(snapshot)=>{
     listaProductos.innerHTML="";
@@ -167,43 +165,129 @@ function cargarProductos(){
   });
 }
 
-/* CREAR PRODUCTO */
 window.crearProducto = async function(){
-  const nombre = nombreProducto.value;
-  const precio = parseFloat(precioProducto.value);
-  const stock = parseInt(stockProducto.value);
-  if(!nombre || isNaN(precio) || isNaN(stock)) return alert("Completa todo");
-  await addDoc(collection(db,"productos"),{nombre,precio,stock});
-};
-
-/* 🔵 EDITAR PRODUCTO */
-window.editarProducto = async function(id){
-  const ref = doc(db,"productos",id);
-  const snap = await getDoc(ref);
-  const producto = snap.data();
-
-  const nuevoNombre = prompt("Nombre:", producto.nombre);
-  const nuevoPrecio = parseFloat(prompt("Precio:", producto.precio));
-  const nuevoStock = parseInt(prompt("Stock:", producto.stock));
-
-  if(!nuevoNombre || isNaN(nuevoPrecio) || isNaN(nuevoStock)){
-    return alert("Datos inválidos");
-  }
-
-  await updateDoc(ref,{
-    nombre:nuevoNombre,
-    precio:nuevoPrecio,
-    stock:nuevoStock
+  if(!nombreProducto.value || !precioProducto.value || !stockProducto.value) return alert("Completa todo");
+  await addDoc(collection(db,"productos"),{
+    nombre:nombreProducto.value,
+    precio:parseFloat(precioProducto.value),
+    stock:parseInt(stockProducto.value)
   });
 };
 
-/* 🔴 ELIMINAR PRODUCTO */
+window.editarProducto = async function(id){
+  const ref = doc(db,"productos",id);
+  const snap = await getDoc(ref);
+  const p = snap.data();
+  const n = prompt("Nombre:",p.nombre);
+  const pr = parseFloat(prompt("Precio:",p.precio));
+  const st = parseInt(prompt("Stock:",p.stock));
+  if(!n||isNaN(pr)||isNaN(st)) return;
+  await updateDoc(ref,{nombre:n,precio:pr,stock:st});
+};
+
 window.eliminarProducto = async function(id){
   if(!confirm("¿Eliminar producto?")) return;
   await deleteDoc(doc(db,"productos",id));
 };
 
-/* (resto de tu código de ventas sigue igual...) */
+function cargarVentas(){
+  const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+  onSnapshot(q,(snapshot)=>{
+    tablaVentas.innerHTML="";
+    let totalVentas=0;
+    snapshot.forEach(docSnap=>{
+      const v=docSnap.data();
+      totalVentas+=v.precio;
+
+      tablaVentas.innerHTML+=`
+      <tr>
+      <td>${v.fecha}</td>
+      <td>${v.vendedor}</td>
+      <td>${v.cliente}</td>
+      <td>${v.producto}</td>
+      <td>${v.metodoPago}</td>
+      <td>$${v.precio}</td>
+      <td>
+        <button onclick="editarVenta('${docSnap.id}')">Editar</button>
+        <button onclick="generarFactura('${docSnap.id}')">PDF</button>
+        <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+        <button onclick="eliminarVenta('${docSnap.id}')" class="delete-btn">Eliminar</button>
+      </td>
+      </tr>`;
+    });
+    total.innerText="Total: $"+totalVentas;
+  });
+}
+
+window.guardarVenta = async function(){
+  if(!cliente.value||!telefono.value||!metodoPago.value||!productoSelect.value) return alert("Completa todo");
+  const ref=doc(db,"productos",productoSelect.value);
+  const snap=await getDoc(ref);
+  const producto=snap.data();
+  if(producto.stock<=0) return alert("Sin stock");
+
+  await addDoc(collection(db,"ventas"),{
+    cliente:cliente.value,
+    telefono:telefono.value,
+    producto:producto.nombre,
+    productoId:productoSelect.value,
+    metodoPago:metodoPago.value,
+    precio:producto.precio,
+    vendedor:usuarioActual,
+    fecha:new Date().toLocaleString(),
+    timestamp:serverTimestamp()
+  });
+
+  await updateDoc(ref,{stock:producto.stock-1});
+};
+
+window.editarVenta = async function(id){
+  const snap = await getDoc(doc(db,"ventas",id));
+  const v = snap.data();
+  const c = prompt("Cliente:",v.cliente);
+  const t = prompt("Teléfono:",v.telefono);
+  const m = prompt("Método:",v.metodoPago);
+  const p = parseFloat(prompt("Precio:",v.precio));
+  if(!c||!t||!m||isNaN(p)) return;
+  await updateDoc(doc(db,"ventas",id),{cliente:c,telefono:t,metodoPago:m,precio:p});
+};
+
+window.eliminarVenta = async function(id){
+  if(!confirm("¿Eliminar venta?")) return;
+  await deleteDoc(doc(db,"ventas",id));
+};
+
+window.eliminarCliente = async function(){
+  if(!clienteEliminar.value) return alert("Escribe el nombre");
+  if(!confirm("¿Eliminar todas las ventas de este cliente?")) return;
+  const q = query(collection(db,"ventas"), where("cliente","==",clienteEliminar.value));
+  const snapshot = await getDocs(q);
+  snapshot.forEach(async (docSnap)=>{
+    await deleteDoc(doc(db,"ventas",docSnap.id));
+  });
+};
+
+window.generarFactura = async function(id){
+  const snap = await getDoc(doc(db,"ventas",id));
+  const v = snap.data();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  pdf.text("FACTURA",20,20);
+  pdf.text("Cliente: "+v.cliente,20,40);
+  pdf.text("Producto: "+v.producto,20,50);
+  pdf.text("Método: "+v.metodoPago,20,60);
+  pdf.text("Precio: $"+v.precio,20,70);
+  pdf.text("Fecha: "+v.fecha,20,80);
+  pdf.save("factura_"+v.cliente+".pdf");
+};
+
+window.enviarWhatsApp = async function(id){
+  const snap = await getDoc(doc(db,"ventas",id));
+  const v = snap.data();
+  const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
+  const url=`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url,"_blank");
+};
 
 window.logout=function(){ signOut(auth); };
 
