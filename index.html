@@ -141,39 +141,53 @@ onAuthStateChanged(auth, async (user)=>{
   }
 });
 
-/* PRODUCTOS */
+/* PRODUCTOS EN TIEMPO REAL */
+function cargarProductos(){
+
+  const q = query(collection(db,"productos"));
+
+  onSnapshot(q,(snapshot)=>{
+
+    listaProductos.innerHTML="";
+    productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
+
+    snapshot.forEach(docSnap=>{
+
+      const p = docSnap.data();
+      const id = docSnap.id;
+
+      if(rolActual==="admin"){
+        listaProductos.innerHTML+=`
+          <li>
+            <strong>${p.nombre}</strong> 
+            | Precio: $${p.precio} 
+            | Stock: ${p.stock}
+            <br>
+            <button onclick="editarProducto('${id}')">Editar</button>
+            <button onclick="eliminarProducto('${id}')" class="delete-btn">Eliminar</button>
+            <hr>
+          </li>
+        `;
+      }
+
+      if(p.stock>0){
+        productoSelect.innerHTML+=
+          `<option value="${id}">${p.nombre} - $${p.precio} (Stock: ${p.stock})</option>`;
+      }
+
+    });
+
+  });
+
+}
+
 window.crearProducto = async function(){
   const nombre = nombreProducto.value;
   const precio = parseFloat(precioProducto.value);
   const stock = parseInt(stockProducto.value);
   if(!nombre || isNaN(precio) || isNaN(stock)) return alert("Completa todo");
   await addDoc(collection(db,"productos"),{nombre,precio,stock});
-  cargarProductos();
 };
-
-async function cargarProductos(){
-  listaProductos.innerHTML="";
-  productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
-  const snapshot = await getDocs(collection(db,"productos"));
-  snapshot.forEach(docSnap=>{
-    const p = docSnap.data();
-    const id = docSnap.id;
-
-    if(rolActual==="admin"){
-      listaProductos.innerHTML+=`
-        <li>
-          ${p.nombre} - $${p.precio} - Stock: ${p.stock}
-          <button onclick="editarProducto('${id}')">Editar</button>
-          <button onclick="eliminarProducto('${id}')" class="delete-btn">Eliminar</button>
-        </li>
-      `;
-    }
-
-    if(p.stock>0){
-      productoSelect.innerHTML+=`<option value="${id}">${p.nombre} - $${p.precio}</option>`;
-    }
-  });
-}
 
 window.editarProducto = async function(id){
   const snap = await getDoc(doc(db,"productos",id));
@@ -192,14 +206,11 @@ window.editarProducto = async function(id){
     precio:nuevoPrecio,
     stock:nuevoStock
   });
-
-  cargarProductos();
 };
 
 window.eliminarProducto = async function(id){
   if(!confirm("¿Eliminar producto?")) return;
   await deleteDoc(doc(db,"productos",id));
-  cargarProductos();
 };
 
 window.logout=function(){ signOut(auth); };
