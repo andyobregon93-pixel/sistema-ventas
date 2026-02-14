@@ -10,7 +10,7 @@
 <style>
 body{font-family:Arial;background:#f4f6f9;margin:0;}
 .container{width:90%;max-width:1100px;margin:30px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-input,select,button{width:100%;padding:8px;margin:5px 0;}
+input,select,button,textarea{width:100%;padding:8px;margin:5px 0;}
 button{background:#007bff;color:white;border:none;cursor:pointer;border-radius:5px;}
 button:hover{opacity:0.9;}
 .delete-btn{background:#dc3545;}
@@ -19,6 +19,7 @@ table{width:100%;border-collapse:collapse;margin-top:15px;}
 th,td{border:1px solid #ddd;padding:8px;text-align:center;}
 th{background:#007bff;color:white;}
 .admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:15px;}
+.note-box{background:#fff3cd;padding:15px;border-radius:8px;margin-top:15px;}
 </style>
 </head>
 
@@ -40,11 +41,11 @@ th{background:#007bff;color:white;}
 <div id="panelAdmin" class="admin-panel" style="display:none;">
 
 <h2>Crear Usuario</h2>
-<input type="email" id="nuevoEmail" placeholder="Email nuevo usuario">
+<input type="email" id="nuevoEmail" placeholder="Email">
 <input type="password" id="nuevoPassword" placeholder="Contraseña">
 <select id="nuevoRol">
-  <option value="vendedor">Vendedor</option>
-  <option value="admin">Admin</option>
+<option value="vendedor">Vendedor</option>
+<option value="admin">Admin</option>
 </select>
 <button onclick="crearUsuario()">Crear Usuario</button>
 
@@ -56,6 +57,17 @@ th{background:#007bff;color:white;}
 <input type="number" id="stockProducto" placeholder="Stock">
 <button onclick="crearProducto()">Crear Producto</button>
 <ul id="listaProductos"></ul>
+
+<hr>
+
+<h2>Bloc de Notas Privado</h2>
+<div class="note-box">
+<input type="text" id="notaPlataforma" placeholder="Plataforma">
+<input type="text" id="notaCorreo" placeholder="Correo">
+<input type="text" id="notaClave" placeholder="Clave">
+<button onclick="guardarNota()">Guardar Nota</button>
+<ul id="listaNotas"></ul>
+</div>
 
 </div>
 
@@ -97,167 +109,133 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-  authDomain: "sistema-ventas-64a4c.firebaseapp.com",
-  projectId: "sistema-ventas-64a4c",
-  storageBucket: "sistema-ventas-64a4c.firebasestorage.app",
-  messagingSenderId: "291577824119",
-  appId: "1:291577824119:web:894fe9842b427c9ac3d772"
+const firebaseConfig={
+apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+authDomain:"sistema-ventas-64a4c.firebaseapp.com",
+projectId:"sistema-ventas-64a4c",
+storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
+messagingSenderId:"291577824119",
+appId:"1:291577824119:web:894fe9842b427c9ac3d772"
 };
 
-const appFirebase = initializeApp(firebaseConfig);
-const auth = getAuth(appFirebase);
-const db = getFirestore(appFirebase);
+const appFirebase=initializeApp(firebaseConfig);
+const auth=getAuth(appFirebase);
+const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
 let rolActual=null;
 
-const loginBox=document.getElementById("loginBox");
-const app=document.getElementById("app");
-const panelAdmin=document.getElementById("panelAdmin");
-
-/* LOGIN */
 window.login=async()=>{
-  const email=document.getElementById("email").value;
-  const password=document.getElementById("password").value;
-  await signInWithEmailAndPassword(auth,email,password);
+await signInWithEmailAndPassword(auth,email.value,password.value);
 };
 
 window.logout=()=>signOut(auth);
 
 onAuthStateChanged(auth,async(user)=>{
-  if(user){
-    usuarioActual=user.email;
-    const snap=await getDoc(doc(db,"usuarios",user.uid));
-    if(!snap.exists()){ signOut(auth); return; }
-    rolActual=snap.data().role;
+if(user){
+usuarioActual=user.email;
+const snap=await getDoc(doc(db,"usuarios",user.uid));
+rolActual=snap.data().role;
 
-    document.getElementById("infoUsuario").innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
-    loginBox.style.display="none";
-    app.style.display="block";
+infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
+loginBox.style.display="none";
+app.style.display="block";
+panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
-    panelAdmin.style.display=(rolActual==="admin")?"block":"none";
+cargarProductos();
+cargarVentas();
+if(rolActual==="admin") cargarNotas();
 
-    cargarProductos();
-    cargarVentas();
-  }else{
-    loginBox.style.display="block";
-    app.style.display="none";
-  }
+}else{
+loginBox.style.display="block";
+app.style.display="none";
+}
 });
 
-/* CREAR USUARIO SIN ROMPER SESIÓN */
-window.crearUsuario=async()=>{
-  if(rolActual!=="admin") return alert("Solo admin");
-
-  const email=nuevoEmail.value;
-  const password=nuevoPassword.value;
-  const rol=nuevoRol.value;
-
-  if(!email||!password) return alert("Completa datos");
-
-  // Crear usuario usando REST API (no rompe sesión)
-  const response = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
-    {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        email:email,
-        password:password,
-        returnSecureToken:true
-      })
-    }
-  );
-
-  const data = await response.json();
-
-  if(data.error){
-    alert(data.error.message);
-    return;
-  }
-
-  await setDoc(doc(db,"usuarios",data.localId),{
-    email:email,
-    role:rol
-  });
-
-  alert("Usuario creado correctamente");
-};
-
-/* TODO LO DEMÁS SIGUE IGUAL (PRODUCTOS Y VENTAS) */
-
-function cargarProductos(){
-  onSnapshot(collection(db,"productos"),(snapshot)=>{
-    listaProductos.innerHTML="";
-    productoSelect.innerHTML="<option value=''>Seleccionar producto</option>";
-    snapshot.forEach(docSnap=>{
-      const p=docSnap.data();
-      const id=docSnap.id;
-      if(rolActual==="admin"){
-        listaProductos.innerHTML+=`
-        <li>${p.nombre} - $${p.precio} - Stock: ${p.stock}
-        <button onclick="editarProducto('${id}')">Editar</button>
-        <button class="delete-btn" onclick="eliminarProducto('${id}')">Eliminar</button>
-        </li>`;
-      }
-      if(p.stock>0){
-        productoSelect.innerHTML+=`<option value="${id}">${p.nombre} - $${p.precio}</option>`;
-      }
-    });
-  });
-}
-
-window.crearProducto=async()=>{
-  await addDoc(collection(db,"productos"),{
-    nombre:nombreProducto.value,
-    precio:parseFloat(precioProducto.value),
-    stock:parseInt(stockProducto.value)
-  });
-};
-
-window.editarProducto=async(id)=>{
-  const ref=doc(db,"productos",id);
-  const snap=await getDoc(ref);
-  const p=snap.data();
-  const n=prompt("Nombre:",p.nombre);
-  const pr=parseFloat(prompt("Precio:",p.precio));
-  const st=parseInt(prompt("Stock:",p.stock));
-  await updateDoc(ref,{nombre:n,precio:pr,stock:st});
-};
-
-window.eliminarProducto=async(id)=>{
-  if(confirm("¿Eliminar producto?")){
-    await deleteDoc(doc(db,"productos",id));
-  }
-};
-
+/* VENTAS */
 function cargarVentas(){
-  const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-  onSnapshot(q,(snapshot)=>{
-    tablaVentas.innerHTML="";
-    let totalVentas=0;
-    snapshot.forEach(docSnap=>{
-      const v=docSnap.data();
-      totalVentas+=v.precio;
-      tablaVentas.innerHTML+=`
-      <tr>
-      <td>${v.fecha}</td>
-      <td>${v.vendedor}</td>
-      <td>${v.cliente}</td>
-      <td>${v.producto}</td>
-      <td>${v.metodoPago}</td>
-      <td>$${v.precio}</td>
-      <td>
-      <button onclick="generarFactura('${docSnap.id}')">PDF</button>
-      <button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-      </td>
-      </tr>`;
-    });
-    total.innerText="Total: $"+totalVentas;
-  });
+const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+onSnapshot(q,(snapshot)=>{
+tablaVentas.innerHTML="";
+let totalVentas=0;
+
+snapshot.forEach(docSnap=>{
+const v=docSnap.data();
+totalVentas+=v.precio;
+
+let botones=`
+<button onclick="generarFactura('${docSnap.id}')">PDF</button>
+<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+`;
+
+if(rolActual==="admin"){
+botones+=`
+<button onclick="editarVenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`;
 }
+
+if(rolActual==="vendedor" && v.vendedor===usuarioActual){
+botones+=`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`;
+}
+
+tablaVentas.innerHTML+=`
+<tr>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.producto}</td>
+<td>${v.metodoPago}</td>
+<td>$${v.precio}</td>
+<td>${botones}</td>
+</tr>`;
+});
+
+total.innerText="Total: $"+totalVentas;
+});
+}
+
+window.editarVenta=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const c=prompt("Cliente:",v.cliente);
+const m=prompt("Método:",v.metodoPago);
+const p=parseFloat(prompt("Precio:",v.precio));
+await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
+};
+
+window.eliminarVenta=async(id)=>{
+if(confirm("¿Eliminar venta?")){
+await deleteDoc(doc(db,"ventas",id));
+}
+};
+
+/* NOTAS PRIVADAS */
+window.guardarNota=async()=>{
+await addDoc(collection(db,"notas"),{
+plataforma:notaPlataforma.value,
+correo:notaCorreo.value,
+clave:notaClave.value,
+fecha:new Date().toLocaleString()
+});
+};
+
+function cargarNotas(){
+onSnapshot(collection(db,"notas"),(snapshot)=>{
+listaNotas.innerHTML="";
+snapshot.forEach(docSnap=>{
+const n=docSnap.data();
+listaNotas.innerHTML+=`
+<li>
+${n.plataforma} | ${n.correo} | ${n.clave}
+<button class="delete-btn" onclick="eliminarNota('${docSnap.id}')">Eliminar</button>
+</li>`;
+});
+});
+}
+
+window.eliminarNota=async(id)=>{
+await deleteDoc(doc(db,"notas",id));
+};
 
 </script>
 </body>
