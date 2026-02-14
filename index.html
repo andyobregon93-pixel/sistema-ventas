@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Ventas</title>
+<title>Sistema de Ventas ANDVIP</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -194,7 +194,15 @@ border-radius:8px;
 <input type="text" id="cliente" placeholder="Cliente">
 <input type="text" id="telefono" placeholder="Teléfono">
 <input type="text" id="producto" placeholder="Producto">
-<input type="text" id="metodoPago" placeholder="Método de Pago">
+
+<select id="metodoPago">
+<option value="Transferencia">Transferencia</option>
+<option value="PayPal">PayPal</option>
+<option value="Banco">Banco</option>
+<option value="Efectivo">Efectivo</option>
+<option value="Otro">Otro</option>
+</select>
+
 <input type="number" id="precio" placeholder="Precio">
 <button onclick="guardarVenta()">Guardar Venta</button>
 
@@ -371,7 +379,7 @@ alert("Elimínalo también desde Firebase Authentication");
 };
 
 /* ============================= */
-/* ====== PERMISOS GLOBALES ===== */
+/* PERMISOS GLOBALES */
 /* ============================= */
 
 async function obtenerPermisosGlobales(){
@@ -407,7 +415,7 @@ actualizarEstadoPermisos();
 };
 
 /* ============================= */
-/* ========= CUENTAS =========== */
+/* CUENTAS */
 /* ============================= */
 
 window.guardarCuenta=async()=>{
@@ -467,7 +475,7 @@ await deleteDoc(doc(db,"cuentas",id));
 };
 
 /* ============================= */
-/* ============ STOCK ========== */
+/* STOCK */
 /* ============================= */
 
 window.guardarStock=async()=>{
@@ -513,7 +521,7 @@ await deleteDoc(doc(db,"stockCuentas",id));
 };
 
 /* ============================= */
-/* ============ VENTAS ========= */
+/* VENTAS */
 /* ============================= */
 
 window.guardarVenta=async()=>{
@@ -531,7 +539,6 @@ timestamp:serverTimestamp()
 cliente.value="";
 telefono.value="";
 producto.value="";
-metodoPago.value="";
 precio.value="";
 };
 
@@ -645,6 +652,10 @@ await deleteDoc(doc(db,"ventas",id));
 }
 };
 
+/* ============================= */
+/* FACTURA PROFESIONAL ANDVIP */
+/* ============================= */
+
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
@@ -652,21 +663,78 @@ const v=snap.data();
 const { jsPDF }=window.jspdf;
 const pdf=new jsPDF();
 
-pdf.text("FACTURA",20,20);
-pdf.text("Cliente: "+v.cliente,20,40);
-pdf.text("Producto: "+v.producto,20,50);
-pdf.text("Precio: $"+v.precio,20,60);
+const nombreEmpresa="ANDVIP";
+const ivaPorcentaje=0.16;
+const numeroSerie="ANDVIP-"+Date.now();
 
-pdf.save("factura.pdf");
+const fechaActual=new Date();
+const fecha=fechaActual.toLocaleDateString();
+const hora=fechaActual.toLocaleTimeString();
+
+const subtotal=v.precio;
+const iva=subtotal*ivaPorcentaje;
+const total=subtotal+iva;
+
+pdf.setFontSize(22);
+pdf.text(nombreEmpresa,80,20);
+
+pdf.setFontSize(14);
+pdf.text("FACTURA",90,30);
+
+pdf.line(20,40,190,40);
+
+pdf.setFontSize(12);
+pdf.text("Serie: "+numeroSerie,20,55);
+pdf.text("Fecha: "+fecha,20,65);
+pdf.text("Hora: "+hora,20,75);
+
+pdf.line(20,85,190,85);
+
+pdf.text("Cliente: "+v.cliente,20,100);
+pdf.text("Producto: "+v.producto,20,110);
+pdf.text("Método de pago: "+v.metodoPago,20,120);
+
+pdf.line(20,130,190,130);
+
+pdf.text("Subtotal: $"+subtotal.toFixed(2),130,145);
+pdf.text("IVA (16%): $"+iva.toFixed(2),130,155);
+
+pdf.setFontSize(14);
+pdf.text("TOTAL: $"+total.toFixed(2),130,170);
+
+pdf.line(20,180,190,180);
+pdf.setFontSize(10);
+pdf.text("Gracias por confiar en ANDVIP",70,190);
+
+pdf.save("Factura_"+numeroSerie+".pdf");
 };
 
 window.enviarWhatsApp=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
 
-const mensaje=`Hola ${v.cliente}
+const ivaPorcentaje=0.16;
+const subtotal=v.precio;
+const iva=subtotal*ivaPorcentaje;
+const total=subtotal+iva;
+
+const numeroSerie="ANDVIP-"+Date.now();
+const fecha=new Date().toLocaleString();
+
+const mensaje=
+`🧾 FACTURA ANDVIP
+Serie: ${numeroSerie}
+Fecha: ${fecha}
+
+Cliente: ${v.cliente}
 Producto: ${v.producto}
-Precio: $${v.precio}`;
+Método de pago: ${v.metodoPago}
+
+Subtotal: $${subtotal.toFixed(2)}
+IVA (16%): $${iva.toFixed(2)}
+TOTAL: $${total.toFixed(2)}
+
+Gracias por confiar en ANDVIP 🙌`;
 
 window.open(
 `https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,
