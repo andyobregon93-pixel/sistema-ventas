@@ -89,7 +89,6 @@ const auth=getAuth(appFirebase);
 const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
-let rolActual="admin"; // para asegurar que se vean botones
 
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
@@ -97,10 +96,10 @@ await signInWithEmailAndPassword(auth,email.value,password.value);
 
 window.logout=()=>signOut(auth);
 
-onAuthStateChanged(auth,async(user)=>{
+onAuthStateChanged(auth,(user)=>{
 if(user){
 usuarioActual=user.email;
-rolActual="admin"; // fuerza visualización botones
+infoUsuario.innerText="Usuario: "+usuarioActual;
 loginBox.style.display="none";
 app.style.display="block";
 cargarVentas();
@@ -110,7 +109,24 @@ app.style.display="none";
 }
 });
 
-/* HISTORIAL CON BOTONES 100% VISIBLES */
+/* GUARDAR VENTA */
+window.guardarVenta=async()=>{
+if(!cliente.value||!telefono.value||!productoSelect.value||!metodoPago.value)
+return alert("Completa todos los campos");
+
+await addDoc(collection(db,"ventas"),{
+cliente:cliente.value,
+telefono:telefono.value,
+producto:productoSelect.value,
+metodoPago:metodoPago.value,
+precio:100,
+vendedor:usuarioActual,
+fecha:new Date().toLocaleString(),
+timestamp:serverTimestamp()
+});
+};
+
+/* HISTORIAL CON TODOS LOS BOTONES */
 function cargarVentas(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
@@ -119,16 +135,16 @@ let totalVentas=0;
 
 snapshot.forEach(docSnap=>{
 const v=docSnap.data();
-totalVentas+=v.precio || 0;
+totalVentas+=v.precio||0;
 
 tablaVentas.innerHTML+=`
 <tr>
-<td>${v.fecha || ""}</td>
-<td>${v.vendedor || ""}</td>
-<td>${v.cliente || ""}</td>
-<td>${v.producto || ""}</td>
-<td>${v.metodoPago || ""}</td>
-<td>$${v.precio || 0}</td>
+<td>${v.fecha||""}</td>
+<td>${v.vendedor||""}</td>
+<td>${v.cliente||""}</td>
+<td>${v.producto||""}</td>
+<td>${v.metodoPago||""}</td>
+<td>$${v.precio||0}</td>
 <td>
 <button onclick="editarVenta('${docSnap.id}')">Editar</button>
 <button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
@@ -142,7 +158,7 @@ total.innerText="Total: $"+totalVentas;
 });
 }
 
-/* FUNCIONES ACTIVAS */
+/* EDITAR */
 window.editarVenta=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
@@ -156,12 +172,14 @@ precio:nuevoPrecio
 });
 };
 
+/* ELIMINAR */
 window.eliminarVenta=async(id)=>{
 if(confirm("¿Eliminar venta?")){
 await deleteDoc(doc(db,"ventas",id));
 }
 };
 
+/* PDF */
 window.generarFactura=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
@@ -171,9 +189,10 @@ pdf.text("FACTURA",20,20);
 pdf.text("Cliente: "+v.cliente,20,40);
 pdf.text("Producto: "+v.producto,20,50);
 pdf.text("Precio: $"+v.precio,20,60);
-pdf.save("factura.pdf");
+pdf.save("factura_"+v.cliente+".pdf");
 };
 
+/* WHATSAPP */
 window.enviarWhatsApp=async(id)=>{
 const snap=await getDoc(doc(db,"ventas",id));
 const v=snap.data();
