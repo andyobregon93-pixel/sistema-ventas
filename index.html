@@ -120,7 +120,7 @@ th{background:#007bff;color:white;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig={ /* TU CONFIG */ };
@@ -133,9 +133,7 @@ let usuarioActual=null;
 let rolActual=null;
 
 /* LOGIN */
-window.login=async()=>{
-await signInWithEmailAndPassword(auth,email.value,password.value);
-};
+window.login=async()=>{ await signInWithEmailAndPassword(auth,email.value,password.value); };
 window.logout=()=>signOut(auth);
 
 /* PERMISOS */
@@ -180,20 +178,19 @@ loginBox.style.display="none";
 app.style.display="block";
 panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
-cargarVentas();
-
 if(rolActual==="admin"){
+cargarVentas();
 cargarCuentas();
 cargarStock();
 actualizarEstadoPermisos();
 }else{
 const permisos=await obtenerPermisos();
+if(permisos.verVentas){ cargarVentas(); }
+else{ cargarVentasUsuario(); }
 
-if(!permisos.verVentas){
-cargarVentasUsuario();
-}
-
-if(!permisos.agregarCuentas){
+if(permisos.agregarCuentas){ cargarCuentas(); }
+else{
+cargarCuentas();
 btnGuardarCuenta.disabled=true;
 }
 }
@@ -203,7 +200,129 @@ app.style.display="none";
 }
 });
 
-/* SOLO SUS VENTAS */
+/* CUENTAS CON DUEÑO */
+window.guardarCuenta=async()=>{
+await addDoc(collection(db,"cuentas"),{
+plataforma:cuentaPlataforma.value,
+correo:cuentaCorreo.value,
+clave:cuentaClave.value,
+dueno:usuarioActual
+});
+};
+
+function cargarCuentas(){
+let q;
+if(rolActual==="admin"){
+q=collection(db,"cuentas");
+}else{
+q=query(collection(db,"cuentas"),where("dueno","==",usuarioActual));
+}
+onSnapshot(q,(snapshot)=>{
+listaCuentas.innerHTML="";
+snapshot.forEach(docSnap=>{
+const c=docSnap.data();
+listaCuentas.innerHTML+=`
+<li>
+${c.plataforma} | ${c.correo} | ${c.clave}
+<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
+</li>`;
+});
+});
+}
+
+window.editarCuenta=async(id)=>{
+const snap=await getDoc(doc(db,"cuentas",id));
+const c=snap.data();
+const p=prompt("Plataforma:",c.plataforma);
+const co=prompt("Correo:",c.correo);
+const cl=prompt("Clave:",c.clave);
+await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
+};
+
+window.eliminarCuenta=async(id)=>{
+await deleteDoc(doc(db,"cuentas",id));
+};
+
+/* STOCK */
+window.guardarStock=async()=>{
+await addDoc(collection(db,"stockCuentas"),{
+plataforma:stockPlataforma.value,
+cantidad:parseInt(stockCantidad.value)
+});
+};
+
+function cargarStock(){
+onSnapshot(collection(db,"stockCuentas"),(snapshot)=>{
+tablaStock.innerHTML="";
+snapshot.forEach(docSnap=>{
+const s=docSnap.data();
+tablaStock.innerHTML+=`
+<tr>
+<td>${s.plataforma}</td>
+<td>${s.cantidad}</td>
+<td>
+<button onclick="editarStock('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
+</td>
+</tr>`;
+});
+});
+}
+
+window.editarStock=async(id)=>{
+const snap=await getDoc(doc(db,"stockCuentas",id));
+const s=snap.data();
+const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
+await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
+};
+
+window.eliminarStock=async(id)=>{
+await deleteDoc(doc(db,"stockCuentas",id));
+};
+
+/* VENTAS */
+window.guardarVenta=async()=>{
+await addDoc(collection(db,"ventas"),{
+cliente:cliente.value,
+telefono:telefono.value,
+producto:producto.value,
+metodoPago:metodoPago.value,
+precio:parseFloat(precio.value),
+vendedor:usuarioActual,
+fecha:new Date().toLocaleString(),
+timestamp:serverTimestamp()
+});
+};
+
+function cargarVentas(){
+const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+onSnapshot(q,(snapshot)=>{
+tablaVentas.innerHTML="";
+let totalVentas=0;
+snapshot.forEach(docSnap=>{
+const v=docSnap.data();
+totalVentas+=v.precio||0;
+tablaVentas.innerHTML+=`
+<tr>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.producto}</td>
+<td>${v.metodoPago}</td>
+<td>$${v.precio}</td>
+<td>
+<button onclick="editarVenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
+<button onclick="generarFactura('${docSnap.id}')">PDF</button>
+<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
+</td>
+</tr>`;
+});
+total.innerText="Total: $"+totalVentas;
+});
+}
+
 function cargarVentasUsuario(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
@@ -227,6 +346,40 @@ tablaVentas.innerHTML+=`
 total.innerText="Total: $"+totalVentas;
 });
 }
+
+window.editarVenta=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const c=prompt("Cliente:",v.cliente);
+const m=prompt("Método:",v.metodoPago);
+const p=parseFloat(prompt("Precio:",v.precio));
+await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
+};
+
+window.eliminarVenta=async(id)=>{
+if(confirm("¿Eliminar venta?")){
+await deleteDoc(doc(db,"ventas",id));
+}
+};
+
+window.generarFactura=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const { jsPDF }=window.jspdf;
+const pdf=new jsPDF();
+pdf.text("FACTURA",20,20);
+pdf.text("Cliente: "+v.cliente,20,40);
+pdf.text("Producto: "+v.producto,20,50);
+pdf.text("Precio: $"+v.precio,20,60);
+pdf.save("factura.pdf");
+};
+
+window.enviarWhatsApp=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
+window.open(`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,"_blank");
+};
 
 </script>
 </body>
