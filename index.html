@@ -54,12 +54,10 @@ th{background:#007bff;color:white;}
 <input type="text" id="cuentaPlataforma" placeholder="Plataforma">
 <input type="text" id="cuentaCorreo" placeholder="Correo">
 <input type="text" id="cuentaClave" placeholder="Clave">
-<button onclick="guardarCuenta()">Guardar Cuenta</button>
+<button id="btnGuardarCuenta" onclick="guardarCuenta()">Guardar Cuenta</button>
 <ul id="listaCuentas"></ul>
 
 <hr>
-
-<!-- ✅ NUEVO APARTADO STOCK -->
 
 <h2>Stock de Cuentas</h2>
 <input type="text" id="stockPlataforma" placeholder="Plataforma">
@@ -76,6 +74,13 @@ th{background:#007bff;color:white;}
 </thead>
 <tbody id="tablaStock"></tbody>
 </table>
+
+<hr>
+
+<h2>Permisos para Vendedores</h2>
+<button onclick="toggleVerVentas()">Permitir / Quitar historial completo</button>
+<button onclick="toggleAgregarCuentas()">Permitir / Quitar agregar cuentas</button>
+<p id="estadoPermisos"></p>
 
 </div>
 
@@ -118,14 +123,7 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig={
-apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-authDomain:"sistema-ventas-64a4c.firebaseapp.com",
-projectId:"sistema-ventas-64a4c",
-storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
-messagingSenderId:"291577824119",
-appId:"1:291577824119:web:894fe9842b427c9ac3d772"
-};
+const firebaseConfig={ /* TU CONFIG */ };
 
 const appFirebase=initializeApp(firebaseConfig);
 const auth=getAuth(appFirebase);
@@ -134,12 +132,43 @@ const db=getFirestore(appFirebase);
 let usuarioActual=null;
 let rolActual=null;
 
+/* LOGIN */
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
 };
-
 window.logout=()=>signOut(auth);
 
+/* PERMISOS */
+async function obtenerPermisos(){
+const ref=doc(db,"config","permisos");
+const snap=await getDoc(ref);
+if(!snap.exists()){
+await setDoc(ref,{verVentas:false,agregarCuentas:false});
+return {verVentas:false,agregarCuentas:false};
+}
+return snap.data();
+}
+
+async function actualizarEstadoPermisos(){
+const p=await obtenerPermisos();
+estadoPermisos.innerText=
+"Historial completo: "+(p.verVentas?"ACTIVO":"OFF")+
+" | Agregar cuentas: "+(p.agregarCuentas?"ACTIVO":"OFF");
+}
+
+window.toggleVerVentas=async()=>{
+const p=await obtenerPermisos();
+await updateDoc(doc(db,"config","permisos"),{verVentas:!p.verVentas});
+actualizarEstadoPermisos();
+};
+
+window.toggleAgregarCuentas=async()=>{
+const p=await obtenerPermisos();
+await updateDoc(doc(db,"config","permisos"),{agregarCuentas:!p.agregarCuentas});
+actualizarEstadoPermisos();
+};
+
+/* AUTH STATE */
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
@@ -152,9 +181,21 @@ app.style.display="block";
 panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
 cargarVentas();
+
 if(rolActual==="admin"){
 cargarCuentas();
-cargarStock(); // ✅ agregado
+cargarStock();
+actualizarEstadoPermisos();
+}else{
+const permisos=await obtenerPermisos();
+
+if(!permisos.verVentas){
+cargarVentasUsuario();
+}
+
+if(!permisos.agregarCuentas){
+btnGuardarCuenta.disabled=true;
+}
 }
 }else{
 loginBox.style.display="block";
@@ -162,104 +203,15 @@ app.style.display="none";
 }
 });
 
-/* CUENTAS */
-window.guardarCuenta=async()=>{
-await addDoc(collection(db,"cuentas"),{
-plataforma:cuentaPlataforma.value,
-correo:cuentaCorreo.value,
-clave:cuentaClave.value
-});
-};
-
-function cargarCuentas(){
-onSnapshot(collection(db,"cuentas"),(snapshot)=>{
-listaCuentas.innerHTML="";
-snapshot.forEach(docSnap=>{
-const c=docSnap.data();
-listaCuentas.innerHTML+=`
-<li>
-${c.plataforma} | ${c.correo} | ${c.clave}
-<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
-</li>`;
-});
-});
-}
-
-window.editarCuenta=async(id)=>{
-const snap=await getDoc(doc(db,"cuentas",id));
-const c=snap.data();
-const p=prompt("Plataforma:",c.plataforma);
-const co=prompt("Correo:",c.correo);
-const cl=prompt("Clave:",c.clave);
-await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
-};
-
-window.eliminarCuenta=async(id)=>{
-await deleteDoc(doc(db,"cuentas",id));
-};
-
-/* ✅ STOCK DE CUENTAS */
-
-window.guardarStock = async () => {
-await addDoc(collection(db,"stockCuentas"),{
-plataforma:stockPlataforma.value,
-cantidad:parseInt(stockCantidad.value)
-});
-stockPlataforma.value="";
-stockCantidad.value="";
-};
-
-function cargarStock(){
-onSnapshot(collection(db,"stockCuentas"),(snapshot)=>{
-tablaStock.innerHTML="";
-snapshot.forEach(docSnap=>{
-const s=docSnap.data();
-tablaStock.innerHTML+=`
-<tr>
-<td>${s.plataforma}</td>
-<td>${s.cantidad}</td>
-<td>
-<button onclick="editarStock('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
-</td>
-</tr>`;
-});
-});
-}
-
-window.editarStock=async(id)=>{
-const snap=await getDoc(doc(db,"stockCuentas",id));
-const s=snap.data();
-const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
-await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
-};
-
-window.eliminarStock=async(id)=>{
-await deleteDoc(doc(db,"stockCuentas",id));
-};
-
-/* VENTAS (igual que antes) */
-window.guardarVenta=async()=>{
-await addDoc(collection(db,"ventas"),{
-cliente:cliente.value,
-telefono:telefono.value,
-producto:producto.value,
-metodoPago:metodoPago.value,
-precio:parseFloat(precio.value),
-vendedor:usuarioActual,
-fecha:new Date().toLocaleString(),
-timestamp:serverTimestamp()
-});
-};
-
-function cargarVentas(){
+/* SOLO SUS VENTAS */
+function cargarVentasUsuario(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
 tablaVentas.innerHTML="";
 let totalVentas=0;
 snapshot.forEach(docSnap=>{
 const v=docSnap.data();
+if(v.vendedor!==usuarioActual) return;
 totalVentas+=v.precio||0;
 tablaVentas.innerHTML+=`
 <tr>
@@ -269,12 +221,7 @@ tablaVentas.innerHTML+=`
 <td>${v.producto}</td>
 <td>${v.metodoPago}</td>
 <td>$${v.precio}</td>
-<td>
-<button onclick="editarVenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
-<button onclick="generarFactura('${docSnap.id}')">PDF</button>
-<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-</td>
+<td></td>
 </tr>`;
 });
 total.innerText="Total: $"+totalVentas;
