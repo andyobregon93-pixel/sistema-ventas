@@ -9,8 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
-/* 🔥 FONDO */
 body{
 font-family:Arial;
 margin:0;
@@ -18,7 +16,6 @@ background:url("fondo.jpg") no-repeat center center fixed;
 background-size:cover;
 }
 
-/* 🔥 EFECTO VIDRIO */
 .container{
 width:90%;
 max-width:1100px;
@@ -39,7 +36,6 @@ table{width:100%;border-collapse:collapse;margin-top:15px;}
 th,td{border:1px solid #ddd;padding:8px;text-align:center;}
 th{background:#007bff;color:white;}
 .admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:15px;}
-
 </style>
 </head>
 
@@ -75,7 +71,7 @@ th{background:#007bff;color:white;}
 <input type="text" id="cuentaPlataforma" placeholder="Plataforma">
 <input type="text" id="cuentaCorreo" placeholder="Correo">
 <input type="text" id="cuentaClave" placeholder="Clave">
-<button id="btnGuardarCuenta" onclick="guardarCuenta()">Guardar Cuenta</button>
+<button onclick="guardarCuenta()">Guardar Cuenta</button>
 <ul id="listaCuentas"></ul>
 
 <hr>
@@ -95,13 +91,6 @@ th{background:#007bff;color:white;}
 </thead>
 <tbody id="tablaStock"></tbody>
 </table>
-
-<hr>
-
-<h2>Permisos para Vendedores</h2>
-<button onclick="toggleVerVentas()">Permitir / Quitar historial completo</button>
-<button onclick="toggleAgregarCuentas()">Permitir / Quitar agregar cuentas</button>
-<p id="estadoPermisos"></p>
 
 </div>
 
@@ -185,7 +174,9 @@ let usuarioActual=null;
 let rolActual=null;
 
 /* LOGIN */
-window.login=async()=>{ await signInWithEmailAndPassword(auth,email.value,password.value); };
+window.login=async()=>{
+await signInWithEmailAndPassword(auth,email.value,password.value);
+};
 window.logout=()=>signOut(auth);
 
 /* AUTH */
@@ -210,6 +201,111 @@ app.style.display="none";
 }
 });
 
+/* CREAR USUARIO */
+window.crearUsuario=async()=>{
+const response=await fetch(
+`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:nuevoEmail.value,
+password:nuevoPassword.value,
+returnSecureToken:true
+})
+}
+);
+const data=await response.json();
+if(data.error){alert(data.error.message);return;}
+
+await setDoc(doc(db,"usuarios",data.localId),{
+email:nuevoEmail.value,
+role:nuevoRol.value
+});
+alert("Usuario creado correctamente");
+};
+
+/* CUENTAS */
+window.guardarCuenta=async()=>{
+await addDoc(collection(db,"cuentas"),{
+plataforma:cuentaPlataforma.value,
+correo:cuentaCorreo.value,
+clave:cuentaClave.value,
+dueno:usuarioActual
+});
+};
+
+function cargarCuentas(){
+let q;
+if(rolActual==="admin"){
+q=collection(db,"cuentas");
+}else{
+q=query(collection(db,"cuentas"),where("dueno","==",usuarioActual));
+}
+onSnapshot(q,(snapshot)=>{
+listaCuentas.innerHTML="";
+snapshot.forEach(docSnap=>{
+const c=docSnap.data();
+listaCuentas.innerHTML+=`
+<li>
+${c.plataforma} | ${c.correo} | ${c.clave}
+<button onclick="editarCuenta('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarCuenta('${docSnap.id}')">Eliminar</button>
+</li>`;
+});
+});
+}
+
+window.editarCuenta=async(id)=>{
+const snap=await getDoc(doc(db,"cuentas",id));
+const c=snap.data();
+const p=prompt("Plataforma:",c.plataforma);
+const co=prompt("Correo:",c.correo);
+const cl=prompt("Clave:",c.clave);
+await updateDoc(doc(db,"cuentas",id),{plataforma:p,correo:co,clave:cl});
+};
+
+window.eliminarCuenta=async(id)=>{
+await deleteDoc(doc(db,"cuentas",id));
+};
+
+/* STOCK */
+window.guardarStock=async()=>{
+await addDoc(collection(db,"stockCuentas"),{
+plataforma:stockPlataforma.value,
+cantidad:parseInt(stockCantidad.value)
+});
+};
+
+function cargarStock(){
+onSnapshot(collection(db,"stockCuentas"),(snapshot)=>{
+tablaStock.innerHTML="";
+snapshot.forEach(docSnap=>{
+const s=docSnap.data();
+tablaStock.innerHTML+=`
+<tr>
+<td>${s.plataforma}</td>
+<td>${s.cantidad}</td>
+<td>
+<button onclick="editarStock('${docSnap.id}')">Editar</button>
+<button class="delete-btn" onclick="eliminarStock('${docSnap.id}')">Eliminar</button>
+</td>
+</tr>`;
+});
+});
+}
+
+window.editarStock=async(id)=>{
+const snap=await getDoc(doc(db,"stockCuentas",id));
+const s=snap.data();
+const nuevaCantidad=parseInt(prompt("Nueva cantidad:",s.cantidad));
+await updateDoc(doc(db,"stockCuentas",id),{cantidad:nuevaCantidad});
+};
+
+window.eliminarStock=async(id)=>{
+await deleteDoc(doc(db,"stockCuentas",id));
+};
+
 /* DASHBOARD */
 function cargarDashboard(snapshot){
 let totalGeneral=0,totalHoy=0,totalMes=0;
@@ -232,9 +328,9 @@ if(!ventasPorVendedor[v.vendedor]) ventasPorVendedor[v.vendedor]=0;
 ventasPorVendedor[v.vendedor]+=precio;
 });
 
-document.getElementById("dashTotalGeneral").innerText="$"+totalGeneral;
-document.getElementById("dashTotalHoy").innerText="$"+totalHoy;
-document.getElementById("dashTotalMes").innerText="$"+totalMes;
+dashTotalGeneral.innerText="$"+totalGeneral;
+dashTotalHoy.innerText="$"+totalHoy;
+dashTotalMes.innerText="$"+totalMes;
 
 const ctx=document.getElementById("graficaVentas");
 if(window.miGrafica) window.miGrafica.destroy();
@@ -249,6 +345,19 @@ datasets:[{label:"Ventas por vendedor",data:Object.values(ventasPorVendedor)}]
 }
 
 /* VENTAS */
+window.guardarVenta=async()=>{
+await addDoc(collection(db,"ventas"),{
+cliente:cliente.value,
+telefono:telefono.value,
+producto:producto.value,
+metodoPago:metodoPago.value,
+precio:parseFloat(precio.value),
+vendedor:usuarioActual,
+fecha:new Date().toLocaleString(),
+timestamp:serverTimestamp()
+});
+};
+
 function cargarVentas(){
 const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
 onSnapshot(q,(snapshot)=>{
@@ -280,6 +389,40 @@ total.innerText="Total: $"+totalVentas;
 cargarDashboard(snapshot);
 });
 }
+
+window.editarVenta=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const c=prompt("Cliente:",v.cliente);
+const m=prompt("Método:",v.metodoPago);
+const p=parseFloat(prompt("Precio:",v.precio));
+await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
+};
+
+window.eliminarVenta=async(id)=>{
+if(confirm("¿Eliminar venta?")){
+await deleteDoc(doc(db,"ventas",id));
+}
+};
+
+window.generarFactura=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const { jsPDF }=window.jspdf;
+const pdf=new jsPDF();
+pdf.text("FACTURA",20,20);
+pdf.text("Cliente: "+v.cliente,20,40);
+pdf.text("Producto: "+v.producto,20,50);
+pdf.text("Precio: $"+v.precio,20,60);
+pdf.save("factura.pdf");
+};
+
+window.enviarWhatsApp=async(id)=>{
+const snap=await getDoc(doc(db,"ventas",id));
+const v=snap.data();
+const mensaje=`Hola ${v.cliente}\nProducto: ${v.producto}\nPrecio: $${v.precio}`;
+window.open(`https://wa.me/${v.telefono}?text=${encodeURIComponent(mensaje)}`,"_blank");
+};
 
 </script>
 </body>
