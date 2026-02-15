@@ -28,6 +28,7 @@ input,select,button{
 width:100%;
 padding:8px;
 margin:5px 0;
+box-sizing:border-box;
 }
 button{
 background:#007bff;
@@ -71,6 +72,63 @@ border-radius:8px;
 .card-blue{background:#e3f2fd;}
 .card-green{background:#e8f5e9;}
 .card-orange{background:#fff3e0;}
+
+/* ============================= */
+/* RESPONSIVE MOBILE */
+/* ============================= */
+
+@media (max-width: 768px){
+
+.container{
+width:95%;
+margin:10px auto;
+padding:15px;
+}
+
+h2,h3,h4{
+text-align:center;
+}
+
+button{
+font-size:14px;
+padding:10px;
+}
+
+input,select{
+font-size:14px;
+}
+
+table{
+display:block;
+overflow-x:auto;
+white-space:nowrap;
+}
+
+th,td{
+font-size:12px;
+padding:6px;
+}
+
+.dashboard-cards{
+grid-template-columns:1fr;
+}
+
+#graficaVentas{
+width:100% !important;
+height:auto !important;
+}
+
+td button{
+margin:3px 0;
+font-size:12px;
+padding:6px;
+}
+
+#listaCuentas li{
+font-size:13px;
+margin-bottom:8px;
+}
+}
 </style>
 </head>
 
@@ -117,6 +175,7 @@ border-radius:8px;
 </div>
 </div>
 
+<div style="overflow-x:auto;">
 <table>
 <thead>
 <tr>
@@ -129,6 +188,7 @@ border-radius:8px;
 </thead>
 <tbody id="tablaUsuarios"></tbody>
 </table>
+</div>
 
 <hr>
 
@@ -153,6 +213,7 @@ border-radius:8px;
 <input type="number" id="stockCantidad" placeholder="Cantidad disponible">
 <button onclick="guardarStock()">Guardar Stock</button>
 
+<div style="overflow-x:auto;">
 <table>
 <thead>
 <tr>
@@ -163,6 +224,7 @@ border-radius:8px;
 </thead>
 <tbody id="tablaStock"></tbody>
 </table>
+</div>
 
 </div>
 
@@ -186,7 +248,7 @@ border-radius:8px;
 </div>
 
 <br>
-<canvas id="graficaVentas" height="100"></canvas>
+<canvas id="graficaVentas"></canvas>
 
 <hr>
 
@@ -207,6 +269,8 @@ border-radius:8px;
 <button onclick="guardarVenta()">Guardar Venta</button>
 
 <h2>Historial de Ventas</h2>
+
+<div style="overflow-x:auto;">
 <table>
 <thead>
 <tr>
@@ -221,6 +285,7 @@ border-radius:8px;
 </thead>
 <tbody id="tablaVentas"></tbody>
 </table>
+</div>
 
 <h3 id="total"></h3>
 
@@ -242,6 +307,7 @@ storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
 messagingSenderId:"291577824119",
 appId:"1:291577824119:web:894fe9842b427c9ac3d772"
 };
+
 const appFirebase=initializeApp(firebaseConfig);
 const auth=getAuth(appFirebase);
 const db=getFirestore(appFirebase);
