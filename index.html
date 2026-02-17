@@ -35,10 +35,6 @@ body{
   margin-bottom:25px;
 }
 
-.sidebar p{
-  margin:5px 0;
-}
-
 .sidebar button{
   margin:6px 0;
   padding:12px;
@@ -48,7 +44,6 @@ body{
   color:white;
   cursor:pointer;
   font-size:15px;
-  transition:0.2s;
 }
 
 .sidebar button:hover{
@@ -70,13 +65,6 @@ body{
   overflow:auto;
 }
 
-.content h2{
-  font-size:26px;
-  margin-bottom:20px;
-}
-
-/* CARDS */
-
 .card{
   background:white;
   padding:25px;
@@ -84,13 +72,6 @@ body{
   box-shadow:0 8px 20px rgba(0,0,0,0.08);
   margin-bottom:25px;
 }
-
-.card h3{
-  font-size:20px;
-  margin-bottom:15px;
-}
-
-/* INPUTS */
 
 input, select{
   width:100%;
@@ -101,21 +82,12 @@ input, select{
   font-size:15px;
 }
 
-button{
-  padding:12px;
-  font-size:15px;
-  border-radius:8px;
-}
-
-/* TABLE */
-
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
   border-radius:10px;
   overflow:hidden;
-  font-size:15px;
 }
 
 th{
@@ -159,7 +131,7 @@ td{
 <body>
 
 <div id="loginBox" style="max-width:400px;margin:100px auto;background:white;padding:30px;border-radius:10px;">
-<h2 style="font-size:24px;">Login</h2>
+<h2>Login</h2>
 <input type="email" id="email" placeholder="Email">
 <input type="password" id="password" placeholder="Contraseña">
 <button onclick="login()">Ingresar</button>
@@ -172,7 +144,7 @@ td{
 <p><strong>Usuario:</strong> <span id="infoUsuario"></span></p>
 <p><strong>Rol:</strong> <span id="infoRol"></span></p>
 
-<button onclick="mostrar('adminPanel')">Panel Admin</button>
+<button id="btnAdmin" onclick="mostrar('adminPanel')">Panel Admin</button>
 <button onclick="mostrar('cuentasPanel')">Cuentas</button>
 <button onclick="mostrar('historialPanel')">Historial</button>
 
@@ -181,6 +153,7 @@ td{
 
 <main class="content">
 
+<!-- ADMIN -->
 <section id="adminPanel" style="display:none;">
 <h2>Panel de Administración</h2>
 
@@ -197,7 +170,6 @@ td{
 <h4>Permisos</h4>
 <label><input type="checkbox" id="permVerTodo"> Ver todo</label><br>
 <label><input type="checkbox" id="permCrear"> Crear cuentas</label><br>
-<label><input type="checkbox" id="permEditar"> Editar</label><br>
 <label><input type="checkbox" id="permEliminar"> Eliminar</label><br>
 
 <button onclick="crearUsuario()">Crear Usuario</button>
@@ -216,10 +188,12 @@ td{
 <button onclick="agregarAdminAyuda()">Agregar</button>
 <ul id="listaAdminsAyuda"></ul>
 </div>
+
 </section>
 
+<!-- CUENTAS -->
 <section id="cuentasPanel" style="display:none;">
-<h2>Cuentas Activadas</h2>
+<h2>Mi Panel</h2>
 <div class="card">
 <select id="plataformaSelect"></select>
 <select id="adminAyudaSelect"></select>
@@ -228,6 +202,7 @@ td{
 </div>
 </section>
 
+<!-- HISTORIAL -->
 <section id="historialPanel" style="display:none;">
 <h2>Historial</h2>
 <table>
@@ -285,7 +260,9 @@ window.logout=()=>signOut(auth);
 
 onAuthStateChanged(auth,async(user)=>{
 if(user){
+
 usuarioActual=user.email;
+
 const snap=await getDoc(doc(db,"usuarios",user.uid));
 rolActual=snap.exists()?snap.data().role:"usuario";
 permisos=snap.exists()?snap.data().permisos||{}:{};
@@ -297,12 +274,17 @@ loginBox.style.display="none";
 app.style.display="flex";
 
 if(rolActual==="admin"){
-adminPanel.style.display="block";
-cargarPlataformas();
-cargarAdminsAyuda();
+    btnAdmin.style.display="block";
+    mostrar("adminPanel");
+    cargarPlataformas();
+    cargarAdminsAyuda();
+}else{
+    btnAdmin.style.display="none";
+    mostrar("cuentasPanel"); // 🔥 Usuario entra directo aquí
 }
 
 cargarHistorial();
+
 }else{
 loginBox.style.display="block";
 app.style.display="none";
@@ -339,7 +321,6 @@ role:nuevoRol.value,
 permisos:{
 verTodo:permVerTodo.checked,
 crear:permCrear.checked,
-editar:permEditar.checked,
 eliminar:permEliminar.checked
 }
 });
@@ -395,7 +376,7 @@ adminAyudaSelect.innerHTML+=`<option>${a.nombre}</option>`;
 
 window.guardarCuenta=async()=>{
 if(!(rolActual==="admin"||permisos.crear)){
-alert("No tienes permiso para crear");
+alert("No tienes permiso");
 return;
 }
 await addDoc(collection(db,"historialGrupo"),{
