@@ -26,10 +26,6 @@ body{
   flex-direction:column;
 }
 
-.sidebar h2{
-  text-align:center;
-}
-
 .sidebar button{
   margin:5px 0;
   padding:10px;
@@ -102,7 +98,6 @@ td{
 
 <aside class="sidebar">
 <h2>SISTEMA GRUPO PRIVADO</h2>
-
 <p><strong>Usuario:</strong> <span id="infoUsuario"></span></p>
 <p><strong>Rol:</strong> <span id="infoRol"></span></p>
 
@@ -115,18 +110,35 @@ td{
 
 <main class="content">
 
+<!-- PANEL ADMIN -->
 <section id="adminPanel" style="display:none;">
+
 <h2>Panel de Administración</h2>
 
 <div class="card">
 <h3>Crear Usuario</h3>
 <input type="email" id="nuevoEmail" placeholder="Email">
 <input type="password" id="nuevoPassword" placeholder="Contraseña">
+
 <select id="nuevoRol">
 <option value="usuario">Usuario</option>
 <option value="admin">Administrador</option>
 </select>
+
+<h4>Permisos</h4>
+<label><input type="checkbox" id="permVerTodo"> Ver todo</label><br>
+<label><input type="checkbox" id="permCrear"> Crear cuentas</label><br>
+<label><input type="checkbox" id="permEditar"> Editar</label><br>
+<label><input type="checkbox" id="permEliminar"> Eliminar</label><br>
+
 <button onclick="crearUsuario()">Crear Usuario</button>
+</div>
+
+<div class="card">
+<h3>Agregar Plataforma</h3>
+<input type="text" id="nuevaPlataforma" placeholder="Nombre plataforma">
+<button onclick="agregarPlataforma()">Agregar</button>
+<ul id="listaPlataformas"></ul>
 </div>
 
 <div class="card">
@@ -135,29 +147,24 @@ td{
 <button onclick="agregarAdminAyuda()">Agregar</button>
 <ul id="listaAdminsAyuda"></ul>
 </div>
+
 </section>
 
+<!-- CUENTAS -->
 <section id="cuentasPanel" style="display:none;">
 <h2>Cuentas Activadas</h2>
 
 <div class="card">
-<select id="plataformaSelect">
-<option value="Netflix">Netflix</option>
-<option value="Disney+">Disney+</option>
-<option value="HBO">HBO</option>
-</select>
-
+<select id="plataformaSelect"></select>
 <select id="adminAyudaSelect"></select>
-
 <input type="text" id="nombreMiembro" placeholder="Nombre del miembro">
-
 <button onclick="guardarCuenta()">Guardar</button>
 </div>
 </section>
 
+<!-- HISTORIAL -->
 <section id="historialPanel" style="display:none;">
 <h2>Historial</h2>
-
 <table>
 <thead>
 <tr>
@@ -166,6 +173,7 @@ td{
 <th>Administrador</th>
 <th>Usuario</th>
 <th>Fecha</th>
+<th>Acciones</th>
 </tr>
 </thead>
 <tbody id="tablaHistorial"></tbody>
@@ -180,7 +188,7 @@ td{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc,
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
 collection, addDoc, serverTimestamp,
 query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -200,6 +208,7 @@ const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
 let rolActual=null;
+let permisos={};
 
 const ADMIN_PRINCIPAL="andyobregon799@gmail.com";
 
@@ -216,6 +225,7 @@ usuarioActual=user.email;
 
 const snap=await getDoc(doc(db,"usuarios",user.uid));
 rolActual=snap.exists()?snap.data().role:"usuario";
+permisos=snap.exists()?snap.data().permisos||{}:{};
 
 infoUsuario.innerText=usuarioActual;
 infoRol.innerText=rolActual;
@@ -225,6 +235,7 @@ app.style.display="flex";
 
 if(rolActual==="admin"){
 adminPanel.style.display="block";
+cargarPlataformas();
 cargarAdminsAyuda();
 }
 
@@ -262,11 +273,42 @@ if(data.error){alert(data.error.message);return;}
 
 await setDoc(doc(db,"usuarios",data.localId),{
 email:nuevoEmail.value,
-role:nuevoRol.value
+role:nuevoRol.value,
+permisos:{
+verTodo:permVerTodo.checked,
+crear:permCrear.checked,
+editar:permEditar.checked,
+eliminar:permEliminar.checked
+}
 });
 
 alert("Usuario creado");
 };
+
+window.agregarPlataforma=async()=>{
+if(usuarioActual!==ADMIN_PRINCIPAL){
+alert("Solo el administrador principal puede agregar plataformas");
+return;
+}
+
+await addDoc(collection(db,"plataformas"),{
+nombre:nuevaPlataforma.value
+});
+
+nuevaPlataforma.value="";
+};
+
+function cargarPlataformas(){
+onSnapshot(collection(db,"plataformas"),(snapshot)=>{
+listaPlataformas.innerHTML="";
+plataformaSelect.innerHTML="";
+snapshot.forEach(docSnap=>{
+const p=docSnap.data();
+listaPlataformas.innerHTML+=`<li>${p.nombre}</li>`;
+plataformaSelect.innerHTML+=`<option>${p.nombre}</option>`;
+});
+});
+}
 
 window.agregarAdminAyuda=async()=>{
 if(usuarioActual!==ADMIN_PRINCIPAL){
@@ -294,6 +336,11 @@ adminAyudaSelect.innerHTML+=`<option>${a.nombre}</option>`;
 }
 
 window.guardarCuenta=async()=>{
+if(!(rolActual==="admin"||permisos.crear)){
+alert("No tienes permiso para crear");
+return;
+}
+
 await addDoc(collection(db,"historialGrupo"),{
 plataforma:plataformaSelect.value,
 miembro:nombreMiembro.value,
@@ -309,7 +356,7 @@ function cargarHistorial(){
 
 let q;
 
-if(rolActual==="admin"){
+if(rolActual==="admin"||permisos.verTodo){
 q=query(collection(db,"historialGrupo"),orderBy("timestamp","desc"));
 }else{
 q=query(collection(db,"historialGrupo"),
@@ -322,6 +369,7 @@ tablaHistorial.innerHTML="";
 snapshot.forEach(docSnap=>{
 const h=docSnap.data();
 const fecha=h.timestamp?new Date(h.timestamp.seconds*1000).toLocaleString():"";
+
 tablaHistorial.innerHTML+=`
 <tr>
 <td>${h.plataforma}</td>
@@ -329,10 +377,18 @@ tablaHistorial.innerHTML+=`
 <td>${h.admin}</td>
 <td>${h.usuario}</td>
 <td>${fecha}</td>
+<td>
+${rolActual==="admin"||permisos.eliminar?
+`<button onclick="eliminarRegistro('${docSnap.id}')">Eliminar</button>`:""}
+</td>
 </tr>`;
 });
 });
 }
+
+window.eliminarRegistro=async(id)=>{
+await deleteDoc(doc(db,"historialGrupo",id));
+};
 
 </script>
 
