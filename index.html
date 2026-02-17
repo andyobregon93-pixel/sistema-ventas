@@ -1,259 +1,229 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión ANDVIP Pro</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f0f2f5; color: #1c1e21; }
-        .container { width: 95%; max-width: 1100px; margin: 20px auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .panel { border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; background: #ffffff; }
-        .admin-section { border-left: 6px solid #007bff; background: #f8fbff; }
-        h2, h3 { color: #007bff; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        
-        /* Form Estilos */
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
-        .flex-row { display: flex; gap: 15px; flex-wrap: wrap; }
-        .flex-row > div { flex: 1; min-width: 250px; }
-        
-        button { background: #007bff; color: white; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #0056b3; transform: translateY(-1px); }
-        .btn-red { background: #dc3545; }
-        .btn-red:hover { background: #a71d2a; }
-        
-        /* Permisos Checkboxes */
-        .permisos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #eee; padding: 15px; border-radius: 8px; margin: 10px 0; }
-        .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
-        .checkbox-item input { width: auto; margin: 0; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        th { background: #f4f7f6; color: #555; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .badge-admin { background: #e7f3ff; color: #007bff; }
-        .badge-user { background: #f0f2f5; color: #65676b; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Maestro ANDVIP</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body{ font-family:Arial; margin:0; background:url("fondo.jpg") no-repeat center center fixed; background-size:cover; }
+    .container{ width:95%; max-width:1200px; margin:30px auto; background:rgba(255,255,255,0.96); padding:20px; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.4); }
+    input,select,button{ width:100%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ccc; box-sizing: border-box; }
+    button{ background:#007bff; color:white; border:none; cursor:pointer; font-weight: bold; }
+    button:hover{ opacity:0.9; }
+    .logout{ background:#dc3545; width: auto; float: right; padding: 8px 15px; }
+    table{ width:100%; border-collapse:collapse; margin-top:15px; background: white; font-size: 0.9em; }
+    th,td{ border:1px solid #ddd; padding:10px; text-align:center; }
+    th{ background:#007bff; color:white; }
+    .admin-only { display: none; } /* Oculto por defecto */
+    .panel-registro { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 20px; }
+    .dashboard-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom: 20px; }
+    .card{ padding:15px; border-radius:8px; text-align: center; border: 1px solid #ddd; }
+    .card-blue{background:#e3f2fd;} .card-green{background:#e8f5e9;} .card-orange{background:#fff3e0;}
+</style>
 </head>
-<body>
 
+<body>
 <div class="container">
+
     <div id="loginBox">
-        <h2>Ingresar al Sistema</h2>
-        <input type="email" id="email" placeholder="Correo">
+        <h2>Acceso ANDVIP</h2>
+        <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="login()">Iniciar Sesión</button>
+        <button onclick="login()">Ingresar</button>
     </div>
 
     <div id="app" style="display:none;">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div id="infoUsuario" style="font-weight: bold;">Cargando usuario...</div>
-            <button onclick="logout()" class="btn-red" style="width: auto;">Cerrar Sesión</button>
-        </div>
+        <button class="logout" onclick="logout()">Cerrar sesión</button>
+        <h3 id="infoUsuario"></h3>
 
-        <div id="panelAdmin" class="panel admin-section" style="display:none;">
-            <h2>Panel Maestro de Administrador</h2>
-            
-            <div class="flex-row">
-                <div>
-                    <h3>1. Crear Nuevo Usuario</h3>
-                    <input type="email" id="newUserEmail" placeholder="Correo del nuevo usuario">
-                    <input type="password" id="newUserPass" placeholder="Contraseña temporal">
-                    <select id="newUserRole">
-                        <option value="usuario">Rol: Usuario Normal</option>
-                        <option value="admin">Rol: Administrador Maestro</option>
-                    </select>
-                    
-                    <div class="permisos-grid">
-                        <div class="checkbox-item"><input type="checkbox" id="pEliminar" checked> Puede eliminar</div>
-                        <div class="checkbox-item"><input type="checkbox" id="pVerTodo" checked> Ver historial global</div>
-                        <div class="checkbox-item"><input type="checkbox" id="pEditar"> Puede editar plataformas</div>
+        <div id="seccionAdmin" class="admin-only">
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; border: 2px solid #007bff; margin-bottom:20px;">
+                <h2>Configuración Maestro (Admin)</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4>Crear Usuario</h4>
+                        <input type="email" id="nuevoEmail" placeholder="Email">
+                        <input type="password" id="nuevoPassword" placeholder="Contraseña">
+                        <select id="newUserRole"><option value="usuario">Usuario</option><option value="admin">Admin</option></select>
+                        <button onclick="crearUsuario()">Guardar Usuario</button>
                     </div>
-                    <button onclick="crearUsuarioFirebase()">Registrar Usuario</button>
-                </div>
-
-                <div>
-                    <h3>2. Configurar Opciones</h3>
-                    <input type="text" id="inputPlat" placeholder="Nueva Plataforma">
-                    <button onclick="subirOpcion('plataformas', 'inputPlat')">Añadir Plataforma</button>
-                    <input type="text" id="inputAyuda" placeholder="Nombre de Admin Ayudante">
-                    <button onclick="subirOpcion('ayudantes', 'inputAyuda')">Añadir Ayudante</button>
+                    <div>
+                        <h4>Opciones de Menú</h4>
+                        <input type="text" id="inputPlat" placeholder="Nueva Plataforma">
+                        <button onclick="subirOpc('plataformas', 'inputPlat')">Añadir Plataforma</button>
+                        <input type="text" id="inputAyuda" placeholder="Nombre de Admin">
+                        <button onclick="subirOpc('ayudantes', 'inputAyuda')">Añadir Ayudante</button>
+                    </div>
                 </div>
             </div>
+
+            <h2>Resumen Visual</h2>
+            <div class="dashboard-cards">
+                <div class="card card-blue"><h4>Total</h4><h2 id="dashTotal">0</h2></div>
+                <div class="card card-green"><h4>Hoy</h4><h2 id="dashHoy">0</h2></div>
+                <div class="card card-orange"><h4>Mes</h4><h2 id="dashMes">0</h2></div>
+            </div>
+            <canvas id="graficaVentas" height="80" style="background: white; border-radius: 8px; margin-bottom: 20px;"></canvas>
         </div>
 
-        <div class="panel">
-            <h2>Registro de Actividad</h2>
-            <div class="flex-row">
+        <div class="panel-registro">
+            <h2 id="tituloForm">Nuevo Registro de Cuenta</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
                 <div>
                     <label>Nombre del Miembro:</label>
-                    <input type="text" id="nombreMiembro" placeholder="Nombre completo">
+                    <input type="text" id="nombreMiembro" placeholder="Escribe el nombre">
                 </div>
                 <div>
                     <label>Plataforma:</label>
                     <select id="selectPlat"></select>
                 </div>
                 <div>
-                    <label>Admin Ayudante:</label>
+                    <label>Admin que ayudó:</label>
                     <select id="selectAyuda"></select>
                 </div>
             </div>
-            <button onclick="guardarRegistro()">Guardar en Historial</button>
+            <button style="background: #28a745; margin-top: 15px; font-size: 1.1em;" onclick="guardarRegistro()">GUARDAR REGISTRO</button>
         </div>
 
-        <div class="panel">
-            <h2>Historial de Movimientos</h2>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Miembro</th>
-                            <th>Plataforma</th>
-                            <th>Admin Ayuda</th>
-                            <th>Registrado por</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaHistorial"></tbody>
-                </table>
-            </div>
-        </div>
+        <h2>Historial de Actividad</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Miembro</th>
+                    <th>Plataforma</th>
+                    <th>Ayudó</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaHistorial"></tbody>
+        </table>
     </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-        authDomain: "sistema-ventas-64a4c.firebaseapp.com",
-        projectId: "sistema-ventas-64a4c",
-        storageBucket: "sistema-ventas-64a4c.firebasestorage.app",
-        messagingSenderId: "291577824119",
-        appId: "1:291577824119:web:894fe9842b427c9ac3d772"
-    };
+const firebaseConfig={
+    apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+    authDomain:"sistema-ventas-64a4c.firebaseapp.com",
+    projectId:"sistema-ventas-64a4c",
+    storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
+    messagingSenderId:"291577824119",
+    appId:"1:291577824119:web:894fe9842b427c9ac3d772"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const appF = initializeApp(firebaseConfig);
+const auth = getAuth(appF);
+const db = getFirestore(appF);
 
-    let miUsuario = null;
-    let misPermisos = {};
+let miRol = "usuario";
 
-    /* --- AUTENTICACIÓN --- */
-    window.login = () => signInWithEmailAndPassword(auth, email.value, password.value).catch(e => alert(e.message));
-    window.logout = () => signOut(auth);
+window.login=()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>alert(e.message));
+window.logout=()=>signOut(auth);
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const docRef = doc(db, "usuarios", user.uid);
-            const docSnap = await getDoc(docRef);
-            
-            miUsuario = docSnap.exists() ? docSnap.data() : { role: "usuario", permisos: {} };
-            misPermisos = miUsuario.permisos || {};
+onAuthStateChanged(auth, async(user)=>{
+    if(user){
+        const snap = await getDoc(doc(db, "usuarios", user.uid));
+        miRol = snap.exists() ? snap.data().role : "usuario";
+        
+        loginBox.style.display="none";
+        app.style.display="block";
+        infoUsuario.innerText = `Conectado: ${user.email} (${miRol.toUpperCase()})`;
 
-            document.getElementById("loginBox").style.display = "none";
-            document.getElementById("app").style.display = "block";
-            document.getElementById("infoUsuario").innerHTML = `Hola, ${user.email} <span class="badge ${miUsuario.role==='admin'?'badge-admin':'badge-user'}">${miUsuario.role}</span>`;
-
-            if (miUsuario.role === "admin") document.getElementById("panelAdmin").style.display = "block";
-            
-            cargarSelectores();
-            cargarHistorial();
+        // --- LÓGICA DE PANTALLA DIRECTA ---
+        if(miRol === "admin") {
+            document.getElementById("seccionAdmin").style.display = "block";
         } else {
-            document.getElementById("loginBox").style.display = "block";
-            document.getElementById("app").style.display = "none";
+            document.getElementById("seccionAdmin").style.display = "none";
+            // Para el usuario, el historial se verá más limpio
+        }
+
+        cargarSelectores();
+        escucharHistorial();
+    } else {
+        loginBox.style.display="block"; app.style.display="none";
+    }
+});
+
+/* ADMIN: CREAR USUARIOS */
+window.crearUsuario=async()=>{
+    const emailN = nuevoEmail.value;
+    alert("Usuario perfilado. Créalo manualmente en Firebase Auth.");
+    await setDoc(doc(db, "usuarios", emailN.replace(/\./g, "_")), { email: emailN, role: newUserRole.value });
+};
+
+window.subirOpc=async(col, id)=>{
+    const v = document.getElementById(id).value;
+    if(v) await addDoc(collection(db, col), { nombre: v });
+    document.getElementById(id).value = "";
+};
+
+function cargarSelectores(){
+    onSnapshot(collection(db, "plataformas"), s => {
+        selectPlat.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
+    });
+    onSnapshot(collection(db, "ayudantes"), s => {
+        selectAyuda.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
+    });
+}
+
+window.guardarRegistro = async () => {
+    if(!nombreMiembro.value) return alert("Escribe el nombre");
+    await addDoc(collection(db, "registros"), {
+        miembro: nombreMiembro.value,
+        plataforma: selectPlat.value,
+        adminAyuda: selectAyuda.value,
+        vendedor: auth.currentUser.email,
+        fecha: new Date().toLocaleString(),
+        timestamp: serverTimestamp()
+    });
+    nombreMiembro.value = ""; alert("¡Registro guardado con éxito!");
+};
+
+function escucharHistorial(){
+    let q = query(collection(db, "registros"), orderBy("timestamp", "desc"));
+    if(miRol !== "admin") q = query(collection(db, "registros"), where("vendedor", "==", auth.currentUser.email), orderBy("timestamp", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        tablaHistorial.innerHTML = "";
+        let t=0, h=0, m=0;
+        const hoyF = new Date().toLocaleDateString();
+        let stats = {};
+
+        snapshot.forEach(docSnap => {
+            const r = docSnap.data();
+            t++;
+            if(r.timestamp){
+                const f = new Date(r.timestamp.seconds*1000);
+                if(f.toLocaleDateString() === hoyF) h++;
+                if(f.getMonth() === new Date().getMonth()) m++;
+            }
+            stats[r.plataforma] = (stats[r.plataforma] || 0) + 1;
+
+            // EL USUARIO NO PUEDE EDITAR NI ELIMINAR (Solo ve el historial)
+            const btnAccion = (miRol === 'admin') ? `<button class="delete-btn" style="padding:5px;width:auto" onclick="borrar('${docSnap.id}')">Borrar</button>` : `<span style="color:gray; font-size:0.8em;">Protegido</span>`;
+
+            tablaHistorial.innerHTML += `<tr><td>${r.fecha}</td><td>${r.miembro}</td><td><b>${r.plataforma}</b></td><td>${r.adminAyuda}</td><td>${btnAccion}</td></tr>`;
+        });
+
+        if(miRol === 'admin'){
+            dashTotal.innerText = t; dashHoy.innerText = h; dashMes.innerText = m;
+            actualizarGrafica(stats);
         }
     });
+}
 
-    /* --- GESTIÓN DE USUARIOS (SOLO ADMIN) --- */
-    window.crearUsuarioFirebase = async () => {
-        const mail = newUserEmail.value;
-        const pass = newUserPass.value;
-        if(!mail || !pass) return alert("Completa los datos");
+function actualizarGrafica(datos){
+    const ctx = document.getElementById("graficaVentas");
+    if(window.miGrafica) window.miGrafica.destroy();
+    window.miGrafica = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(datos), datasets: [{ label: 'Uso por Plataforma', data: Object.values(datos), backgroundColor: '#007bff' }] } });
+}
 
-        try {
-            // Nota: En un entorno real, la creación de otros usuarios se hace via Firebase Admin SDK o Functions.
-            // Aquí usamos un truco: registramos el perfil en Firestore. El usuario deberá "registrarse" o tú crearlo manualmente en Auth.
-            // Para que funcione 100% automático, necesitas una Cloud Function.
-            alert("Usuario perfilado en base de datos. Asegúrate de crearlo en la pestaña 'Authentication' de Firebase con el mismo correo.");
-            
-            await setDoc(doc(db, "usuarios", mail.replace(/\./g, "_")), {
-                email: mail,
-                role: newUserRole.value,
-                permisos: {
-                    eliminar: pEliminar.checked,
-                    verTodo: pVerTodo.checked,
-                    editar: pEditar.checked
-                }
-            });
-        } catch (e) { alert(e.message); }
-    };
-
-    /* --- OPCIONES DE ADMIN --- */
-    window.subirOpcion = async (col, inputId) => {
-        const val = document.getElementById(inputId).value;
-        if (val) await addDoc(collection(db, col), { nombre: val });
-        document.getElementById(inputId).value = "";
-    };
-
-    function cargarSelectores() {
-        onSnapshot(collection(db, "plataformas"), (s) => {
-            selectPlat.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
-        });
-        onSnapshot(collection(db, "ayudantes"), (s) => {
-            selectAyuda.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
-        });
-    }
-
-    /* --- REGISTROS --- */
-    window.guardarRegistro = async () => {
-        const nom = nombreMiembro.value;
-        if (!nom) return alert("Pon el nombre");
-        await addDoc(collection(db, "registros"), {
-            miembro: nom,
-            plataforma: selectPlat.value,
-            adminAyuda: selectAyuda.value,
-            creadoPor: auth.currentUser.email,
-            fecha: new Date().toLocaleString(),
-            timestamp: serverTimestamp()
-        });
-        nombreMiembro.value = "";
-    };
-
-    function cargarHistorial() {
-        let q = query(collection(db, "registros"), orderBy("timestamp", "desc"));
-        
-        // Si no tiene permiso de "verTodo", solo ve lo suyo
-        if (miUsuario.role !== "admin" && !misPermisos.verTodo) {
-            q = query(collection(db, "registros"), where("creadoPor", "==", auth.currentUser.email), orderBy("timestamp", "desc"));
-        }
-
-        onSnapshot(q, (snap) => {
-            tablaHistorial.innerHTML = "";
-            snap.forEach(d => {
-                const r = d.data();
-                const btnEliminar = (miUsuario.role === 'admin' || misPermisos.eliminar) 
-                    ? `<button class="btn-red" style="padding:5px; width:auto" onclick="borrarReg('${d.id}')">Eliminar</button>` 
-                    : `<span style="font-size:10px; color:gray">Sin permiso</span>`;
-                
-                tablaHistorial.innerHTML += `
-                    <tr>
-                        <td>${r.fecha}</td>
-                        <td>${r.miembro}</td>
-                        <td><span class="badge badge-admin">${r.plataforma}</span></td>
-                        <td>${r.adminAyuda}</td>
-                        <td>${r.creadoPor}</td>
-                        <td>${btnEliminar}</td>
-                    </tr>
-                `;
-            });
-        });
-    }
-
-    window.borrarReg = async (id) => { if(confirm("¿Seguro?")) await deleteDoc(doc(db, "registros", id)); };
+window.borrar = async(id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "registros", id)); };
 
 </script>
 </body>
