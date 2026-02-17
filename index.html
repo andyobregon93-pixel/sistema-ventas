@@ -3,227 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Maestro ANDVIP</title>
+<title>Sistema Maestro ANDVIP Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    body{ font-family:Arial; margin:0; background:url("fondo.jpg") no-repeat center center fixed; background-size:cover; }
-    .container{ width:95%; max-width:1200px; margin:30px auto; background:rgba(255,255,255,0.96); padding:20px; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.4); }
-    input,select,button{ width:100%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ccc; box-sizing: border-box; }
-    button{ background:#007bff; color:white; border:none; cursor:pointer; font-weight: bold; }
-    button:hover{ opacity:0.9; }
-    .logout{ background:#dc3545; width: auto; float: right; padding: 8px 15px; }
-    table{ width:100%; border-collapse:collapse; margin-top:15px; background: white; font-size: 0.9em; }
-    th,td{ border:1px solid #ddd; padding:10px; text-align:center; }
-    th{ background:#007bff; color:white; }
-    .admin-only { display: none; } /* Oculto por defecto */
-    .panel-registro { background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 20px; }
-    .dashboard-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom: 20px; }
-    .card{ padding:15px; border-radius:8px; text-align: center; border: 1px solid #ddd; }
-    .card-blue{background:#e3f2fd;} .card-green{background:#e8f5e9;} .card-orange{background:#fff3e0;}
+    body{ font-family:'Segoe UI', Arial; margin:0; background:url("fondo.jpg") no-repeat center center fixed; background-size:cover; color: #333; }
+    .container{ width:95%; max-width:1200px; margin:20px auto; background:rgba(255,255,255,0.97); padding:25px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+    input, select, button { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #ccc; box-sizing: border-box; font-size: 14px; }
+    button { background:#007bff; color:white; border:none; cursor:pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background:#0056b3; transform: translateY(-1px); }
+    .btn-red { background:#dc3545; width: auto; }
+    .btn-green { background:#28a745; font-size: 1.1em; margin-top: 10px; }
+    
+    /* Paneles */
+    .panel { background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; margin-bottom:20px; }
+    .admin-only { border: 2px solid #007bff; background: #f0f7ff; display: none; }
+    
+    /* Tablas */
+    table { width:100%; border-collapse:collapse; margin-top:15px; background: white; border-radius: 8px; overflow: hidden; }
+    th, td { border:1px solid #eee; padding:12px; text-align:center; }
+    th { background:#007bff; color:white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+
+    /* Dashboard */
+    .dashboard-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; margin-bottom: 20px; }
+    .card { padding:15px; border-radius:10px; text-align: center; color: white; }
+    .c-1 { background: #4e73df; } .c-2 { background: #1cc88a; } .c-3 { background: #f6c23e; }
 </style>
 </head>
-
 <body>
-<div class="container">
 
+<div class="container">
     <div id="loginBox">
-        <h2>Acceso ANDVIP</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="login()">Ingresar</button>
+        <h2 style="text-align:center;">Inicia Sesión en ANDVIP</h2>
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Tu contraseña">
+        <button onclick="login()">INGRESAR AL SISTEMA</button>
     </div>
 
     <div id="app" style="display:none;">
-        <button class="logout" onclick="logout()">Cerrar sesión</button>
-        <h3 id="infoUsuario"></h3>
-
-        <div id="seccionAdmin" class="admin-only">
-            <div style="background:#f8f9fa; padding:15px; border-radius:8px; border: 2px solid #007bff; margin-bottom:20px;">
-                <h2>Configuración Maestro (Admin)</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <h4>Crear Usuario</h4>
-                        <input type="email" id="nuevoEmail" placeholder="Email">
-                        <input type="password" id="nuevoPassword" placeholder="Contraseña">
-                        <select id="newUserRole"><option value="usuario">Usuario</option><option value="admin">Admin</option></select>
-                        <button onclick="crearUsuario()">Guardar Usuario</button>
-                    </div>
-                    <div>
-                        <h4>Opciones de Menú</h4>
-                        <input type="text" id="inputPlat" placeholder="Nueva Plataforma">
-                        <button onclick="subirOpc('plataformas', 'inputPlat')">Añadir Plataforma</button>
-                        <input type="text" id="inputAyuda" placeholder="Nombre de Admin">
-                        <button onclick="subirOpc('ayudantes', 'inputAyuda')">Añadir Ayudante</button>
-                    </div>
-                </div>
-            </div>
-
-            <h2>Resumen Visual</h2>
-            <div class="dashboard-cards">
-                <div class="card card-blue"><h4>Total</h4><h2 id="dashTotal">0</h2></div>
-                <div class="card card-green"><h4>Hoy</h4><h2 id="dashHoy">0</h2></div>
-                <div class="card card-orange"><h4>Mes</h4><h2 id="dashMes">0</h2></div>
-            </div>
-            <canvas id="graficaVentas" height="80" style="background: white; border-radius: 8px; margin-bottom: 20px;"></canvas>
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:15px;">
+            <h3 id="infoUsuario" style="margin:0; color:#007bff;"></h3>
+            <button class="btn-red" onclick="logout()">Cerrar sesión</button>
         </div>
 
-        <div class="panel-registro">
-            <h2 id="tituloForm">Nuevo Registro de Cuenta</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+        <div id="panelAdmin" class="panel admin-only">
+            <h2 style="margin-top:0;">🔧 Panel de Control - Administradora</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div>
-                    <label>Nombre del Miembro:</label>
-                    <input type="text" id="nombreMiembro" placeholder="Escribe el nombre">
+                    <h4>Gestionar Usuarios</h4>
+                    <input type="email" id="nuevoEmail" placeholder="Correo del nuevo miembro">
+                    <input type="password" id="nuevoPassword" placeholder="Contraseña">
+                    <select id="nuevoRol">
+                        <option value="usuario">Rol: Usuario Normal</option>
+                        <option value="admin">Rol: Administradora</option>
+                    </select>
+                    <button onclick="crearUsuario()">Registrar Acceso</button>
                 </div>
                 <div>
-                    <label>Plataforma:</label>
+                    <h4>Configurar Plataformas y Admins</h4>
+                    <input type="text" id="inputPlat" placeholder="Nueva Plataforma (Netflix, etc)">
+                    <button onclick="subirOpc('plataformas', 'inputPlat')">Añadir Plataforma</button>
+                    <input type="text" id="inputAyuda" placeholder="Nombre de Admin de ayuda">
+                    <button onclick="subirOpc('ayudantes', 'inputAyuda')">Añadir Ayudante</button>
+                </div>
+            </div>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+            
+            <h4>Estadísticas de Trabajo</h4>
+            <div class="dashboard-cards">
+                <div class="card c-1"><span>Total Global</span><h2 id="dashTotal">0</h2></div>
+                <div class="card c-2"><span>Registros Hoy</span><h2 id="dashHoy">0</h2></div>
+                <div class="card c-3"><span>Este Mes</span><h2 id="dashMes">0</h2></div>
+            </div>
+            <canvas id="graficaActividad" height="80" style="background:white; padding:10px; border-radius:10px;"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2 style="margin-top:0;">📝 Registrar Nueva Cuenta</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div>
+                    <label>Nombre del Miembro:</label>
+                    <input type="text" id="nombreMiembro" placeholder="Nombre completo">
+                </div>
+                <div>
+                    <label>Plataforma Entregada:</label>
                     <select id="selectPlat"></select>
                 </div>
                 <div>
-                    <label>Admin que ayudó:</label>
+                    <label>Admin que te ayudó:</label>
                     <select id="selectAyuda"></select>
                 </div>
             </div>
-            <button style="background: #28a745; margin-top: 15px; font-size: 1.1em;" onclick="guardarRegistro()">GUARDAR REGISTRO</button>
+            <button class="btn-green" onclick="guardarRegistro()">GUARDAR REGISTRO AHORA</button>
         </div>
 
-        <h2>Historial de Actividad</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Miembro</th>
-                    <th>Plataforma</th>
-                    <th>Ayudó</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaHistorial"></tbody>
-        </table>
+        <div class="panel">
+            <h2>📜 Historial de Registros</h2>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Miembro</th>
+                            <th>Plataforma</th>
+                            <th>Admin Ayuda</th>
+                            <th>Registrado por</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistorial"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig={
-    apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-    authDomain:"sistema-ventas-64a4c.firebaseapp.com",
-    projectId:"sistema-ventas-64a4c",
-    storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
-    messagingSenderId:"291577824119",
-    appId:"1:291577824119:web:894fe9842b427c9ac3d772"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+        authDomain: "sistema-ventas-64a4c.firebaseapp.com",
+        projectId: "sistema-ventas-64a4c",
+        storageBucket: "sistema-ventas-64a4c.firebasestorage.app",
+        messagingSenderId: "291577824119",
+        appId: "1:291577824119:web:894fe9842b427c9ac3d772"
+    };
 
-const appF = initializeApp(firebaseConfig);
-const auth = getAuth(appF);
-const db = getFirestore(appF);
+    const appF = initializeApp(firebaseConfig);
+    const auth = getAuth(appF);
+    const db = getFirestore(appF);
 
-let miRol = "usuario";
+    let miRol = "usuario";
 
-window.login=()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>alert(e.message));
-window.logout=()=>signOut(auth);
+    /* --- SESIÓN --- */
+    window.login = () => signInWithEmailAndPassword(auth, email.value, password.value).catch(e => alert("Error de acceso: " + e.message));
+    window.logout = () => signOut(auth);
 
-onAuthStateChanged(auth, async(user)=>{
-    if(user){
-        const snap = await getDoc(doc(db, "usuarios", user.uid));
-        miRol = snap.exists() ? snap.data().role : "usuario";
-        
-        loginBox.style.display="none";
-        app.style.display="block";
-        infoUsuario.innerText = `Conectado: ${user.email} (${miRol.toUpperCase()})`;
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const snap = await getDoc(doc(db, "usuarios", user.uid));
+            // Si el documento no existe por UID, intentamos por email (para usuarios viejos)
+            const snapMail = await getDoc(doc(db, "usuarios", user.email.replace(/\./g, "_")));
+            
+            miRol = snap.exists() ? snap.data().role : (snapMail.exists() ? snapMail.data().role : "usuario");
 
-        // --- LÓGICA DE PANTALLA DIRECTA ---
-        if(miRol === "admin") {
-            document.getElementById("seccionAdmin").style.display = "block";
+            loginBox.style.display = "none";
+            app.style.display = "block";
+            infoUsuario.innerText = `Bienvenida: ${user.email}`;
+
+            if (miRol === "admin") document.getElementById("panelAdmin").style.display = "block";
+            
+            cargarSelects();
+            escucharHistorial();
         } else {
-            document.getElementById("seccionAdmin").style.display = "none";
-            // Para el usuario, el historial se verá más limpio
+            loginBox.style.display = "block";
+            app.style.display = "none";
         }
-
-        cargarSelectores();
-        escucharHistorial();
-    } else {
-        loginBox.style.display="block"; app.style.display="none";
-    }
-});
-
-/* ADMIN: CREAR USUARIOS */
-window.crearUsuario=async()=>{
-    const emailN = nuevoEmail.value;
-    alert("Usuario perfilado. Créalo manualmente en Firebase Auth.");
-    await setDoc(doc(db, "usuarios", emailN.replace(/\./g, "_")), { email: emailN, role: newUserRole.value });
-};
-
-window.subirOpc=async(col, id)=>{
-    const v = document.getElementById(id).value;
-    if(v) await addDoc(collection(db, col), { nombre: v });
-    document.getElementById(id).value = "";
-};
-
-function cargarSelectores(){
-    onSnapshot(collection(db, "plataformas"), s => {
-        selectPlat.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
     });
-    onSnapshot(collection(db, "ayudantes"), s => {
-        selectAyuda.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
-    });
-}
 
-window.guardarRegistro = async () => {
-    if(!nombreMiembro.value) return alert("Escribe el nombre");
-    await addDoc(collection(db, "registros"), {
-        miembro: nombreMiembro.value,
-        plataforma: selectPlat.value,
-        adminAyuda: selectAyuda.value,
-        vendedor: auth.currentUser.email,
-        fecha: new Date().toLocaleString(),
-        timestamp: serverTimestamp()
-    });
-    nombreMiembro.value = ""; alert("¡Registro guardado con éxito!");
-};
+    /* --- ADMIN: GESTIÓN --- */
+    window.crearUsuario = async () => {
+        const mail = nuevoEmail.value;
+        const pass = nuevoPassword.value;
+        if(!mail || !pass) return alert("Completa correo y clave");
 
-function escucharHistorial(){
-    let q = query(collection(db, "registros"), orderBy("timestamp", "desc"));
-    if(miRol !== "admin") q = query(collection(db, "registros"), where("vendedor", "==", auth.currentUser.email), orderBy("timestamp", "desc"));
+        try {
+            // Guardar perfil
+            await setDoc(doc(db, "usuarios", mail.replace(/\./g, "_")), { email: mail, role: nuevoRol.value });
+            
+            // Intentar crear en Auth
+            const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: mail, password: pass, returnSecureToken: false })
+            });
+            const data = await res.json();
+            
+            if(data.error) alert("Perfil guardado. Nota: " + data.error.message);
+            else alert("¡Usuario creado con éxito!");
+            
+            nuevoEmail.value = ""; nuevoPassword.value = "";
+        } catch(e) { alert("Error: " + e.message); }
+    };
 
-    onSnapshot(q, (snapshot) => {
-        tablaHistorial.innerHTML = "";
-        let t=0, h=0, m=0;
-        const hoyF = new Date().toLocaleDateString();
-        let stats = {};
+    window.subirOpc = async (col, id) => {
+        const val = document.getElementById(id).value;
+        if(val) await addDoc(collection(db, col), { nombre: val });
+        document.getElementById(id).value = "";
+    };
 
-        snapshot.forEach(docSnap => {
-            const r = docSnap.data();
-            t++;
-            if(r.timestamp){
-                const f = new Date(r.timestamp.seconds*1000);
-                if(f.toLocaleDateString() === hoyF) h++;
-                if(f.getMonth() === new Date().getMonth()) m++;
-            }
-            stats[r.plataforma] = (stats[r.plataforma] || 0) + 1;
-
-            // EL USUARIO NO PUEDE EDITAR NI ELIMINAR (Solo ve el historial)
-            const btnAccion = (miRol === 'admin') ? `<button class="delete-btn" style="padding:5px;width:auto" onclick="borrar('${docSnap.id}')">Borrar</button>` : `<span style="color:gray; font-size:0.8em;">Protegido</span>`;
-
-            tablaHistorial.innerHTML += `<tr><td>${r.fecha}</td><td>${r.miembro}</td><td><b>${r.plataforma}</b></td><td>${r.adminAyuda}</td><td>${btnAccion}</td></tr>`;
+    function cargarSelects() {
+        onSnapshot(collection(db, "plataformas"), s => {
+            selectPlat.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
         });
+        onSnapshot(collection(db, "ayudantes"), s => {
+            selectAyuda.innerHTML = s.docs.map(d => `<option value="${d.data().nombre}">${d.data().nombre}</option>`).join('');
+        });
+    }
 
-        if(miRol === 'admin'){
-            dashTotal.innerText = t; dashHoy.innerText = h; dashMes.innerText = m;
-            actualizarGrafica(stats);
-        }
-    });
-}
+    /* --- REGISTROS --- */
+    window.guardarRegistro = async () => {
+        if(!nombreMiembro.value) return alert("Escribe el nombre del miembro");
+        await addDoc(collection(db, "registros"), {
+            miembro: nombreMiembro.value,
+            plataforma: selectPlat.value,
+            adminAyuda: selectAyuda.value,
+            vendedor: auth.currentUser.email,
+            fecha: new Date().toLocaleString(),
+            timestamp: serverTimestamp()
+        });
+        nombreMiembro.value = "";
+        alert("¡Registro guardado correctamente!");
+    };
 
-function actualizarGrafica(datos){
-    const ctx = document.getElementById("graficaVentas");
-    if(window.miGrafica) window.miGrafica.destroy();
-    window.miGrafica = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(datos), datasets: [{ label: 'Uso por Plataforma', data: Object.values(datos), backgroundColor: '#007bff' }] } });
-}
+    function escucharHistorial() {
+        let q = query(collection(db, "registros"), orderBy("timestamp", "desc"));
+        // Si no eres admin, solo ves lo tuyo
+        if(miRol !== "admin") q = query(collection(db, "registros"), where("vendedor", "==", auth.currentUser.email), orderBy("timestamp", "desc"));
 
-window.borrar = async(id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "registros", id)); };
+        onSnapshot(q, (snap) => {
+            tablaHistorial.innerHTML = "";
+            let t=0, h=0, m=0;
+            const hoyF = new Date().toLocaleDateString();
+            let stats = {};
+
+            snap.forEach(docSnap => {
+                const r = docSnap.data();
+                t++;
+                if(r.timestamp){
+                    const f = new Date(r.timestamp.seconds*1000);
+                    if(f.toLocaleDateString() === hoyF) h++;
+                    if(f.getMonth() === new Date().getMonth()) m++;
+                }
+                stats[r.plataforma] = (stats[r.plataforma] || 0) + 1;
+
+                const btnAccion = (miRol === 'admin') ? `<button class="btn-red" style="padding:5px;width:auto" onclick="borrar('${docSnap.id}')">Eliminar</button>` : `<span style="color:gray;font-size:12px;">Grabado</span>`;
+
+                tablaHistorial.innerHTML += `
+                    <tr>
+                        <td>${r.fecha}</td>
+                        <td>${r.miembro}</td>
+                        <td><b>${r.plataforma}</b></td>
+                        <td>${r.adminAyuda}</td>
+                        <td>${r.vendedor}</td>
+                        <td>${btnAccion}</td>
+                    </tr>`;
+            });
+
+            if(miRol === 'admin'){
+                dashTotal.innerText = t; dashHoy.innerText = h; dashMes.innerText = m;
+                actualizarGrafica(stats);
+            }
+        });
+    }
+
+    function actualizarGrafica(datos){
+        const ctx = document.getElementById("graficaActividad");
+        if(window.miGrafica) window.miGrafica.destroy();
+        window.miGrafica = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(datos),
+                datasets: [{ label: 'Cuentas entregadas', data: Object.values(datos), backgroundColor: '#4e73df' }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    window.borrar = async(id) => { if(confirm("¿Seguro que quieres eliminar este registro?")) await deleteDoc(doc(db, "registros", id)); };
 
 </script>
 </body>
