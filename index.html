@@ -212,3 +212,349 @@ td{
 
 </main>
 </div>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc,
+collection, addDoc, serverTimestamp,
+query, orderBy, onSnapshot, where }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+authDomain:"sistema-ventas-64a4c.firebaseapp.com",
+projectId:"sistema-ventas-64a4c",
+storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
+messagingSenderId:"291577824119",
+appId:"1:291577824119:web:894fe9842b427c9ac3d772"
+};
+
+const appFirebase=initializeApp(firebaseConfig);
+const auth=getAuth(appFirebase);
+const db=getFirestore(appFirebase);
+
+let usuarioActual=null;
+let rolActual=null;
+let permisosUsuario={};
+let unsubscribeHistorial=null;
+
+function toast(msg){
+const t=document.getElementById("toast");
+t.innerText=msg;
+t.classList.add("show");
+setTimeout(()=>t.classList.remove("show"),3000);
+}
+
+window.login=async()=>{
+await signInWithEmailAndPassword(auth,email.value,password.value);
+toast("Bienvenido ✅");
+};
+
+window.logout=async()=>{
+await signOut(auth);
+app.style.display="none";
+loginBox.style.display="block";
+toast("Sesión cerrada 👋");
+};
+
+onAuthStateChanged(auth,async(user)=>{
+if(user){
+usuarioActual=user.email;
+infoUsuario.innerText=usuarioActual;
+
+const snap=await getDoc(doc(db,"usuarios",user.uid));
+rolActual=snap.exists()?snap.data().role:"usuario";
+permisosUsuario=snap.exists()?snap.data().permisos||{}:{};
+
+infoRol.innerText=rolActual;
+
+loginBox.style.display="none";
+app.style.display="flex";
+
+if(rolActual==="admin"){
+btnAdmin.style.display="block";
+btnResumen.style.display="block";
+mostrar("adminPanel");
+aplicarFiltro();
+}else{
+btnAdmin.style.display="none";
+btnResumen.style.display=permisosUsuario.verResumen?"block":"none";
+mostrar("cuentasPanel");
+}
+
+cargarPlataformas();
+cargarAdmins();
+cargarHistorial();
+}
+});
+
+window.mostrar=(id)=>{
+
+if(rolActual!=="admin" && id==="adminPanel"){
+toast("No tienes permiso ❌");
+return;
+}
+
+adminPanel.style.display="none";
+cuentasPanel.style.display="none";
+historialPanel.style.display="none";
+resumenPanel.style.display="none";
+document.getElementById(id).style.display="block";
+};
+
+window.crearUsuario=async()=>{
+
+const email=nuevoEmail.value;
+const password=nuevoPassword.value;
+const rol=nuevoRol.value;
+
+const permisos={
+crear:permCrear.checked,
+eliminar:permEliminar.checked,
+verTodo:permVerTodo.checked,
+verResumen:permResumen.checked
+};
+
+const response=await fetch(
+`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:email,
+password:password,
+returnSecureToken:true
+})
+}
+);
+
+const data=await response.json();
+
+if(data.error){
+toast(data.error.message);
+return;
+}
+
+await setDoc(doc(db,"usuarios",data.localId),{
+email:email,
+role:rol,
+permisos:permisos
+});
+
+toast("Usuario creado correctamente ✅");
+
+nuevoEmail.value="";
+nuevoPassword.value="";
+permCrear.checked=false;
+permEliminar.checked=false;
+permVerTodo.checked=false;
+permResumen.checked=false;
+};
+
+window.agregarPlataforma=async()=>{
+await addDoc(collection(db,"plataformas"),{nombre:nuevaPlataforma.value});
+nuevaPlataforma.value="";
+toast("Plataforma agregada ✅");
+};
+
+window.agregarAdminAyuda=async()=>{
+await addDoc(collection(db,"adminsAyuda"),{nombre:nuevoAdminAyuda.value});
+nuevoAdminAyuda.value="";
+toast("Administrador agregado ✅");
+};
+
+function cargarPlataformas(){
+onSnapshot(collection(db,"plataformas"),(snap)=>{
+plataformaSelect.innerHTML="";
+listaPlataformas.innerHTML="";
+snap.forEach(docSnap=>{
+const p=docSnap.data().nombre;
+plataformaSelect.innerHTML+=`<option>${p}</option>`;
+if(rolActual==="admin"){
+listaPlataformas.innerHTML+=`<li>${p}</li>`;
+}
+});
+});
+}
+
+function cargarAdmins(){
+onSnapshot(collection(db,"adminsAyuda"),(snap)=>{
+adminAyudaSelect.innerHTML="";
+listaAdmins.innerHTML="";
+snap.forEach(docSnap=>{
+const a=docSnap.data().nombre;
+adminAyudaSelect.innerHTML+=`<option>${a}</option>`;
+if(rolActual==="admin"){
+listaAdmins.innerHTML+=`<li>${a}</li>`;
+}
+});
+});
+}
+
+window.guardarCuenta=async()=>{
+
+if(rolActual!=="admin" && !permisosUsuario.crear){
+toast("No tienes permiso para registrar ❌");
+return;
+}
+
+await addDoc(collection(db,"historialGrupo"),{
+plataforma:plataformaSelect.value,
+miembro:nombreMiembro.value,
+adminAyudo:adminAyudaSelect.value,
+usuario:usuarioActual,
+timestamp:serverTimestamp()
+});
+
+nombreMiembro.value="";
+toast("Registro guardado exitosamente ✅");
+};
+
+function cargarHistorial(){
+
+if(unsubscribeHistorial){
+unsubscribeHistorial();
+}
+
+let q;
+
+if(rolActual==="admin" || permisosUsuario.verTodo){
+q=query(collection(db,"historialGrupo"),orderBy("timestamp","desc"));
+}else{
+q=query(collection(db,"historialGrupo"),
+where("usuario","==",usuarioActual),
+orderBy("timestamp","desc"));
+}
+
+unsubscribeHistorial=onSnapshot(q,(snap)=>{
+tablaHistorial.innerHTML="";
+
+snap.forEach(docSnap=>{
+const d=docSnap.data();
+const fecha=d.timestamp
+?new Date(d.timestamp.seconds*1000).toLocaleString()
+:"";
+
+tablaHistorial.innerHTML+=`
+<tr>
+<td>${d.plataforma}</td>
+<td>${d.miembro}</td>
+<td>${d.adminAyudo}</td>
+<td>${d.usuario}</td>
+<td>${fecha}</td>
+<td>${
+(rolActual==="admin"||permisosUsuario.eliminar)
+?`<button onclick="eliminar('${docSnap.id}')">Eliminar</button>`
+:"-"
+}</td>
+</tr>`;
+});
+});
+}
+
+window.eliminar=async(id)=>{
+await deleteDoc(doc(db,"historialGrupo",id));
+toast("Registro eliminado 🗑️");
+};
+window.aplicarFiltro=function(){
+
+let filtro=document.getElementById("filtroTiempo").value;
+let fechaInicio;
+const ahora=new Date();
+
+if(filtro==="semana"){
+fechaInicio=new Date();
+fechaInicio.setDate(ahora.getDate()-ahora.getDay());
+fechaInicio.setHours(0,0,0,0);
+document.getElementById("rangoPersonalizado").style.display="none";
+}
+
+if(filtro==="mes"){
+fechaInicio=new Date(ahora.getFullYear(),ahora.getMonth(),1);
+document.getElementById("rangoPersonalizado").style.display="none";
+}
+
+if(filtro==="personalizado"){
+document.getElementById("rangoPersonalizado").style.display="block";
+
+const inicioInput=document.getElementById("fechaInicio").value;
+const finInput=document.getElementById("fechaFin").value;
+
+if(!inicioInput||!finInput)return;
+
+fechaInicio=new Date(inicioInput);
+const fechaFin=new Date(finInput);
+fechaFin.setHours(23,59,59,999);
+
+generarResumen(fechaInicio,fechaFin);
+return;
+}
+
+generarResumen(fechaInicio,null);
+};
+
+function generarResumen(fechaInicio,fechaFin){
+
+let q;
+
+if(fechaFin){
+q=query(
+collection(db,"historialGrupo"),
+where("timestamp",">=",fechaInicio),
+where("timestamp","<=",fechaFin),
+orderBy("timestamp","desc")
+);
+}else{
+q=query(
+collection(db,"historialGrupo"),
+where("timestamp",">=",fechaInicio),
+orderBy("timestamp","desc")
+);
+}
+
+onSnapshot(q,(snap)=>{
+
+let totales={};
+let detalle={};
+
+snap.forEach(docSnap=>{
+const d=docSnap.data();
+const admin=d.adminAyudo||"Sin asignar";
+const plataforma=d.plataforma;
+
+if(!totales[admin])totales[admin]=0;
+totales[admin]++;
+
+if(!detalle[admin])detalle[admin]={};
+if(!detalle[admin][plataforma])detalle[admin][plataforma]=0;
+detalle[admin][plataforma]++;
+});
+
+const ranking=Object.entries(totales).sort((a,b)=>b[1]-a[1]);
+
+let html="<h3>🏆 Ranking</h3>";
+
+ranking.forEach((r,i)=>{
+html+=`<p><strong>${i+1}° ${r[0]}</strong> - ${r[1]} ayudas</p>`;
+});
+
+html+="<hr><h3>📊 Detalle por Plataforma</h3>";
+
+for(const admin in detalle){
+html+=`<h4>${admin}</h4>`;
+for(const plat in detalle[admin]){
+html+=`<p>${plat}: ${detalle[admin][plat]}</p>`;
+}
+}
+
+document.getElementById("resumenAyudas").innerHTML=
+ranking.length?html:"No hay registros en este periodo.";
+
+});
+}
+
+</script>
+</body>
+</html>
