@@ -8,32 +8,47 @@
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:'Segoe UI', Arial, sans-serif;
   background:linear-gradient(to bottom,#1e3c72,#2a5298);
 }
 
 .layout{
   display:flex;
-  height:100vh;
+  min-height:100vh;
 }
 
+/* SIDEBAR */
+
 .sidebar{
-  width:260px;
-  background:rgba(0,0,0,0.4);
+  width:280px;
+  background:rgba(0,0,0,0.45);
   color:white;
-  padding:20px;
+  padding:25px;
   display:flex;
   flex-direction:column;
+  font-size:16px;
+}
+
+.sidebar h2{
+  text-align:center;
+  font-size:20px;
+  margin-bottom:25px;
+}
+
+.sidebar p{
+  margin:5px 0;
 }
 
 .sidebar button{
-  margin:5px 0;
-  padding:10px;
+  margin:6px 0;
+  padding:12px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   background:#2a5298;
   color:white;
   cursor:pointer;
+  font-size:15px;
+  transition:0.2s;
 }
 
 .sidebar button:hover{
@@ -43,44 +58,100 @@ body{
 .logout{
   background:#c0392b !important;
   margin-top:auto;
+  font-weight:bold;
 }
+
+/* CONTENT */
 
 .content{
   flex:1;
   background:#f4f6f9;
-  padding:30px;
+  padding:40px;
   overflow:auto;
 }
 
-.card{
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+.content h2{
+  font-size:26px;
   margin-bottom:20px;
 }
 
-input,select{
-  width:100%;
-  padding:8px;
-  margin:5px 0;
+/* CARDS */
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  margin-bottom:25px;
 }
+
+.card h3{
+  font-size:20px;
+  margin-bottom:15px;
+}
+
+/* INPUTS */
+
+input, select{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:8px;
+  border:1px solid #ddd;
+  font-size:15px;
+}
+
+button{
+  padding:12px;
+  font-size:15px;
+  border-radius:8px;
+}
+
+/* TABLE */
 
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
+  border-radius:10px;
+  overflow:hidden;
+  font-size:15px;
 }
 
 th{
   background:#2a5298;
   color:white;
-  padding:10px;
+  padding:14px;
 }
 
 td{
-  padding:8px;
-  border:1px solid #ddd;
+  padding:12px;
+  border-bottom:1px solid #eee;
+  text-align:center;
+}
+
+/* RESPONSIVE */
+
+@media (max-width:900px){
+  .layout{
+    flex-direction:column;
+  }
+  .sidebar{
+    width:100%;
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:space-around;
+  }
+  .sidebar h2{
+    width:100%;
+  }
+  .sidebar button{
+    flex:1 1 45%;
+    margin:5px;
+  }
+  .content{
+    padding:20px;
+  }
 }
 </style>
 </head>
@@ -88,7 +159,7 @@ td{
 <body>
 
 <div id="loginBox" style="max-width:400px;margin:100px auto;background:white;padding:30px;border-radius:10px;">
-<h2>Login</h2>
+<h2 style="font-size:24px;">Login</h2>
 <input type="email" id="email" placeholder="Email">
 <input type="password" id="password" placeholder="Contraseña">
 <button onclick="login()">Ingresar</button>
@@ -110,9 +181,7 @@ td{
 
 <main class="content">
 
-<!-- PANEL ADMIN -->
 <section id="adminPanel" style="display:none;">
-
 <h2>Panel de Administración</h2>
 
 <div class="card">
@@ -147,13 +216,10 @@ td{
 <button onclick="agregarAdminAyuda()">Agregar</button>
 <ul id="listaAdminsAyuda"></ul>
 </div>
-
 </section>
 
-<!-- CUENTAS -->
 <section id="cuentasPanel" style="display:none;">
 <h2>Cuentas Activadas</h2>
-
 <div class="card">
 <select id="plataformaSelect"></select>
 <select id="adminAyudaSelect"></select>
@@ -162,7 +228,6 @@ td{
 </div>
 </section>
 
-<!-- HISTORIAL -->
 <section id="historialPanel" style="display:none;">
 <h2>Historial</h2>
 <table>
@@ -188,7 +253,7 @@ td{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+import { getFirestore, doc, getDoc, setDoc, deleteDoc,
 collection, addDoc, serverTimestamp,
 query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -220,9 +285,7 @@ window.logout=()=>signOut(auth);
 
 onAuthStateChanged(auth,async(user)=>{
 if(user){
-
 usuarioActual=user.email;
-
 const snap=await getDoc(doc(db,"usuarios",user.uid));
 rolActual=snap.exists()?snap.data().role:"usuario";
 permisos=snap.exists()?snap.data().permisos||{}:{};
@@ -240,7 +303,6 @@ cargarAdminsAyuda();
 }
 
 cargarHistorial();
-
 }else{
 loginBox.style.display="block";
 app.style.display="none";
@@ -290,11 +352,9 @@ if(usuarioActual!==ADMIN_PRINCIPAL){
 alert("Solo el administrador principal puede agregar plataformas");
 return;
 }
-
 await addDoc(collection(db,"plataformas"),{
 nombre:nuevaPlataforma.value
 });
-
 nuevaPlataforma.value="";
 };
 
@@ -315,11 +375,9 @@ if(usuarioActual!==ADMIN_PRINCIPAL){
 alert("Solo el administrador principal puede agregar.");
 return;
 }
-
 await addDoc(collection(db,"adminsAyuda"),{
 nombre:nuevoAdminAyuda.value
 });
-
 nuevoAdminAyuda.value="";
 };
 
@@ -340,7 +398,6 @@ if(!(rolActual==="admin"||permisos.crear)){
 alert("No tienes permiso para crear");
 return;
 }
-
 await addDoc(collection(db,"historialGrupo"),{
 plataforma:plataformaSelect.value,
 miembro:nombreMiembro.value,
@@ -348,14 +405,11 @@ admin:adminAyudaSelect.value,
 usuario:usuarioActual,
 timestamp:serverTimestamp()
 });
-
 nombreMiembro.value="";
 };
 
 function cargarHistorial(){
-
 let q;
-
 if(rolActual==="admin"||permisos.verTodo){
 q=query(collection(db,"historialGrupo"),orderBy("timestamp","desc"));
 }else{
@@ -369,7 +423,6 @@ tablaHistorial.innerHTML="";
 snapshot.forEach(docSnap=>{
 const h=docSnap.data();
 const fecha=h.timestamp?new Date(h.timestamp.seconds*1000).toLocaleString():"";
-
 tablaHistorial.innerHTML+=`
 <tr>
 <td>${h.plataforma}</td>
