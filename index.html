@@ -3,353 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Grupo Privado</title>
+<title>Sistema de Ventas ANDVIP</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-:root{
-  --azul:#1e3c72;
-  --azul2:#2a5298;
-  --rojo:#c0392b;
-  --verde:#27ae60;
-  --gris:#f4f6f9;
-}
-
-*{
-  box-sizing:border-box;
-}
-
 body{
-  margin:0;
-  font-family:'Segoe UI', Arial, sans-serif;
-  background:linear-gradient(to bottom,var(--azul),var(--azul2));
-  font-size:16px;
+font-family:Arial;
+margin:0;
+background:url("fondo.jpg") no-repeat center center fixed;
+background-size:cover;
 }
-
-.toast{
-  position:fixed;
-  top:20px;
-  right:20px;
-  background:var(--verde);
-  color:white;
-  padding:15px 25px;
-  border-radius:12px;
-  font-weight:600;
-  opacity:0;
-  transform:translateY(-20px);
-  transition:0.3s;
-  z-index:999;
+.container{
+width:95%;
+max-width:1200px;
+margin:30px auto;
+background:rgba(255,255,255,0.95);
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
-.toast.show{ opacity:1; transform:translateY(0); }
-
-.layout{
-  display:flex;
-  min-height:100vh;
+input,select,button{
+width:100%;
+padding:8px;
+margin:5px 0;
 }
-
-.sidebar{
-  width:280px;
-  background:rgba(0,0,0,0.6);
-  color:white;
-  padding:25px;
-  display:flex;
-  flex-direction:column;
-  transition:0.3s;
-}
-
-.sidebar h2{
-  text-align:center;
-  margin-bottom:20px;
-  font-size:20px;
-}
-
-.sidebar button{
-  margin:6px 0;
-  padding:14px;
-  border:none;
-  border-radius:10px;
-  background:var(--azul2);
-  color:white;
-  cursor:pointer;
-  font-size:15px;
-}
-
-.logout{
-  background:var(--rojo) !important;
-  margin-top:auto;
-}
-
-.content{
-  flex:1;
-  background:var(--gris);
-  padding:40px;
-}
-
-.card{
-  background:white;
-  padding:25px;
-  border-radius:15px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-  margin-bottom:25px;
-}
-
-input,select{
-  width:100%;
-  padding:14px;
-  margin:10px 0;
-  border-radius:10px;
-  border:1px solid #ddd;
-  font-size:15px;
-}
-
 button{
-  font-size:15px;
+background:#007bff;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:5px;
 }
-
+button:hover{opacity:0.9;}
+.delete-btn{background:#dc3545;}
+.logout{background:#dc3545;}
 table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-  min-width:600px;
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
 }
-
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
 th{
-  background:var(--azul2);
-  color:white;
-  padding:14px;
-  font-size:14px;
+background:#007bff;
+color:white;
 }
-
-td{
-  padding:12px;
-  border-bottom:1px solid #eee;
-  text-align:center;
-  font-size:14px;
-}
-
-/* SCROLL TABLA EN MOVIL */
-#historialPanel{
-  overflow-x:auto;
-}
-
-/* 📱 RESPONSIVE */
-@media(max-width:1024px){
-  .content{
-    padding:25px;
-  }
-}
-
-@media(max-width:768px){
-
-  .layout{
-    flex-direction:column;
-  }
-
-  .sidebar{
-    width:100%;
-    flex-direction:row;
-    flex-wrap:wrap;
-    justify-content:center;
-    padding:15px;
-  }
-
-  .sidebar h2{
-    width:100%;
-    text-align:center;
-  }
-
-  .sidebar button{
-    width:48%;
-    margin:5px 1%;
-    font-size:14px;
-    padding:12px;
-  }
-
-  .logout{
-    width:100%;
-  }
-
-  .content{
-    padding:20px;
-  }
-
-  .card{
-    padding:20px;
-  }
-
-  table{
-    min-width:500px;
-  }
-
-}
-
-@media(max-width:480px){
-
-  body{
-    font-size:15px;
-  }
-
-  .sidebar button{
-    width:100%;
-  }
-
-  table{
-    min-width:450px;
-  }
-
+.admin-panel{
+background:#f1f1f1;
+padding:15px;
+border-radius:8px;
+margin-top:15px;
 }
 </style>
 </head>
 
 <body>
+<div class="container">
 
-<div id="toast" class="toast"></div>
-
-<div id="loginBox" style="max-width:400px;margin:120px auto;background:white;padding:30px;border-radius:15px;">
+<div id="loginBox">
 <h2>Login</h2>
 <input type="email" id="email" placeholder="Email">
 <input type="password" id="password" placeholder="Contraseña">
 <button onclick="login()">Ingresar</button>
 </div>
 
-<div class="layout" id="app" style="display:none;">
+<div id="app" style="display:none;">
 
-<aside class="sidebar">
-<h2>SISTEMA</h2>
-<p><strong>Usuario:</strong> <span id="infoUsuario"></span></p>
-<p><strong>Rol:</strong> <span id="infoRol"></span></p>
-
-<button id="btnAdmin" onclick="mostrar('adminPanel')">Administración</button>
-<button onclick="mostrar('cuentasPanel')">Registrar</button>
-<button onclick="mostrar('historialPanel')">Historial</button>
-<button id="btnResumen" onclick="mostrar('resumenPanel')">Resumen</button>
-
+<h3 id="infoUsuario"></h3>
 <button class="logout" onclick="logout()">Cerrar sesión</button>
-</aside>
 
-<main class="content">
+<hr>
+<h2>Activación Gratis</h2>
 
-<section id="adminPanel" style="display:none;">
-<h2>Administración</h2>
+<input type="text" id="nombreActivacion" placeholder="Tu Nombre">
 
-<div class="card">
-<h3>Crear Usuario</h3>
-<input type="email" id="nuevoEmail" placeholder="Correo del usuario">
-<input type="password" id="nuevoPassword" placeholder="Contraseña">
-<select id="nuevoRol">
-<option value="usuario">Usuario</option>
-<option value="admin">Administrador</option>
+<select id="plataformaActivacion">
+<option value="">Seleccionar Plataforma</option>
 </select>
 
-<h4>Permisos</h4>
-<label><input type="checkbox" id="permCrear"> Puede registrar</label><br>
-<label><input type="checkbox" id="permEliminar"> Puede eliminar</label><br>
-<label><input type="checkbox" id="permVerTodo"> Puede ver todo</label><br>
-<label><input type="checkbox" id="permResumen"> Puede ver resumen</label><br>
+<select id="adminActivacion">
+<option value="">Administrador que ayudó</option>
+</select>
 
-<button onclick="crearUsuario()">Crear Usuario</button>
-</div>
+<button onclick="registrarActivacion()">Registrar Activación</button>
 
-<div class="card">
-<h3>Plataformas</h3>
-<input type="text" id="nuevaPlataforma" placeholder="Nueva plataforma">
-<button onclick="agregarPlataforma()">Agregar</button>
-<ul id="listaPlataformas"></ul>
-</div>
-
-<div class="card">
-<h3>Administradores que ayudan</h3>
-<input type="text" id="nuevoAdminAyuda" placeholder="Nuevo administrador">
-<button onclick="agregarAdminAyuda()">Agregar</button>
-<ul id="listaAdmins"></ul>
-</div>
-</section>
-
-<section id="cuentasPanel" style="display:none;">
-<h2>Registrar Activación</h2>
-<div class="card">
-<select id="plataformaSelect"></select>
-<select id="adminAyudaSelect"></select>
-<input type="text" id="nombreMiembro" placeholder="Nombre del miembro">
-<button id="btnGuardar" onclick="guardarCuenta()">Guardar</button>
-</div>
-</section>
-
-<section id="historialPanel" style="display:none;">
-<h2>Historial</h2>
+<div id="historialActivacionesAdmin" style="display:none;">
+<hr>
+<h2>Historial de Activaciones</h2>
 <table>
 <thead>
 <tr>
+<th>Nombre</th>
 <th>Plataforma</th>
-<th>Miembro</th>
-<th>Admin</th>
-<th>Usuario</th>
+<th>Administrador</th>
+<th>Registrado Por</th>
 <th>Fecha</th>
-<th>Acción</th>
+<th>Acciones</th>
 </tr>
 </thead>
-<tbody id="tablaHistorial"></tbody>
+<tbody id="tablaActivaciones"></tbody>
 </table>
-</section>
-
-<section id="resumenPanel" style="display:none;">
-<h2>Resumen y Ranking</h2>
-<div class="card">
-<select id="filtroTiempo" onchange="aplicarFiltro()">
-<option value="semana">Esta Semana</option>
-<option value="mes">Este Mes</option>
-<option value="personalizado">Rango Personalizado</option>
-</select>
-
-<div id="rangoPersonalizado" style="display:none;">
-<input type="date" id="fechaInicio">
-<input type="date" id="fechaFin">
-<button onclick="aplicarFiltro()">Aplicar</button>
 </div>
 
 <hr>
-<div id="resumenAyudas"></div>
-</div>
-</section>
+<h2>Historial de Ventas</h2>
+<table>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Vendedor</th>
+<th>Cliente</th>
+<th>Producto</th>
+<th>Método</th>
+<th>Total</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tablaVentas"></tbody>
+</table>
 
-</main>
+<h3 id="total"></h3>
+
 </div>
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-getAuth, 
-signInWithEmailAndPassword, 
-onAuthStateChanged, 
-signOut,
-sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import { 
-getFirestore, 
-doc, 
-getDoc, 
-setDoc, 
-deleteDoc,
-collection, 
-addDoc, 
-serverTimestamp,
-query, 
-orderBy, 
-onSnapshot, 
-where 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-
-/* ========================
-   CONFIG ORIGINAL TUYO
-======================== */
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+collection, addDoc, serverTimestamp,
+query, orderBy, onSnapshot, where }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig={
-apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-authDomain:"sistema-ventas-64a4c.firebaseapp.com",
-projectId:"sistema-ventas-64a4c",
-storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
-messagingSenderId:"291577824119",
-appId:"1:291577824119:web:894fe9842b427c9ac3d772"
+apiKey:"TU_API_KEY",
+authDomain:"TU_AUTH_DOMAIN",
+projectId:"TU_PROJECT_ID"
 };
 
 const appFirebase=initializeApp(firebaseConfig);
@@ -358,313 +153,139 @@ const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
 let rolActual=null;
-let permisosUsuario={};
-let unsubscribeHistorial=null;
 
-
-/* ========================
-   UTIL
-======================== */
-
-function toast(msg){
-const t=document.getElementById("toast");
-t.innerText=msg;
-t.classList.add("show");
-setTimeout(()=>t.classList.remove("show"),3000);
-}
-
-
-/* ========================
-   LOGIN / LOGOUT
-======================== */
-
+/* LOGIN */
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
-toast("Bienvenido ✅");
 };
+window.logout=()=>signOut(auth);
 
-window.logout=async()=>{
-await signOut(auth);
-app.style.display="none";
-loginBox.style.display="block";
-toast("Sesión cerrada 👋");
-};
-
-
-/* ========================
-   AUTH STATE
-======================== */
-
+/* AUTH */
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 
 usuarioActual=user.email;
-infoUsuario.innerText=usuarioActual;
-
 const snap=await getDoc(doc(db,"usuarios",user.uid));
-rolActual=snap.exists()?snap.data().role:"usuario";
-permisosUsuario=snap.exists()?snap.data().permisos||{}:{};
+rolActual=snap.exists()?snap.data().role:"vendedor";
 
-/* 🔒 BLOQUEO SI ESTÁ PAUSADO */
-if(snap.exists() && snap.data().pausado){
-toast("Tu usuario está pausado ❌");
-await signOut(auth);
-return;
-}
-
-infoRol.innerText=rolActual;
+infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
 
 loginBox.style.display="none";
-app.style.display="flex";
+app.style.display="block";
 
-if(rolActual==="admin"){
-btnAdmin.style.display="block";
-btnResumen.style.display="block";
-mostrar("adminPanel");
-cargarUsuarios();   // 👈 NUEVO
-aplicarFiltro();
-}else{
-btnAdmin.style.display="none";
-btnResumen.style.display=permisosUsuario.verResumen?"block":"none";
-mostrar("cuentasPanel");
-}
-
+cargarVentas();
 cargarPlataformas();
 cargarAdmins();
-cargarHistorial();
+
+if(rolActual==="admin"){
+document.getElementById("historialActivacionesAdmin").style.display="block";
+cargarHistorialActivaciones();
+}else{
+document.getElementById("historialActivacionesAdmin").style.display="none";
+}
+
+}else{
+loginBox.style.display="block";
+app.style.display="none";
 }
 });
 
-
-/* ========================
-   MOSTRAR SECCIONES
-======================== */
-
-window.mostrar=(id)=>{
-
-if(rolActual!=="admin" && id==="adminPanel"){
-toast("No tienes permiso ❌");
+/* ACTIVACIÓN */
+window.registrarActivacion=async()=>{
+if(!nombreActivacion.value || !plataformaActivacion.value){
+alert("Completa los datos");
 return;
 }
 
-adminPanel.style.display="none";
-cuentasPanel.style.display="none";
-historialPanel.style.display="none";
-resumenPanel.style.display="none";
-document.getElementById(id).style.display="block";
-};
-
-
-/* ========================
-   CREAR USUARIO
-======================== */
-
-window.crearUsuario=async()=>{
-
-const email=nuevoEmail.value;
-const password=nuevoPassword.value;
-const rol=nuevoRol.value;
-
-const permisos={
-crear:permCrear.checked,
-eliminar:permEliminar.checked,
-verTodo:permVerTodo.checked,
-verResumen:permResumen.checked
-};
-
-const response=await fetch(
-`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
-{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({
-email:email,
-password:password,
-returnSecureToken:true
-})
-}
-);
-
-const data=await response.json();
-
-if(data.error){
-toast(data.error.message);
-return;
-}
-
-await setDoc(doc(db,"usuarios",data.localId),{
-email:email,
-role:rol,
-permisos:permisos,
-pausado:false
+await addDoc(collection(db,"activaciones"),{
+nombre:nombreActivacion.value,
+plataforma:plataformaActivacion.value,
+adminAyudo:adminActivacion.value,
+registradoPor:usuarioActual,
+fecha:new Date().toLocaleString(),
+timestamp:serverTimestamp()
 });
 
-toast("Usuario creado correctamente ✅");
-
-nuevoEmail.value="";
-nuevoPassword.value="";
-};
-
-
-/* ========================
-   GESTIÓN DE USUARIOS
-======================== */
-
-function cargarUsuarios(){
-onSnapshot(collection(db,"usuarios"),(snap)=>{
-listaUsuarios.innerHTML="";
-snap.forEach(docSnap=>{
-const data=docSnap.data();
-const id=docSnap.id;
-
-listaUsuarios.innerHTML+=`
-<li style="margin-bottom:12px;">
-<strong>${data.email}</strong> 
-(${data.role}) 
-${data.pausado?"🟡 Pausado":"🟢 Activo"}
-<br>
-<button onclick="pausarUsuario('${id}',${data.pausado?false:true})">
-${data.pausado?"Activar":"Pausar"}
-</button>
-<button onclick="resetearPassword('${data.email}')">
-Cambiar Clave
-</button>
-<button onclick="eliminarUsuario('${id}')">
-Eliminar
-</button>
-</li>`;
-});
-});
-}
-
-window.pausarUsuario=async(id,estado)=>{
-await setDoc(doc(db,"usuarios",id),{ pausado:estado },{ merge:true });
-toast(estado?"Usuario pausado ⏸️":"Usuario activado ✅");
-};
-
-window.resetearPassword=async(email)=>{
-await sendPasswordResetEmail(auth,email);
-toast("Correo enviado para cambiar contraseña 📩");
-};
-
-window.eliminarUsuario=async(id)=>{
-if(!confirm("¿Seguro que deseas eliminar este usuario?"))return;
-await deleteDoc(doc(db,"usuarios",id));
-toast("Usuario eliminado de la base de datos 🗑️");
-};
-
-
-/* ========================
-   RESTO DE TU SISTEMA
-   (NO SE TOCÓ NADA)
-======================== */
-
-/* Plataformas */
-window.agregarPlataforma=async()=>{
-await addDoc(collection(db,"plataformas"),{nombre:nuevaPlataforma.value});
-nuevaPlataforma.value="";
-toast("Plataforma agregada ✅");
-};
-
-window.agregarAdminAyuda=async()=>{
-await addDoc(collection(db,"adminsAyuda"),{nombre:nuevoAdminAyuda.value});
-nuevoAdminAyuda.value="";
-toast("Administrador agregado ✅");
+nombreActivacion.value="";
 };
 
 function cargarPlataformas(){
-onSnapshot(collection(db,"plataformas"),(snap)=>{
-plataformaSelect.innerHTML="";
-listaPlataformas.innerHTML="";
-snap.forEach(docSnap=>{
-const p=docSnap.data().nombre;
-plataformaSelect.innerHTML+=`<option>${p}</option>`;
-if(rolActual==="admin"){
-listaPlataformas.innerHTML+=`<li>${p}</li>`;
-}
+onSnapshot(collection(db,"plataformas"),(snapshot)=>{
+plataformaActivacion.innerHTML='<option value="">Seleccionar Plataforma</option>';
+snapshot.forEach(docSnap=>{
+plataformaActivacion.innerHTML+=`<option>${docSnap.data().nombre}</option>`;
 });
 });
 }
 
 function cargarAdmins(){
-onSnapshot(collection(db,"adminsAyuda"),(snap)=>{
-adminAyudaSelect.innerHTML="";
-listaAdmins.innerHTML="";
-snap.forEach(docSnap=>{
-const a=docSnap.data().nombre;
-adminAyudaSelect.innerHTML+=`<option>${a}</option>`;
-if(rolActual==="admin"){
-listaAdmins.innerHTML+=`<li>${a}</li>`;
-}
+const q=query(collection(db,"usuarios"),where("role","==","admin"));
+onSnapshot(q,(snapshot)=>{
+adminActivacion.innerHTML='<option value="">Administrador que ayudó</option>';
+snapshot.forEach(docSnap=>{
+adminActivacion.innerHTML+=`<option>${docSnap.data().email}</option>`;
 });
 });
 }
 
-
-/* Historial */
-window.guardarCuenta=async()=>{
-
-if(rolActual!=="admin" && !permisosUsuario.crear){
-toast("No tienes permiso para registrar ❌");
-return;
-}
-
-await addDoc(collection(db,"historialGrupo"),{
-plataforma:plataformaSelect.value,
-miembro:nombreMiembro.value,
-adminAyudo:adminAyudaSelect.value,
-usuario:usuarioActual,
-timestamp:serverTimestamp()
-});
-
-nombreMiembro.value="";
-toast("Registro guardado exitosamente ✅");
-};
-
-function cargarHistorial(){
-
-if(unsubscribeHistorial){
-unsubscribeHistorial();
-}
-
-let q;
-
-if(rolActual==="admin" || permisosUsuario.verTodo){
-q=query(collection(db,"historialGrupo"),orderBy("timestamp","desc"));
-}else{
-q=query(collection(db,"historialGrupo"),
-where("usuario","==",usuarioActual),
-orderBy("timestamp","desc"));
-}
-
-unsubscribeHistorial=onSnapshot(q,(snap)=>{
-tablaHistorial.innerHTML="";
-snap.forEach(docSnap=>{
-const d=docSnap.data();
-const fecha=d.timestamp
-?new Date(d.timestamp.seconds*1000).toLocaleString()
-:"";
-
-tablaHistorial.innerHTML+=`
+function cargarHistorialActivaciones(){
+const q=query(collection(db,"activaciones"),orderBy("timestamp","desc"));
+onSnapshot(q,(snapshot)=>{
+tablaActivaciones.innerHTML="";
+snapshot.forEach(docSnap=>{
+const a=docSnap.data();
+tablaActivaciones.innerHTML+=`
 <tr>
-<td>${d.plataforma}</td>
-<td>${d.miembro}</td>
-<td>${d.adminAyudo}</td>
-<td>${d.usuario}</td>
-<td>${fecha}</td>
-<td>${
-(rolActual==="admin"||permisosUsuario.eliminar)
-?`<button onclick="eliminar('${docSnap.id}')">Eliminar</button>`
-:"-"
-}</td>
+<td>${a.nombre}</td>
+<td>${a.plataforma}</td>
+<td>${a.adminAyudo}</td>
+<td>${a.registradoPor}</td>
+<td>${a.fecha}</td>
+<td>
+<button onclick="eliminarActivacion('${docSnap.id}')">Eliminar</button>
+</td>
 </tr>`;
 });
 });
 }
 
-window.eliminar=async(id)=>{
-await deleteDoc(doc(db,"historialGrupo",id));
-toast("Registro eliminado 🗑️");
+window.eliminarActivacion=async(id)=>{
+if(rolActual!=="admin") return;
+await deleteDoc(doc(db,"activaciones",id));
+};
+
+/* VENTAS SIN PDF NI WHATSAPP */
+function cargarVentas(){
+const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
+onSnapshot(q,(snapshot)=>{
+tablaVentas.innerHTML="";
+let totalVentas=0;
+
+snapshot.forEach(docSnap=>{
+const v=docSnap.data();
+const total=v.total ?? v.precio ?? 0;
+totalVentas+=total;
+
+tablaVentas.innerHTML+=`
+<tr>
+<td>${v.fecha}</td>
+<td>${v.vendedor}</td>
+<td>${v.cliente}</td>
+<td>${v.producto}</td>
+<td>${v.metodoPago}</td>
+<td>$${total.toFixed(2)}</td>
+<td>
+<button onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>
+</td>
+</tr>`;
+});
+
+total.innerText="Total: $"+totalVentas.toFixed(2);
+});
+}
+
+window.eliminarVenta=async(id)=>{
+await deleteDoc(doc(db,"ventas",id));
 };
 
 </script>
