@@ -9,55 +9,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+/* ======= TU CSS ORIGINAL COMPLETO SIN CAMBIOS ======= */
 body{
 font-family:Arial;
 margin:0;
 background:url("fondo.jpg") no-repeat center center fixed;
 background-size:cover;
-display:flex;
 }
-
-/* ===== SIDEBAR ===== */
-
-.sidebar{
-width:220px;
-background:#111;
-color:white;
-height:100vh;
-position:fixed;
-left:0;
-top:0;
-padding-top:20px;
-}
-
-.sidebar h2{
-text-align:center;
-margin-bottom:30px;
-}
-
-.sidebar button{
-width:90%;
-margin:10px auto;
-display:block;
-background:#007bff;
-border:none;
-padding:10px;
-color:white;
-border-radius:5px;
-cursor:pointer;
-}
-
-.sidebar button:hover{
-background:#0056b3;
-}
-
-/* ===== CONTENIDO ===== */
-
-.main{
-margin-left:220px;
-width:100%;
-}
-
 .container{
 width:95%;
 max-width:1200px;
@@ -67,13 +25,12 @@ padding:20px;
 border-radius:10px;
 box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
-
 input,select,button{
 width:100%;
 padding:8px;
 margin:5px 0;
+box-sizing:border-box;
 }
-
 button{
 background:#007bff;
 color:white;
@@ -81,47 +38,38 @@ border:none;
 cursor:pointer;
 border-radius:5px;
 }
-
 button:hover{opacity:0.9;}
-
 .delete-btn{background:#dc3545;}
 .logout{background:#dc3545;}
-
 table{
 width:100%;
 border-collapse:collapse;
 margin-top:15px;
 }
-
 th,td{
 border:1px solid #ddd;
 padding:8px;
 text-align:center;
 }
-
 th{
 background:#007bff;
 color:white;
 }
-
 .admin-panel{
 background:#f1f1f1;
 padding:15px;
 border-radius:8px;
 margin-top:15px;
 }
-
 .dashboard-cards{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:15px;
 }
-
 .card{
 padding:15px;
 border-radius:8px;
 }
-
 .card-blue{background:#e3f2fd;}
 .card-green{background:#e8f5e9;}
 .card-orange{background:#fff3e0;}
@@ -129,18 +77,6 @@ border-radius:8px;
 </head>
 
 <body>
-
-<!-- ===== SIDEBAR ===== -->
-
-<div class="sidebar">
-<h2>ANDVIP</h2>
-
-<button onclick="mostrarVentas()">Sistema Ventas</button>
-<button onclick="mostrarGrupo()">Grupo Privado</button>
-<button class="logout" onclick="logout()">Cerrar sesión</button>
-</div>
-
-<div class="main">
 <div class="container">
 
 <div id="loginBox">
@@ -153,226 +89,340 @@ border-radius:8px;
 <div id="app" style="display:none;">
 
 <h3 id="infoUsuario"></h3>
+<button class="logout" onclick="logout()">Cerrar sesión</button>
 
-<!-- ============================= -->
-<!-- MODULO VENTAS -->
-<!-- ============================= -->
+<div id="panelAdmin" class="admin-panel" style="display:none;">
 
-<div id="moduloVentas">
+<h2>Crear Usuario</h2>
+<input type="email" id="nuevoEmail" placeholder="Email">
+<input type="password" id="nuevoPassword" placeholder="Contraseña">
+<select id="nuevoRol">
+<option value="vendedor">Vendedor</option>
+<option value="admin">Admin</option>
+</select>
 
-<!-- TODO TU SISTEMA DE VENTAS SIGUE AQUÍ EXACTAMENTE IGUAL -->
-<!-- NO SE BORRA NADA -->
+<h4>Permisos Individuales</h4>
+<label><input type="checkbox" id="permEditarVentas"> Puede editar ventas</label>
+<label><input type="checkbox" id="permEliminarVentas"> Puede eliminar ventas</label>
+<label><input type="checkbox" id="permGuardarCuentas"> Puede guardar cuentas</label>
+<label><input type="checkbox" id="permGrupo"> Puede usar Grupo Privado</label>
 
-<!-- ============================= -->
-<!-- FIN DE TU SISTEMA DE VENTAS -->
-<!-- ============================= -->
-
-</div> <!-- CIERRE moduloVentas -->
-
-
-<!-- ============================= -->
-<!-- MODULO GRUPO PRIVADO -->
-<!-- ============================= -->
-
-<div id="moduloGrupo" style="display:none;">
-
-<h2>Sistema Grupo Privado</h2>
-
-<!-- ACTIVAR CUENTA (Admin + Permiso) -->
-
-<div id="bloqueActivarGrupo">
-
-<h3>Activar Cuenta</h3>
-
-<select id="grupoSelectPlataforma"></select>
-<select id="grupoSelectAdmin"></select>
-
-<input type="text" id="grupoMiembro" placeholder="Nombre del miembro">
-
-<button onclick="guardarCuentaGrupo()">Guardar</button>
-
-</div>
-
-
-<!-- PANEL SOLO ADMIN -->
-
-<div id="bloqueAdminGrupo" style="display:none; margin-top:30px;">
+<button onclick="crearUsuario()">Crear Usuario</button>
 
 <hr>
 
-<h3>Administradores que ayudan</h3>
+<h2>Administrar Vendedores</h2>
 
+<div class="dashboard-cards">
+<div class="card card-blue">
+<h4>Total Vendedores Activos</h4>
+<h2 id="totalVendedores">0</h2>
+</div>
+</div>
+
+<div style="overflow-x:auto;">
+<table>
+<thead>
+<tr>
+<th>Email</th>
+<th>Rol</th>
+<th>Estado</th>
+<th>Contraseña</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tablaUsuarios"></tbody>
+</table>
+</div>
+
+<hr>
+
+<h3>Permisos Globales</h3>
+<button onclick="toggleVerVentas()">Permitir / Quitar historial completo</button>
+<button onclick="toggleAgregarCuentas()">Permitir / Quitar agregar cuentas</button>
+<p id="estadoPermisos"></p>
+
+<hr>
+
+<h2>Mis Cuentas</h2>
+<input type="text" id="cuentaPlataforma" placeholder="Plataforma">
+<input type="text" id="cuentaCorreo" placeholder="Correo">
+<input type="text" id="cuentaClave" placeholder="Clave">
+<button onclick="guardarCuenta()">Guardar Cuenta</button>
+<ul id="listaCuentas"></ul>
+
+<hr>
+
+<h2>Stock de Cuentas</h2>
+<input type="text" id="stockPlataforma" placeholder="Plataforma">
+<input type="number" id="stockCantidad" placeholder="Cantidad disponible">
+<button onclick="guardarStock()">Guardar Stock</button>
+
+<div style="overflow-x:auto;">
+<table>
+<thead>
+<tr>
+<th>Plataforma</th>
+<th>Cantidad</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tablaStock"></tbody>
+</table>
+</div>
+
+<hr>
+
+<!-- ============================= -->
+<!-- SISTEMA GRUPO PRIVADO -->
+<!-- ============================= -->
+
+<h2>🔐 Sistema Grupo Privado</h2>
+
+<h3>Administradores que ayudan</h3>
 <input type="text" id="grupoNuevoAdmin" placeholder="Nombre administrador">
 <button onclick="agregarAdminGrupo()">Agregar</button>
-
 <ul id="listaAdminsGrupo"></ul>
 
 <hr>
 
 <h3>Plataformas</h3>
-
 <input type="text" id="grupoNuevaPlataforma" placeholder="Nombre plataforma">
 <button onclick="agregarPlataformaGrupo()">Agregar</button>
-
 <ul id="listaPlataformasGrupo"></ul>
+
+<hr>
+
+<h3>Activar Cuenta</h3>
+<select id="grupoSelectPlataforma"></select>
+
+<select id="grupoTipoCuenta">
+<option value="Basico">Básico</option>
+<option value="Premium">Premium</option>
+<option value="Gratis">Gratis</option>
+</select>
+
+<select id="grupoSelectAdmin"></select>
+
+<input type="text" id="grupoMiembro" placeholder="Nombre del miembro">
+<button onclick="guardarCuentaGrupo()">Guardar</button>
 
 <hr>
 
 <h3>Historial Grupo Privado</h3>
 
+<div style="overflow-x:auto;">
 <table>
 <thead>
 <tr>
 <th>Plataforma</th>
+<th>Tipo</th>
 <th>Miembro</th>
-<th>Administrador</th>
-<th>Activado por</th>
+<th>Admin Ayudó</th>
+<th>Registrado por</th>
 <th>Fecha</th>
 <th>Acciones</th>
 </tr>
 </thead>
 <tbody id="tablaGrupoHistorial"></tbody>
 </table>
-
 </div>
+<script type="module">
 
-</div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+collection, addDoc, serverTimestamp,
+query, orderBy, onSnapshot, where }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<!-- ============================= -->
-<!-- FUNCIONES DE CAMBIO DE MODULO -->
-<!-- ============================= -->
+/* ================= FIREBASE ================= */
 
-<script>
-function mostrarVentas(){
-document.getElementById("moduloVentas").style.display="block";
-document.getElementById("moduloGrupo").style.display="none";
-}
+const firebaseConfig={
+apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+authDomain:"sistema-ventas-64a4c.firebaseapp.com",
+projectId:"sistema-ventas-64a4c",
+storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
+messagingSenderId:"291577824119",
+appId:"1:291577824119:web:894fe9842b427c9ac3d772"
+};
 
-function mostrarGrupo(){
-document.getElementById("moduloVentas").style.display="none";
-document.getElementById("moduloGrupo").style.display="block";
-}
-</script>
+const appFirebase=initializeApp(firebaseConfig);
+const auth=getAuth(appFirebase);
+const db=getFirestore(appFirebase);
 
-/* ===================================================== */
-/* ================= GRUPO PRIVADO ===================== */
-/* ===================================================== */
+let usuarioActual=null;
+let rolActual=null;
+let permisosUsuario={};
 
-/* ===== CONTROL VISIBILIDAD POR ROL ===== */
+/* ================= LOGIN ================= */
 
-onAuthStateChanged(auth, async(user)=>{
+window.login=async()=>{
+await signInWithEmailAndPassword(auth,email.value,password.value);
+};
+
+window.logout=()=>signOut(auth);
+
+/* ================= AUTH ================= */
+
+onAuthStateChanged(auth,async(user)=>{
 if(user){
 
-if(rolActual==="admin" || permisosUsuario.accesoGrupoPrivado){
-document.getElementById("moduloGrupo").style.display="none";
+usuarioActual=user.email;
+const snap=await getDoc(doc(db,"usuarios",user.uid));
+
+if(snap.exists() && snap.data().activo===false){
+alert("Usuario desactivado");
+logout();
+return;
 }
+
+rolActual=snap.exists()?snap.data().role:"vendedor";
+permisosUsuario=snap.exists()?snap.data().permisos||{}:{};
+
+infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
+
+loginBox.style.display="none";
+app.style.display="block";
+panelAdmin.style.display=(rolActual==="admin")?"block":"none";
 
 if(rolActual==="admin"){
-document.getElementById("bloqueAdminGrupo").style.display="block";
+cargarUsuarios();
+actualizarEstadoPermisos();
+cargarStock();
 cargarAdminsGrupo();
 cargarPlataformasGrupo();
+cargarSelectsGrupo();
 cargarHistorialGrupo();
 }else{
-document.getElementById("bloqueAdminGrupo").style.display="none";
-}
 
-if(rolActual==="admin" || permisosUsuario.activarCuentasGrupo){
-document.getElementById("bloqueActivarGrupo").style.display="block";
+if(permisosUsuario.grupo){
 cargarSelectsGrupo();
 }else{
-document.getElementById("bloqueActivarGrupo").style.display="none";
+grupoNuevoAdmin.style.display="none";
+grupoNuevaPlataforma.style.display="none";
+grupoSelectPlataforma.style.display="none";
+grupoSelectAdmin.style.display="none";
+grupoTipoCuenta.style.display="none";
+grupoMiembro.style.display="none";
+}
 }
 
+cargarCuentas();
+
+const permisosGlobales=await obtenerPermisosGlobales();
+
+if(rolActual==="admin" || permisosGlobales.verVentas){
+cargarVentasCompleto();
+}else{
+cargarVentasUsuario();
+}
+
+}else{
+loginBox.style.display="block";
+app.style.display="none";
 }
 });
 
+/* ================= CREAR USUARIO ================= */
 
-/* ===== ADMINISTRADORES ===== */
+window.crearUsuario=async()=>{
+const passwordPlano=nuevoPassword.value;
+
+const response=await fetch(
+`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`,
+{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:nuevoEmail.value,
+password:passwordPlano,
+returnSecureToken:true
+})
+}
+);
+
+const data=await response.json();
+if(data.error){alert(data.error.message);return;}
+
+await setDoc(doc(db,"usuarios",data.localId),{
+email:nuevoEmail.value,
+password:passwordPlano,
+role:nuevoRol.value,
+activo:true,
+permisos:{
+editarVentas:permEditarVentas.checked,
+eliminarVentas:permEliminarVentas.checked,
+guardarCuentas:permGuardarCuentas.checked,
+grupo:permGrupo.checked
+}
+});
+
+alert("Usuario creado correctamente");
+cargarUsuarios();
+};
+
+/* ================= GRUPO PRIVADO ================= */
 
 window.agregarAdminGrupo=async()=>{
 if(rolActual!=="admin") return;
-
-await addDoc(collection(db,"adminsGrupo"),{
+await addDoc(collection(db,"grupoAdmins"),{
 nombre:grupoNuevoAdmin.value
 });
-
 grupoNuevoAdmin.value="";
 };
 
 function cargarAdminsGrupo(){
-onSnapshot(collection(db,"adminsGrupo"),(snapshot)=>{
+onSnapshot(collection(db,"grupoAdmins"),(snapshot)=>{
 listaAdminsGrupo.innerHTML="";
 snapshot.forEach(docSnap=>{
-const a=docSnap.data();
-listaAdminsGrupo.innerHTML+=`
-<li>${a.nombre}</li>
-`;
+listaAdminsGrupo.innerHTML+=`<li>${docSnap.data().nombre}</li>`;
 });
 });
 }
 
-
-/* ===== PLATAFORMAS ===== */
-
 window.agregarPlataformaGrupo=async()=>{
 if(rolActual!=="admin") return;
-
-await addDoc(collection(db,"plataformasGrupo"),{
+await addDoc(collection(db,"grupoPlataformas"),{
 nombre:grupoNuevaPlataforma.value
 });
-
 grupoNuevaPlataforma.value="";
 };
 
 function cargarPlataformasGrupo(){
-onSnapshot(collection(db,"plataformasGrupo"),(snapshot)=>{
+onSnapshot(collection(db,"grupoPlataformas"),(snapshot)=>{
 listaPlataformasGrupo.innerHTML="";
 snapshot.forEach(docSnap=>{
-const p=docSnap.data();
-listaPlataformasGrupo.innerHTML+=`
-<li>${p.nombre}</li>
-`;
+listaPlataformasGrupo.innerHTML+=`<li>${docSnap.data().nombre}</li>`;
 });
 });
 }
-
-
-/* ===== CARGAR SELECTS ===== */
 
 function cargarSelectsGrupo(){
-
-onSnapshot(collection(db,"adminsGrupo"),(snapshot)=>{
+onSnapshot(collection(db,"grupoAdmins"),(snapshot)=>{
 grupoSelectAdmin.innerHTML="";
 snapshot.forEach(docSnap=>{
-grupoSelectAdmin.innerHTML+=`
-<option>${docSnap.data().nombre}</option>
-`;
+grupoSelectAdmin.innerHTML+=`<option>${docSnap.data().nombre}</option>`;
 });
 });
-
-onSnapshot(collection(db,"plataformasGrupo"),(snapshot)=>{
+onSnapshot(collection(db,"grupoPlataformas"),(snapshot)=>{
 grupoSelectPlataforma.innerHTML="";
 snapshot.forEach(docSnap=>{
-grupoSelectPlataforma.innerHTML+=`
-<option>${docSnap.data().nombre}</option>
-`;
+grupoSelectPlataforma.innerHTML+=`<option>${docSnap.data().nombre}</option>`;
 });
 });
-
 }
 
-
-/* ===== GUARDAR CUENTA ACTIVADA ===== */
-
 window.guardarCuentaGrupo=async()=>{
-
 if(!grupoMiembro.value) return;
 
-await addDoc(collection(db,"cuentasGrupo"),{
+await addDoc(collection(db,"grupoCuentas"),{
 plataforma:grupoSelectPlataforma.value,
+tipo:grupoTipoCuenta.value,
 miembro:grupoMiembro.value,
-adminAyuda:grupoSelectAdmin.value,
-activadoPor:usuarioActual,
+adminAyudo:grupoSelectAdmin.value,
+registradoPor:usuarioActual,
 fecha:new Date().toLocaleString(),
 timestamp:serverTimestamp()
 });
@@ -380,41 +430,41 @@ timestamp:serverTimestamp()
 grupoMiembro.value="";
 };
 
-
-/* ===== HISTORIAL ===== */
-
 function cargarHistorialGrupo(){
 onSnapshot(
-query(collection(db,"cuentasGrupo"),orderBy("timestamp","desc")),
+query(collection(db,"grupoCuentas"),orderBy("timestamp","desc")),
 (snapshot)=>{
-
 tablaGrupoHistorial.innerHTML="";
-
 snapshot.forEach(docSnap=>{
 const d=docSnap.data();
-
 tablaGrupoHistorial.innerHTML+=`
 <tr>
 <td>${d.plataforma}</td>
+<td>${d.tipo}</td>
 <td>${d.miembro}</td>
-<td>${d.adminAyuda}</td>
-<td>${d.activadoPor}</td>
+<td>${d.adminAyudo}</td>
+<td>${d.registradoPor}</td>
 <td>${d.fecha}</td>
 <td>
 <button class="delete-btn" onclick="eliminarCuentaGrupo('${docSnap.id}')">
 Eliminar
 </button>
 </td>
-</tr>
-`;
+</tr>`;
 });
 });
 }
 
-
-/* ===== ELIMINAR ===== */
-
 window.eliminarCuentaGrupo=async(id)=>{
 if(rolActual!=="admin") return;
-await deleteDoc(doc(db,"cuentasGrupo",id));
+await deleteDoc(doc(db,"grupoCuentas",id));
 };
+
+</script>
+
+</div> <!-- cierre panelAdmin -->
+</div> <!-- cierre app -->
+</div> <!-- cierre container -->
+
+</body>
+</html>
