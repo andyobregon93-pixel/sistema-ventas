@@ -13,99 +13,73 @@
   --verde:#27ae60;
   --gris:#f4f6f9;
 }
-
 body{
   margin:0;
   font-family:'Segoe UI', Arial, sans-serif;
   background:linear-gradient(to bottom,var(--azul),var(--azul2));
 }
-
-/* NOTIFICACIÓN */
 .toast{
   position:fixed;
   top:20px;
   right:20px;
   background:var(--verde);
   color:white;
-  padding:16px 25px;
+  padding:15px 25px;
   border-radius:12px;
-  font-size:16px;
   font-weight:600;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
   opacity:0;
   transform:translateY(-20px);
   transition:0.3s;
   z-index:999;
 }
-
-.toast.show{
-  opacity:1;
-  transform:translateY(0);
-}
-
-/* LAYOUT */
+.toast.show{ opacity:1; transform:translateY(0); }
 .layout{ display:flex; min-height:100vh; }
-
 .sidebar{
-  width:300px;
-  background:rgba(0,0,0,0.55);
+  width:280px;
+  background:rgba(0,0,0,0.6);
   color:white;
-  padding:30px;
+  padding:25px;
   display:flex;
   flex-direction:column;
 }
-
-.sidebar h2{ text-align:center; font-size:24px; margin-bottom:30px; }
-
+.sidebar h2{ text-align:center; margin-bottom:20px; }
 .sidebar button{
-  margin:8px 0;
-  padding:15px;
+  margin:6px 0;
+  padding:12px;
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   background:var(--azul2);
   color:white;
   cursor:pointer;
-  font-size:17px;
-  font-weight:600;
 }
-
 .logout{ background:var(--rojo) !important; margin-top:auto; }
-
-.content{ flex:1; background:var(--gris); padding:50px; }
-
+.content{ flex:1; background:var(--gris); padding:40px; }
 .card{
   background:white;
-  padding:35px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.08);
-  margin-bottom:35px;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  margin-bottom:25px;
 }
-
-input, select{
+input,select{
   width:100%;
-  padding:16px;
-  margin:12px 0;
-  border-radius:12px;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
   border:1px solid #ddd;
-  font-size:17px;
 }
-
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
-  border-radius:18px;
-  overflow:hidden;
 }
-
 th{
   background:var(--azul2);
   color:white;
-  padding:18px;
+  padding:12px;
 }
-
 td{
-  padding:16px;
+  padding:10px;
   border-bottom:1px solid #eee;
   text-align:center;
 }
@@ -116,8 +90,8 @@ td{
 
 <div id="toast" class="toast"></div>
 
-<div id="loginBox" style="max-width:450px;margin:120px auto;background:white;padding:40px;border-radius:18px;">
-<h2 style="text-align:center;">Login</h2>
+<div id="loginBox" style="max-width:400px;margin:120px auto;background:white;padding:30px;border-radius:15px;">
+<h2>Login</h2>
 <input type="email" id="email" placeholder="Email">
 <input type="password" id="password" placeholder="Contraseña">
 <button onclick="login()">Ingresar</button>
@@ -126,39 +100,39 @@ td{
 <div class="layout" id="app" style="display:none;">
 
 <aside class="sidebar">
-<h2>SISTEMA GRUPO PRIVADO</h2>
+<h2>SISTEMA</h2>
 <p><strong>Usuario:</strong> <span id="infoUsuario"></span></p>
 <p><strong>Rol:</strong> <span id="infoRol"></span></p>
-
-<button id="btnAdmin" onclick="mostrar('adminPanel')">Panel Admin</button>
-<button onclick="mostrar('cuentasPanel')">Mi Panel</button>
+<button id="btnAdmin" onclick="mostrar('adminPanel')">Administración</button>
+<button onclick="mostrar('cuentasPanel')">Registrar</button>
 <button onclick="mostrar('historialPanel')">Historial</button>
 <button id="btnResumen" onclick="mostrar('resumenPanel')">Resumen</button>
-
 <button class="logout" onclick="logout()">Cerrar sesión</button>
 </aside>
 
 <main class="content">
 
 <section id="adminPanel" style="display:none;">
-<h2>Panel de Administración</h2>
+<h2>Administración</h2>
+
 <div class="card">
-<h3>Crear Usuario</h3>
-<input type="email" id="nuevoEmail" placeholder="Email">
-<input type="password" id="nuevoPassword" placeholder="Contraseña">
-<select id="nuevoRol">
-<option value="usuario">Usuario</option>
-<option value="admin">Administrador</option>
-</select>
-<label><input type="checkbox" id="permVerTodo"> Ver todo</label><br>
-<label><input type="checkbox" id="permCrear"> Guardar</label><br>
-<label><input type="checkbox" id="permEliminar"> Eliminar</label><br>
-<button onclick="crearUsuario()">Crear Usuario</button>
+<h3>Plataformas</h3>
+<input type="text" id="nuevaPlataforma" placeholder="Nueva plataforma">
+<button onclick="agregarPlataforma()">Agregar</button>
+<ul id="listaPlataformas"></ul>
 </div>
+
+<div class="card">
+<h3>Administradores que ayudan</h3>
+<input type="text" id="nuevoAdminAyuda" placeholder="Nuevo administrador">
+<button onclick="agregarAdminAyuda()">Agregar</button>
+<ul id="listaAdmins"></ul>
+</div>
+
 </section>
 
 <section id="cuentasPanel" style="display:none;">
-<h2>Mi Panel</h2>
+<h2>Registrar Activación</h2>
 <div class="card">
 <select id="plataformaSelect"></select>
 <select id="adminAyudaSelect"></select>
@@ -174,10 +148,10 @@ td{
 <tr>
 <th>Plataforma</th>
 <th>Miembro</th>
-<th>Administrador</th>
+<th>Admin</th>
 <th>Usuario</th>
 <th>Fecha</th>
-<th>Acciones</th>
+<th>Acción</th>
 </tr>
 </thead>
 <tbody id="tablaHistorial"></tbody>
@@ -185,8 +159,21 @@ td{
 </section>
 
 <section id="resumenPanel" style="display:none;">
-<h2>Resumen de Ayudas (Semana Actual)</h2>
+<h2>Resumen y Ranking</h2>
 <div class="card">
+<select id="filtroTiempo" onchange="aplicarFiltro()">
+  <option value="semana">Esta Semana</option>
+  <option value="mes">Este Mes</option>
+  <option value="personalizado">Rango Personalizado</option>
+</select>
+
+<div id="rangoPersonalizado" style="display:none;">
+  <input type="date" id="fechaInicio">
+  <input type="date" id="fechaFin">
+  <button onclick="aplicarFiltro()">Aplicar</button>
+</div>
+
+<hr>
 <div id="resumenAyudas"></div>
 </div>
 </section>
@@ -199,7 +186,7 @@ td{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc,
+import { getFirestore, doc, getDoc, deleteDoc,
 collection, addDoc, serverTimestamp,
 query, orderBy, onSnapshot, where }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -219,19 +206,17 @@ const db=getFirestore(appFirebase);
 
 let usuarioActual=null;
 let rolActual=null;
-let permisos={};
 
-/* NOTIFICACIÓN */
-function mostrarToast(mensaje){
-const toast=document.getElementById("toast");
-toast.innerText=mensaje;
-toast.classList.add("show");
-setTimeout(()=>{ toast.classList.remove("show"); },3000);
+function toast(msg){
+const t=document.getElementById("toast");
+t.innerText=msg;
+t.classList.add("show");
+setTimeout(()=>t.classList.remove("show"),3000);
 }
 
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
-mostrarToast("Bienvenido al sistema ✅");
+toast("Bienvenido ✅");
 };
 
 window.logout=()=>signOut(auth);
@@ -239,11 +224,10 @@ window.logout=()=>signOut(auth);
 onAuthStateChanged(auth,async(user)=>{
 if(user){
 usuarioActual=user.email;
+infoUsuario.innerText=usuarioActual;
+
 const snap=await getDoc(doc(db,"usuarios",user.uid));
 rolActual=snap.exists()?snap.data().role:"usuario";
-permisos=snap.exists()?snap.data().permisos||{}:{};
-
-infoUsuario.innerText=usuarioActual;
 infoRol.innerText=rolActual;
 
 loginBox.style.display="none";
@@ -253,15 +237,11 @@ if(rolActual==="admin"){
 btnAdmin.style.display="block";
 btnResumen.style.display="block";
 mostrar("adminPanel");
-cargarResumenSemanal();
+aplicarFiltro();
 }else{
 btnAdmin.style.display="none";
 btnResumen.style.display="none";
 mostrar("cuentasPanel");
-}
-
-if(!(rolActual==="admin"||permisos.crear)){
-btnGuardar.style.display="none";
 }
 
 cargarPlataformas();
@@ -278,24 +258,47 @@ resumenPanel.style.display="none";
 document.getElementById(id).style.display="block";
 };
 
-window.crearUsuario=async()=>{
-await addDoc(collection(db,"usuarios"),{
-email:nuevoEmail.value,
-role:nuevoRol.value,
-permisos:{
-verTodo:permVerTodo.checked,
-crear:permCrear.checked,
-eliminar:permEliminar.checked
-}
-});
-mostrarToast("Usuario creado correctamente ✅");
+window.agregarPlataforma=async()=>{
+await addDoc(collection(db,"plataformas"),{nombre:nuevaPlataforma.value});
+nuevaPlataforma.value="";
+toast("Plataforma agregada ✅");
 };
 
-window.guardarCuenta=async()=>{
-if(!(rolActual==="admin"||permisos.crear)){
-mostrarToast("No tienes permiso ❌");
-return;
+window.agregarAdminAyuda=async()=>{
+await addDoc(collection(db,"adminsAyuda"),{nombre:nuevoAdminAyuda.value});
+nuevoAdminAyuda.value="";
+toast("Administrador agregado ✅");
+};
+
+function cargarPlataformas(){
+onSnapshot(collection(db,"plataformas"),(snap)=>{
+plataformaSelect.innerHTML="";
+listaPlataformas.innerHTML="";
+snap.forEach(docSnap=>{
+const p=docSnap.data().nombre;
+plataformaSelect.innerHTML+=`<option>${p}</option>`;
+if(rolActual==="admin"){
+listaPlataformas.innerHTML+=`<li>${p}</li>`;
 }
+});
+});
+}
+
+function cargarAdmins(){
+onSnapshot(collection(db,"adminsAyuda"),(snap)=>{
+adminAyudaSelect.innerHTML="";
+listaAdmins.innerHTML="";
+snap.forEach(docSnap=>{
+const a=docSnap.data().nombre;
+adminAyudaSelect.innerHTML+=`<option>${a}</option>`;
+if(rolActual==="admin"){
+listaAdmins.innerHTML+=`<li>${a}</li>`;
+}
+});
+});
+}
+
+window.guardarCuenta=async()=>{
 await addDoc(collection(db,"historialGrupo"),{
 plataforma:plataformaSelect.value,
 miembro:nombreMiembro.value,
@@ -304,64 +307,121 @@ usuario:usuarioActual,
 timestamp:serverTimestamp()
 });
 nombreMiembro.value="";
-mostrarToast("Registro guardado exitosamente ✅");
+toast("Registro guardado exitosamente ✅");
 };
 
-window.eliminarRegistro=async(id)=>{
+function cargarHistorial(){
+let q=collection(db,"historialGrupo");
+if(rolActual!=="admin"){
+q=query(q,where("usuario","==",usuarioActual));
+}
+q=query(q,orderBy("timestamp","desc"));
+
+onSnapshot(q,(snap)=>{
+tablaHistorial.innerHTML="";
+snap.forEach(docSnap=>{
+const d=docSnap.data();
+const fecha=d.timestamp?new Date(d.timestamp.seconds*1000).toLocaleString():"";
+tablaHistorial.innerHTML+=`
+<tr>
+<td>${d.plataforma}</td>
+<td>${d.miembro}</td>
+<td>${d.adminAyudo}</td>
+<td>${d.usuario}</td>
+<td>${fecha}</td>
+<td>${rolActual==="admin"?`<button onclick="eliminar('${docSnap.id}')">Eliminar</button>`:"-"}</td>
+</tr>`;
+});
+});
+}
+
+window.eliminar=async(id)=>{
 await deleteDoc(doc(db,"historialGrupo",id));
-mostrarToast("Registro eliminado correctamente 🗑️");
+toast("Registro eliminado 🗑️");
 };
 
-/* RESUMEN + RANKING */
-function cargarResumenSemanal(){
-const inicioSemana=new Date();
-inicioSemana.setDate(inicioSemana.getDate()-inicioSemana.getDay());
-inicioSemana.setHours(0,0,0,0);
+window.aplicarFiltro=function(){
+let filtro=document.getElementById("filtroTiempo").value;
+let fechaInicio;
+const ahora=new Date();
 
-const q=query(
-collection(db,"historialGrupo"),
-where("timestamp",">=",inicioSemana),
-orderBy("timestamp","desc")
-);
+if(filtro==="semana"){
+fechaInicio=new Date();
+fechaInicio.setDate(ahora.getDate()-ahora.getDay());
+fechaInicio.setHours(0,0,0,0);
+document.getElementById("rangoPersonalizado").style.display="none";
+}
 
-onSnapshot(q,(snapshot)=>{
-let resumen={}, totales={};
+if(filtro==="mes"){
+fechaInicio=new Date(ahora.getFullYear(),ahora.getMonth(),1);
+document.getElementById("rangoPersonalizado").style.display="none";
+}
 
-snapshot.forEach(docSnap=>{
+if(filtro==="personalizado"){
+document.getElementById("rangoPersonalizado").style.display="block";
+const inicioInput=document.getElementById("fechaInicio").value;
+const finInput=document.getElementById("fechaFin").value;
+if(!inicioInput||!finInput)return;
+fechaInicio=new Date(inicioInput);
+const fechaFin=new Date(finInput);
+fechaFin.setHours(23,59,59,999);
+generarResumen(fechaInicio,fechaFin);
+return;
+}
+
+generarResumen(fechaInicio,null);
+};
+
+function generarResumen(fechaInicio,fechaFin){
+let q;
+if(fechaFin){
+q=query(collection(db,"historialGrupo"),
+where("timestamp",">=",fechaInicio),
+where("timestamp","<=",fechaFin),
+orderBy("timestamp","desc"));
+}else{
+q=query(collection(db,"historialGrupo"),
+where("timestamp",">=",fechaInicio),
+orderBy("timestamp","desc"));
+}
+
+onSnapshot(q,(snap)=>{
+let totales={},detalle={};
+
+snap.forEach(docSnap=>{
 const d=docSnap.data();
 const admin=d.adminAyudo||"Sin asignar";
-const plat=d.plataforma;
+const plataforma=d.plataforma;
 
-if(!resumen[admin]) resumen[admin]={};
-if(!resumen[admin][plat]) resumen[admin][plat]=0;
-resumen[admin][plat]++;
-
-if(!totales[admin]) totales[admin]=0;
+if(!totales[admin])totales[admin]=0;
 totales[admin]++;
+
+if(!detalle[admin])detalle[admin]={};
+if(!detalle[admin][plataforma])detalle[admin][plataforma]=0;
+detalle[admin][plataforma]++;
 });
 
 const ranking=Object.entries(totales).sort((a,b)=>b[1]-a[1]);
 
-let html="<h2>🏆 Ranking Semanal</h2>";
+let html="<h3>🏆 Ranking</h3>";
 ranking.forEach((r,i)=>{
-html+=`<p><strong>${i+1}° ${r[0]}</strong> – ${r[1]} ayudas</p>`;
+html+=`<p><strong>${i+1}° ${r[0]}</strong> - ${r[1]} ayudas</p>`;
 });
 
-html+="<hr><h2>📊 Detalle por Plataforma</h2>";
+html+="<hr><h3>📊 Detalle por Plataforma</h3>";
 
-for(const admin in resumen){
-html+=`<h3>${admin}</h3>`;
-for(const p in resumen[admin]){
-html+=`<p>${p}: <strong>${resumen[admin][p]}</strong></p>`;
+for(const admin in detalle){
+html+=`<h4>${admin}</h4>`;
+for(const plat in detalle[admin]){
+html+=`<p>${plat}: ${detalle[admin][plat]}</p>`;
 }
-html+="<br>";
 }
 
-resumenAyudas.innerHTML=html||"No hay ayudas esta semana.";
+document.getElementById("resumenAyudas").innerHTML=
+ranking.length?html:"No hay registros en este periodo.";
 });
 }
 
 </script>
-
 </body>
 </html>
