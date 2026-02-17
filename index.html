@@ -17,8 +17,6 @@ body{
   min-height:100vh;
 }
 
-/* SIDEBAR */
-
 .sidebar{
   width:280px;
   background:rgba(0,0,0,0.45);
@@ -26,13 +24,11 @@ body{
   padding:25px;
   display:flex;
   flex-direction:column;
-  font-size:16px;
 }
 
 .sidebar h2{
   text-align:center;
-  font-size:20px;
-  margin-bottom:25px;
+  margin-bottom:20px;
 }
 
 .sidebar button{
@@ -43,26 +39,17 @@ body{
   background:#2a5298;
   color:white;
   cursor:pointer;
-  font-size:15px;
-}
-
-.sidebar button:hover{
-  background:#1e3c72;
 }
 
 .logout{
   background:#c0392b !important;
   margin-top:auto;
-  font-weight:bold;
 }
-
-/* CONTENT */
 
 .content{
   flex:1;
   background:#f4f6f9;
   padding:40px;
-  overflow:auto;
 }
 
 .card{
@@ -79,15 +66,12 @@ input, select{
   margin:8px 0;
   border-radius:8px;
   border:1px solid #ddd;
-  font-size:15px;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
-  border-radius:10px;
-  overflow:hidden;
 }
 
 th{
@@ -100,30 +84,6 @@ td{
   padding:12px;
   border-bottom:1px solid #eee;
   text-align:center;
-}
-
-/* RESPONSIVE */
-
-@media (max-width:900px){
-  .layout{
-    flex-direction:column;
-  }
-  .sidebar{
-    width:100%;
-    flex-direction:row;
-    flex-wrap:wrap;
-    justify-content:space-around;
-  }
-  .sidebar h2{
-    width:100%;
-  }
-  .sidebar button{
-    flex:1 1 45%;
-    margin:5px;
-  }
-  .content{
-    padding:20px;
-  }
 }
 </style>
 </head>
@@ -145,7 +105,7 @@ td{
 <p><strong>Rol:</strong> <span id="infoRol"></span></p>
 
 <button id="btnAdmin" onclick="mostrar('adminPanel')">Panel Admin</button>
-<button onclick="mostrar('cuentasPanel')">Cuentas</button>
+<button onclick="mostrar('cuentasPanel')">Mi Panel</button>
 <button onclick="mostrar('historialPanel')">Historial</button>
 
 <button class="logout" onclick="logout()">Cerrar sesión</button>
@@ -153,7 +113,6 @@ td{
 
 <main class="content">
 
-<!-- ADMIN -->
 <section id="adminPanel" style="display:none;">
 <h2>Panel de Administración</h2>
 
@@ -169,40 +128,22 @@ td{
 
 <h4>Permisos</h4>
 <label><input type="checkbox" id="permVerTodo"> Ver todo</label><br>
-<label><input type="checkbox" id="permCrear"> Crear cuentas</label><br>
+<label><input type="checkbox" id="permCrear"> Guardar</label><br>
 <label><input type="checkbox" id="permEliminar"> Eliminar</label><br>
 
 <button onclick="crearUsuario()">Crear Usuario</button>
 </div>
-
-<div class="card">
-<h3>Agregar Plataforma</h3>
-<input type="text" id="nuevaPlataforma" placeholder="Nombre plataforma">
-<button onclick="agregarPlataforma()">Agregar</button>
-<ul id="listaPlataformas"></ul>
-</div>
-
-<div class="card">
-<h3>Administradores que ayudan</h3>
-<input type="text" id="nuevoAdminAyuda" placeholder="Nombre">
-<button onclick="agregarAdminAyuda()">Agregar</button>
-<ul id="listaAdminsAyuda"></ul>
-</div>
-
 </section>
 
-<!-- CUENTAS -->
 <section id="cuentasPanel" style="display:none;">
 <h2>Mi Panel</h2>
 <div class="card">
 <select id="plataformaSelect"></select>
-<select id="adminAyudaSelect"></select>
 <input type="text" id="nombreMiembro" placeholder="Nombre del miembro">
-<button onclick="guardarCuenta()">Guardar</button>
+<button id="btnGuardar" onclick="guardarCuenta()">Guardar</button>
 </div>
 </section>
 
-<!-- HISTORIAL -->
 <section id="historialPanel" style="display:none;">
 <h2>Historial</h2>
 <table>
@@ -210,7 +151,6 @@ td{
 <tr>
 <th>Plataforma</th>
 <th>Miembro</th>
-<th>Administrador</th>
 <th>Usuario</th>
 <th>Fecha</th>
 <th>Acciones</th>
@@ -250,8 +190,6 @@ let usuarioActual=null;
 let rolActual=null;
 let permisos={};
 
-const ADMIN_PRINCIPAL="andyobregon799@gmail.com";
-
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
 };
@@ -274,13 +212,15 @@ loginBox.style.display="none";
 app.style.display="flex";
 
 if(rolActual==="admin"){
-    btnAdmin.style.display="block";
-    mostrar("adminPanel");
-    cargarPlataformas();
-    cargarAdminsAyuda();
+btnAdmin.style.display="block";
+mostrar("adminPanel");
 }else{
-    btnAdmin.style.display="none";
-    mostrar("cuentasPanel"); // 🔥 Usuario entra directo aquí
+btnAdmin.style.display="none";
+mostrar("cuentasPanel");
+}
+
+if(!(rolActual==="admin"||permisos.crear)){
+btnGuardar.style.display="none";
 }
 
 cargarHistorial();
@@ -328,64 +268,19 @@ eliminar:permEliminar.checked
 alert("Usuario creado");
 };
 
-window.agregarPlataforma=async()=>{
-if(usuarioActual!==ADMIN_PRINCIPAL){
-alert("Solo el administrador principal puede agregar plataformas");
-return;
-}
-await addDoc(collection(db,"plataformas"),{
-nombre:nuevaPlataforma.value
-});
-nuevaPlataforma.value="";
-};
-
-function cargarPlataformas(){
-onSnapshot(collection(db,"plataformas"),(snapshot)=>{
-listaPlataformas.innerHTML="";
-plataformaSelect.innerHTML="";
-snapshot.forEach(docSnap=>{
-const p=docSnap.data();
-listaPlataformas.innerHTML+=`<li>${p.nombre}</li>`;
-plataformaSelect.innerHTML+=`<option>${p.nombre}</option>`;
-});
-});
-}
-
-window.agregarAdminAyuda=async()=>{
-if(usuarioActual!==ADMIN_PRINCIPAL){
-alert("Solo el administrador principal puede agregar.");
-return;
-}
-await addDoc(collection(db,"adminsAyuda"),{
-nombre:nuevoAdminAyuda.value
-});
-nuevoAdminAyuda.value="";
-};
-
-function cargarAdminsAyuda(){
-onSnapshot(collection(db,"adminsAyuda"),(snapshot)=>{
-listaAdminsAyuda.innerHTML="";
-adminAyudaSelect.innerHTML="";
-snapshot.forEach(docSnap=>{
-const a=docSnap.data();
-listaAdminsAyuda.innerHTML+=`<li>${a.nombre}</li>`;
-adminAyudaSelect.innerHTML+=`<option>${a.nombre}</option>`;
-});
-});
-}
-
 window.guardarCuenta=async()=>{
 if(!(rolActual==="admin"||permisos.crear)){
-alert("No tienes permiso");
+alert("No tienes permiso para guardar");
 return;
 }
+
 await addDoc(collection(db,"historialGrupo"),{
 plataforma:plataformaSelect.value,
 miembro:nombreMiembro.value,
-admin:adminAyudaSelect.value,
 usuario:usuarioActual,
 timestamp:serverTimestamp()
 });
+
 nombreMiembro.value="";
 };
 
@@ -404,11 +299,11 @@ tablaHistorial.innerHTML="";
 snapshot.forEach(docSnap=>{
 const h=docSnap.data();
 const fecha=h.timestamp?new Date(h.timestamp.seconds*1000).toLocaleString():"";
+
 tablaHistorial.innerHTML+=`
 <tr>
 <td>${h.plataforma}</td>
 <td>${h.miembro}</td>
-<td>${h.admin}</td>
 <td>${h.usuario}</td>
 <td>${fecha}</td>
 <td>
