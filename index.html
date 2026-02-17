@@ -10,6 +10,7 @@
   --azul:#1e3c72;
   --azul2:#2a5298;
   --rojo:#c0392b;
+  --verde:#27ae60;
   --gris:#f4f6f9;
 }
 
@@ -19,10 +20,31 @@ body{
   background:linear-gradient(to bottom,var(--azul),var(--azul2));
 }
 
-.layout{
-  display:flex;
-  min-height:100vh;
+/* NOTIFICACIÓN */
+.toast{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:var(--verde);
+  color:white;
+  padding:16px 25px;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:600;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  opacity:0;
+  transform:translateY(-20px);
+  transition:0.3s;
+  z-index:999;
 }
+
+.toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* LAYOUT */
+.layout{ display:flex; min-height:100vh; }
 
 .sidebar{
   width:300px;
@@ -33,16 +55,7 @@ body{
   flex-direction:column;
 }
 
-.sidebar h2{
-  text-align:center;
-  font-size:24px;
-  margin-bottom:30px;
-}
-
-.sidebar p{
-  font-size:17px;
-  margin:6px 0;
-}
+.sidebar h2{ text-align:center; font-size:24px; margin-bottom:30px; }
 
 .sidebar button{
   margin:8px 0;
@@ -56,19 +69,9 @@ body{
   font-weight:600;
 }
 
-.logout{
-  background:var(--rojo) !important;
-  margin-top:auto;
-}
+.logout{ background:var(--rojo) !important; margin-top:auto; }
 
-.content{
-  flex:1;
-  background:var(--gris);
-  padding:50px;
-}
-
-h2{ font-size:30px; }
-h3{ font-size:22px; }
+.content{ flex:1; background:var(--gris); padding:50px; }
 
 .card{
   background:white;
@@ -85,15 +88,6 @@ input, select{
   border-radius:12px;
   border:1px solid #ddd;
   font-size:17px;
-}
-
-button{
-  padding:16px;
-  font-size:17px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
 }
 
 table{
@@ -115,17 +109,12 @@ td{
   border-bottom:1px solid #eee;
   text-align:center;
 }
-
-@media (max-width:950px){
-  .layout{ flex-direction:column; }
-  .sidebar{ width:100%; flex-direction:row; flex-wrap:wrap; justify-content:center; }
-  .sidebar h2{ width:100%; }
-  .content{ padding:25px; }
-}
 </style>
 </head>
 
 <body>
+
+<div id="toast" class="toast"></div>
 
 <div id="loginBox" style="max-width:450px;margin:120px auto;background:white;padding:40px;border-radius:18px;">
 <h2 style="text-align:center;">Login</h2>
@@ -144,6 +133,7 @@ td{
 <button id="btnAdmin" onclick="mostrar('adminPanel')">Panel Admin</button>
 <button onclick="mostrar('cuentasPanel')">Mi Panel</button>
 <button onclick="mostrar('historialPanel')">Historial</button>
+<button id="btnResumen" onclick="mostrar('resumenPanel')">Resumen</button>
 
 <button class="logout" onclick="logout()">Cerrar sesión</button>
 </aside>
@@ -152,22 +142,17 @@ td{
 
 <section id="adminPanel" style="display:none;">
 <h2>Panel de Administración</h2>
-
 <div class="card">
 <h3>Crear Usuario</h3>
 <input type="email" id="nuevoEmail" placeholder="Email">
 <input type="password" id="nuevoPassword" placeholder="Contraseña">
-
 <select id="nuevoRol">
 <option value="usuario">Usuario</option>
 <option value="admin">Administrador</option>
 </select>
-
-<h4>Permisos</h4>
 <label><input type="checkbox" id="permVerTodo"> Ver todo</label><br>
 <label><input type="checkbox" id="permCrear"> Guardar</label><br>
 <label><input type="checkbox" id="permEliminar"> Eliminar</label><br>
-
 <button onclick="crearUsuario()">Crear Usuario</button>
 </div>
 </section>
@@ -197,6 +182,13 @@ td{
 </thead>
 <tbody id="tablaHistorial"></tbody>
 </table>
+</section>
+
+<section id="resumenPanel" style="display:none;">
+<h2>Resumen de Ayudas (Semana Actual)</h2>
+<div class="card">
+<div id="resumenAyudas"></div>
+</div>
 </section>
 
 </main>
@@ -229,17 +221,24 @@ let usuarioActual=null;
 let rolActual=null;
 let permisos={};
 
+/* NOTIFICACIÓN */
+function mostrarToast(mensaje){
+const toast=document.getElementById("toast");
+toast.innerText=mensaje;
+toast.classList.add("show");
+setTimeout(()=>{ toast.classList.remove("show"); },3000);
+}
+
 window.login=async()=>{
 await signInWithEmailAndPassword(auth,email.value,password.value);
+mostrarToast("Bienvenido al sistema ✅");
 };
 
 window.logout=()=>signOut(auth);
 
 onAuthStateChanged(auth,async(user)=>{
 if(user){
-
 usuarioActual=user.email;
-
 const snap=await getDoc(doc(db,"usuarios",user.uid));
 rolActual=snap.exists()?snap.data().role:"usuario";
 permisos=snap.exists()?snap.data().permisos||{}:{};
@@ -252,9 +251,12 @@ app.style.display="flex";
 
 if(rolActual==="admin"){
 btnAdmin.style.display="block";
+btnResumen.style.display="block";
 mostrar("adminPanel");
+cargarResumenSemanal();
 }else{
 btnAdmin.style.display="none";
+btnResumen.style.display="none";
 mostrar("cuentasPanel");
 }
 
@@ -265,10 +267,6 @@ btnGuardar.style.display="none";
 cargarPlataformas();
 cargarAdmins();
 cargarHistorial();
-
-}else{
-loginBox.style.display="block";
-app.style.display="none";
 }
 });
 
@@ -276,33 +274,28 @@ window.mostrar=(id)=>{
 adminPanel.style.display="none";
 cuentasPanel.style.display="none";
 historialPanel.style.display="none";
+resumenPanel.style.display="none";
 document.getElementById(id).style.display="block";
 };
 
-function cargarPlataformas(){
-onSnapshot(collection(db,"plataformas"),(snapshot)=>{
-plataformaSelect.innerHTML="";
-snapshot.forEach(docSnap=>{
-plataformaSelect.innerHTML+=`<option>${docSnap.data().nombre}</option>`;
-});
-});
+window.crearUsuario=async()=>{
+await addDoc(collection(db,"usuarios"),{
+email:nuevoEmail.value,
+role:nuevoRol.value,
+permisos:{
+verTodo:permVerTodo.checked,
+crear:permCrear.checked,
+eliminar:permEliminar.checked
 }
-
-function cargarAdmins(){
-onSnapshot(collection(db,"adminsAyuda"),(snapshot)=>{
-adminAyudaSelect.innerHTML="";
-snapshot.forEach(docSnap=>{
-adminAyudaSelect.innerHTML+=`<option>${docSnap.data().nombre}</option>`;
 });
-});
-}
+mostrarToast("Usuario creado correctamente ✅");
+};
 
 window.guardarCuenta=async()=>{
 if(!(rolActual==="admin"||permisos.crear)){
-alert("No tienes permiso para guardar");
+mostrarToast("No tienes permiso ❌");
 return;
 }
-
 await addDoc(collection(db,"historialGrupo"),{
 plataforma:plataformaSelect.value,
 miembro:nombreMiembro.value,
@@ -310,45 +303,63 @@ adminAyudo:adminAyudaSelect.value,
 usuario:usuarioActual,
 timestamp:serverTimestamp()
 });
-
 nombreMiembro.value="";
+mostrarToast("Registro guardado exitosamente ✅");
 };
-
-function cargarHistorial(){
-let q;
-if(rolActual==="admin"||permisos.verTodo){
-q=query(collection(db,"historialGrupo"),orderBy("timestamp","desc"));
-}else{
-q=query(collection(db,"historialGrupo"),
-where("usuario","==",usuarioActual),
-orderBy("timestamp","desc"));
-}
-
-onSnapshot(q,(snapshot)=>{
-tablaHistorial.innerHTML="";
-snapshot.forEach(docSnap=>{
-const h=docSnap.data();
-const fecha=h.timestamp?new Date(h.timestamp.seconds*1000).toLocaleString():"";
-
-tablaHistorial.innerHTML+=`
-<tr>
-<td>${h.plataforma}</td>
-<td>${h.miembro}</td>
-<td>${h.adminAyudo}</td>
-<td>${h.usuario}</td>
-<td>${fecha}</td>
-<td>
-${rolActual==="admin"||permisos.eliminar?
-`<button onclick="eliminarRegistro('${docSnap.id}')">Eliminar</button>`:""}
-</td>
-</tr>`;
-});
-});
-}
 
 window.eliminarRegistro=async(id)=>{
 await deleteDoc(doc(db,"historialGrupo",id));
+mostrarToast("Registro eliminado correctamente 🗑️");
 };
+
+/* RESUMEN + RANKING */
+function cargarResumenSemanal(){
+const inicioSemana=new Date();
+inicioSemana.setDate(inicioSemana.getDate()-inicioSemana.getDay());
+inicioSemana.setHours(0,0,0,0);
+
+const q=query(
+collection(db,"historialGrupo"),
+where("timestamp",">=",inicioSemana),
+orderBy("timestamp","desc")
+);
+
+onSnapshot(q,(snapshot)=>{
+let resumen={}, totales={};
+
+snapshot.forEach(docSnap=>{
+const d=docSnap.data();
+const admin=d.adminAyudo||"Sin asignar";
+const plat=d.plataforma;
+
+if(!resumen[admin]) resumen[admin]={};
+if(!resumen[admin][plat]) resumen[admin][plat]=0;
+resumen[admin][plat]++;
+
+if(!totales[admin]) totales[admin]=0;
+totales[admin]++;
+});
+
+const ranking=Object.entries(totales).sort((a,b)=>b[1]-a[1]);
+
+let html="<h2>🏆 Ranking Semanal</h2>";
+ranking.forEach((r,i)=>{
+html+=`<p><strong>${i+1}° ${r[0]}</strong> – ${r[1]} ayudas</p>`;
+});
+
+html+="<hr><h2>📊 Detalle por Plataforma</h2>";
+
+for(const admin in resumen){
+html+=`<h3>${admin}</h3>`;
+for(const p in resumen[admin]){
+html+=`<p>${p}: <strong>${resumen[admin][p]}</strong></p>`;
+}
+html+="<br>";
+}
+
+resumenAyudas.innerHTML=html||"No hay ayudas esta semana.";
+});
+}
 
 </script>
 
