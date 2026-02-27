@@ -3,84 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Pro Ultra - Ventas & Facturación</title>
+    <title>Sistema Pro Ultra - Ventas & Multicanal</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { 
-            --primary: #1e40af; 
-            --secondary: #64748b;
-            --danger: #dc2626; 
-            --success: #16a34a; 
-            --dark: #0f172a;
-            --light: #f8fafc;
-        }
-        
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f1f5f9; margin: 0; color: var(--dark); }
+        :root { --primary: #1e40af; --secondary: #64748b; --danger: #dc2626; --success: #16a34a; --dark: #0f172a; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; color: var(--dark); }
         .container { width: 95%; max-width: 1200px; margin: 20px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         
-        h2 { border-left: 5px solid var(--primary); padding-left: 15px; color: var(--dark); margin-bottom: 25px; }
-        h3 { color: var(--secondary); margin-top: 0; }
-
+        h2 { border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 25px; }
         .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        input, select, button { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; transition: 0.3s; }
+        input, select, button { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
         
-        button { cursor: pointer; font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+        button { cursor: pointer; font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 8px; justify-content: center; transition: 0.3s; }
         .btn-main { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-success { background: var(--success); color: white; }
-        .btn-main:hover, .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-share { background: #25d366; color: white; } /* Color WhatsApp */
 
-        /* Tablas */
-        .table-container { overflow-x: auto; margin-top: 20px; border: 1px solid #e2e8f0; border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
-        th { background: #f8fafc; color: var(--secondary); padding: 15px; text-align: left; font-size: 12px; text-transform: uppercase; }
+        .table-container { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        th { background: #f8fafc; padding: 15px; text-align: left; color: var(--secondary); font-size: 12px; text-transform: uppercase; }
         td { padding: 15px; border-top: 1px solid #e2e8f0; font-size: 14px; }
-        
-        /* Estados */
+
         .status-on { color: var(--success); font-weight: bold; background: #f0fdf4; padding: 4px 8px; border-radius: 20px; }
         .status-off { color: var(--danger); font-weight: bold; background: #fef2f2; padding: 4px 8px; border-radius: 20px; }
         .badge-user { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
 
         .admin-section { border: 2px solid #e2e8f0; padding: 25px; border-radius: 15px; margin-top: 40px; background: #fafafa; }
         .cart-item { display: flex; justify-content: space-between; padding: 12px; background: #f8fafc; margin-bottom: 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .action-btns { display: flex; gap: 8px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="loginBox" style="max-width: 400px; margin: 100px auto; text-align: center;">
-        <i class="fas fa-shield-alt fa-3x" style="color: var(--primary); margin-bottom: 20px;"></i>
+        <i class="fas fa-user-shield fa-3x" style="color: var(--primary);"></i>
         <h2>Acceso al Sistema</h2>
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <input type="email" id="email" placeholder="Correo Electrónico">
-            <input type="password" id="password" placeholder="Contraseña">
-            <button class="btn-main" onclick="login()">Entrar al Sistema</button>
-        </div>
+        <input type="email" id="email" placeholder="Correo" style="width:90%; margin-bottom:15px;"><br>
+        <input type="password" id="password" placeholder="Contraseña" style="width:90%; margin-bottom:15px;"><br>
+        <button class="btn-main" onclick="login()" style="width:95%">Entrar al Sistema</button>
     </div>
 
     <div id="app" style="display:none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h3 id="infoUsuario"></h3>
             <button class="btn-danger" onclick="logout()">Cerrar Sesión <i class="fas fa-sign-out-alt"></i></button>
-        </div>
+        </header>
 
         <section>
-            <h2><i class="fas fa-shopping-cart"></i> Nueva Venta</h2>
+            <h2><i class="fas fa-cash-register"></i> Nueva Venta</h2>
             <div class="grid-form">
-                <div>
-                    <label>Cliente</label>
-                    <input type="text" id="cliente" placeholder="Nombre del Cliente" style="width:100%">
-                </div>
-                <div>
-                    <label>Identificación/NIT</label>
-                    <input type="text" id="nit" placeholder="NIT o Cédula" style="width:100%">
-                </div>
-                <div>
-                    <label>Método de Pago</label>
+                <div><label>Cliente</label><input type="text" id="cliente" placeholder="Nombre completo" style="width:100%"></div>
+                <div><label>NIT / Cédula</label><input type="text" id="nit" placeholder="Identificación" style="width:100%"></div>
+                <div><label>Método de Pago</label>
                     <select id="metodoPago" style="width:100%">
                         <option value="Efectivo">Efectivo</option>
                         <option value="Transferencia">Transferencia</option>
@@ -92,60 +72,58 @@
             <div class="grid-form" style="background: #eef2ff; padding: 20px; border-radius: 12px;">
                 <select id="productoSelect"></select>
                 <input type="number" id="cantidadVenta" value="1" min="1">
-                <button class="btn-success" onclick="agregarAlCarrito()"><i class="fas fa-plus"></i> Añadir</button>
+                <button class="btn-success" onclick="agregarAlCarrito()"><i class="fas fa-cart-plus"></i> Añadir Producto</button>
             </div>
 
-            <div id="carritoContenedor" style="margin-top: 20px;">
-                <h4>Productos en esta venta:</h4>
+            <div id="carritoContenedor">
                 <div id="listaCarrito"></div>
                 <div style="text-align: right; margin-top: 15px;">
                     <h2 id="totalVentaTemporal" style="border:none;">Total: $0.00</h2>
-                    <button class="btn-main" onclick="finalizarVenta()"><i class="fas fa-file-invoice-dollar"></i> CONFIRMAR Y GENERAR FACTURA</button>
+                    <button class="btn-main" onclick="finalizarVenta()" style="padding: 15px 30px;">
+                        <i class="fas fa-check-double"></i> PROCESAR VENTA Y FACTURAR
+                    </button>
                 </div>
             </div>
         </section>
 
         <div id="panelAdmin" class="admin-section" style="display:none;">
-            <h2><i class="fas fa-user-shield"></i> Panel de Control (Admin)</h2>
+            <h2><i class="fas fa-tools"></i> Panel de Control (Admin)</h2>
             
-            <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px;">
-                <h3><i class="fas fa-users"></i> Gestión de Usuarios</h3>
+            <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #eee;">
+                <h3><i class="fas fa-users-cog"></i> Usuarios del Sistema</h3>
                 <div class="grid-form">
                     <input type="email" id="nuevoEmail" placeholder="Nuevo Email">
                     <input type="password" id="nuevoPassword" placeholder="Contraseña">
-                    <select id="nuevoRol">
-                        <option value="vendedor">Vendedor</option>
-                        <option value="admin">Admin</option>
-                    </select>
+                    <select id="nuevoRol"><option value="vendedor">Vendedor</option><option value="admin">Admin</option></select>
                     <button class="btn-main" onclick="crearUsuario()">Registrar</button>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr></thead>
                         <tbody id="tablaUsuarios"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div style="background: white; padding: 20px; border-radius: 12px;">
-                <h3><i class="fas fa-boxes"></i> Inventario de Stock</h3>
+            <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+                <h3><i class="fas fa-box-open"></i> Inventario</h3>
                 <div class="grid-form">
-                    <input type="text" id="nombreProd" placeholder="Nombre Producto">
-                    <input type="number" id="precioProd" placeholder="Precio $">
-                    <input type="number" id="stockProd" placeholder="Stock Inicial">
-                    <button class="btn-success" onclick="crearProducto()">Guardar Producto</button>
+                    <input type="text" id="nombreProd" placeholder="Producto">
+                    <input type="number" id="precioProd" placeholder="Precio">
+                    <input type="number" id="stockProd" placeholder="Stock">
+                    <button class="btn-success" onclick="crearProducto()">Guardar</button>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Acción</th></tr></thead>
                         <tbody id="tablaStock"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <section style="margin-top: 40px;">
-            <h2><i class="fas fa-history"></i> Historial Detallado de Ventas</h2>
+        <section style="margin-top: 50px;">
+            <h2><i class="fas fa-file-invoice-dollar"></i> Historial de Operaciones</h2>
             <div class="table-container">
                 <table>
                     <thead>
@@ -154,15 +132,15 @@
                             <th>Vendedor</th>
                             <th>Cliente</th>
                             <th>Artículos</th>
-                            <th>Total</th>
+                            <th>Total Cobrado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaVentas"></tbody>
                 </table>
             </div>
-            <div style="background: var(--dark); color: white; padding: 20px; border-radius: 0 0 12px 12px; text-align: right;">
-                <h3 id="granTotalHistorial" style="margin:0;">Total General: $0.00</h3>
+            <div style="background: var(--dark); color: white; padding: 25px; text-align: right; border-radius: 0 0 16px 16px;">
+                <h3 id="granTotalHistorial" style="margin:0;">Ventas Totales: $0.00</h3>
             </div>
         </section>
     </div>
@@ -173,6 +151,7 @@
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, query, orderBy, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    // Tu configuración de Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
         authDomain: "sistema-ventas-64a4c.firebaseapp.com",
@@ -186,24 +165,16 @@
     const auth = getAuth(appFirebase);
     const db = getFirestore(appFirebase);
 
-    let usuarioActual = null;
-    let rolActual = null;
-    let carrito = [];
-    let productosData = [];
+    let usuarioActual = null, rolActual = null, carrito = [], productosData = [];
 
-    // --- AUTENTICACIÓN ---
+    // --- ACCESO ---
     window.login = async () => {
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
-            const userSnap = await getDoc(doc(db, "usuarios", userCredential.user.uid));
-            if (userSnap.exists() && userSnap.data().estado === "inactivo") {
-                await signOut(auth);
-                alert("Cuenta desactivada.");
-                return;
-            }
+        try { 
+            const uC = await signInWithEmailAndPassword(auth, email.value, password.value); 
+            const uS = await getDoc(doc(db, "usuarios", uC.user.uid));
+            if(uS.exists() && uS.data().estado === "inactivo") { await signOut(auth); alert("Tu cuenta está suspendida."); }
         } catch (e) { alert("Error: " + e.message); }
     };
-
     window.logout = () => signOut(auth);
 
     onAuthStateChanged(auth, async (user) => {
@@ -211,192 +182,142 @@
             const snap = await getDoc(doc(db, "usuarios", user.uid));
             usuarioActual = user.email;
             rolActual = snap.exists() ? snap.data().role : "vendedor";
-            
-            infoUsuario.innerHTML = `<span class="badge-user"><i class="fas fa-user"></i> ${usuarioActual} (${rolActual})</span>`;
-            loginBox.style.display = "none";
-            app.style.display = "block";
+            infoUsuario.innerHTML = `<span class="badge-user"><i class="fas fa-user-tie"></i> ${usuarioActual} (${rolActual})</span>`;
+            loginBox.style.display = "none"; app.style.display = "block";
             panelAdmin.style.display = (rolActual === "admin") ? "block" : "none";
-
-            cargarStock();
-            cargarVentas();
-            if (rolActual === "admin") cargarUsuarios();
-        } else {
-            loginBox.style.display = "block";
-            app.style.display = "none";
-        }
+            cargarStock(); cargarVentas(); if (rolActual === "admin") cargarUsuarios();
+        } else { loginBox.style.display = "block"; app.style.display = "none"; }
     });
 
-    // --- GESTIÓN USUARIOS (ADMIN) ---
+    // --- ADMIN USUARIOS ---
     function cargarUsuarios() {
         onSnapshot(collection(db, "usuarios"), (snapshot) => {
             tablaUsuarios.innerHTML = "";
             snapshot.forEach(docSnap => {
-                const u = docSnap.data();
-                const id = docSnap.id;
-                const isActivo = u.estado === "activo";
-                tablaUsuarios.innerHTML += `
-                    <tr>
-                        <td>${u.email}</td>
-                        <td><span class="badge-user">${u.role}</span></td>
-                        <td><span class="${isActivo ? 'status-on' : 'status-off'}">${isActivo ? 'ACTIVO' : 'INACTIVO'}</span></td>
-                        <td>
-                            <button class="${isActivo ? 'btn-danger' : 'btn-success'}" style="padding:5px 10px;" onclick="toggleUser('${id}', '${u.estado}')">
-                                ${isActivo ? 'Apagar' : 'Prender'}
-                            </button>
-                            <button class="btn-danger" style="padding:5px 10px; background:black;" onclick="eliminarUsuario('${id}')"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
+                const u = docSnap.data(), id = docSnap.id, acts = u.estado === "activo";
+                tablaUsuarios.innerHTML += `<tr>
+                    <td><b>${u.email}</b></td>
+                    <td>${u.role}</td>
+                    <td><span class="${acts?'status-on':'status-off'}">${acts?'ACTIVO':'SUSPENDIDO'}</span></td>
+                    <td>
+                        <button class="${acts?'btn-danger':'btn-success'}" style="padding:5px 10px;" onclick="toggleUser('${id}','${u.estado}')">${acts?'Apagar':'Prender'}</button>
+                    </td></tr>`;
             });
         });
     }
-
-    window.crearUsuario = async () => {
-        const idManual = Date.now().toString();
-        await setDoc(doc(db, "usuarios", idManual), {
-            email: nuevoEmail.value,
-            role: nuevoRol.value,
-            estado: "activo"
-        });
-        alert("Usuario registrado en base de datos.");
+    window.toggleUser = async (id, est) => { await updateDoc(doc(db, "usuarios", id), { estado: est === "activo" ? "inactivo" : "activo" }); };
+    window.crearUsuario = async () => { 
+        const nid = Date.now().toString();
+        await setDoc(doc(db, "usuarios", nid), { email: nuevoEmail.value, role: nuevoRol.value, estado: "activo" }); 
+        alert("Usuario Registrado"); 
     };
-
-    window.toggleUser = async (id, estadoActual) => {
-        await updateDoc(doc(db, "usuarios", id), { estado: estadoActual === "activo" ? "inactivo" : "activo" });
-    };
-
-    window.eliminarUsuario = async (id) => { if(confirm("¿Eliminar usuario?")) await deleteDoc(doc(db, "usuarios", id)); };
 
     // --- STOCK ---
     function cargarStock() {
         onSnapshot(collection(db, "productos"), (snapshot) => {
-            productoSelect.innerHTML = "";
-            tablaStock.innerHTML = "";
-            productosData = [];
+            productoSelect.innerHTML = ""; tablaStock.innerHTML = ""; productosData = [];
             snapshot.forEach(docSnap => {
-                const p = docSnap.data();
-                productosData.push({ id: docSnap.id, ...p });
+                const p = docSnap.data(); productosData.push({ id: docSnap.id, ...p });
                 productoSelect.innerHTML += `<option value="${docSnap.id}">${p.nombre} ($${p.precio})</option>`;
-                tablaStock.innerHTML += `
-                    <tr>
-                        <td>${p.nombre}</td>
-                        <td>$${p.precio}</td>
-                        <td>${p.stock}</td>
-                        <td><button class="btn-danger" onclick="eliminarProducto('${docSnap.id}')">Eliminar</button></td>
-                    </tr>`;
+                tablaStock.innerHTML += `<tr><td>${p.nombre}</td><td>$${p.precio}</td><td>${p.stock}</td><td><button class="btn-danger" onclick="eliminarProducto('${docSnap.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         });
     }
-
-    window.crearProducto = async () => {
-        const p = parseFloat(precioProd.value);
-        const s = parseInt(stockProd.value);
-        if(isNaN(p) || isNaN(s)) return alert("Ingresa valores válidos");
-        await addDoc(collection(db, "productos"), { nombre: nombreProd.value, precio: p, stock: s });
+    window.crearProducto = async () => { 
+        await addDoc(collection(db, "productos"), { nombre: nombreProd.value, precio: parseFloat(precioProd.value), stock: parseInt(stockProd.value) }); 
         nombreProd.value = ""; precioProd.value = ""; stockProd.value = "";
     };
+    window.eliminarProducto = async (id) => { if(confirm("¿Eliminar producto?")) await deleteDoc(doc(db, "productos", id)); };
 
-    window.eliminarProducto = async (id) => { await deleteDoc(doc(db, "productos", id)); };
-
-    // --- VENTAS ---
+    // --- VENTA ---
     window.agregarAlCarrito = () => {
-        const id = productoSelect.value;
+        const prod = productosData.find(p => p.id === productoSelect.value);
         const cant = parseInt(cantidadVenta.value);
-        const prod = productosData.find(p => p.id === id);
-        if (cant > prod.stock) return alert("No hay stock");
+        if (cant > prod.stock) return alert("¡Sin existencias!");
         carrito.push({ ...prod, cantidad: cant, subtotal: prod.precio * cant });
         renderCarrito();
     };
 
     function renderCarrito() {
-        listaCarrito.innerHTML = "";
-        let t = 0;
-        carrito.forEach((item, i) => {
-            t += item.subtotal;
-            listaCarrito.innerHTML += `<div class="cart-item"><span>${item.nombre} x ${item.cantidad}</span> <span>$${item.subtotal.toFixed(2)} <button onclick="carrito.splice(${i},1);renderCarrito()" style="color:red; background:none;">X</button></span></div>`;
-        });
+        listaCarrito.innerHTML = ""; let t = 0;
+        carrito.forEach((item, i) => { t += item.subtotal; listaCarrito.innerHTML += `<div class="cart-item"><span><b>${item.nombre}</b> x ${item.cantidad}</span> <span>$${item.subtotal.toFixed(2)} <button onclick="carrito.splice(${i},1);renderCarrito()" style="color:red; background:none; border:none; cursor:pointer;">X</button></span></div>`; });
         totalVentaTemporal.innerText = `Total: $${t.toFixed(2)}`;
     }
 
     window.finalizarVenta = async () => {
-        if (carrito.length === 0 || !cliente.value) return alert("Completa los datos");
-        const total = carrito.reduce((sum, item) => sum + item.subtotal, 0);
-        const ventaData = {
-            cliente: cliente.value,
-            nit: nit.value || "S/N",
-            vendedor: usuarioActual,
-            metodoPago: metodoPago.value,
-            productos: carrito,
-            total: total,
-            fecha: new Date().toLocaleString(),
-            timestamp: new Date()
-        };
-
-        const docRef = await addDoc(collection(db, "ventas"), ventaData);
-        for (const item of carrito) {
-            await updateDoc(doc(db, "productos", item.id), { stock: increment(-item.cantidad) });
-        }
-        generarFacturaHermosa(ventaData);
+        if (!cliente.value || carrito.length === 0) return alert("Ingresa el cliente y añade productos.");
+        const total = carrito.reduce((s, i) => s + i.subtotal, 0);
+        const v = { cliente: cliente.value, nit: nit.value || "S/N", vendedor: usuarioActual, metodoPago: metodoPago.value, productos: [...carrito], total: total, fecha: new Date().toLocaleString(), timestamp: new Date() };
+        
+        await addDoc(collection(db, "ventas"), v);
+        for (const it of carrito) { await updateDoc(doc(db, "productos", it.id), { stock: increment(-it.cantidad) }); }
+        
+        generarPDF(v); // Descarga automática
+        alert("¡Venta completada con éxito!");
         carrito = []; cliente.value = ""; nit.value = ""; renderCarrito();
     };
 
-    // --- FACTURA PDF HERMOSA ---
-    function generarFacturaHermosa(v) {
+    // --- PDF Y COMPARTIR ---
+    function generarPDF(v, download = true) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        doc.setFillColor(30, 64, 175);
-        doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
-        doc.text("RECIBO DE VENTA PRO", 15, 25);
+        // Cabecera Pro
+        doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255); doc.setFontSize(22); doc.text("SISTEMA PRO - FACTURA", 15, 25);
         
-        doc.setTextColor(40, 40, 40);
-        doc.setFontSize(10);
-        doc.text(`FECHA: ${v.fecha}`, 150, 50);
-        doc.setFont("helvetica", "bold");
-        doc.text("DATOS DEL CLIENTE:", 15, 60);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Nombre: ${v.cliente}`, 15, 67);
-        doc.text(`ID/NIT: ${v.nit}`, 15, 74);
-        doc.text(`Vendedor: ${v.vendedor}`, 110, 67);
-        doc.text(`Pago: ${v.metodoPago}`, 110, 74);
+        // Datos
+        doc.setTextColor(40); doc.setFontSize(10);
+        doc.text(`VENDEDOR: ${v.vendedor}`, 15, 50); doc.text(`FECHA: ${v.fecha}`, 140, 50);
+        doc.text(`CLIENTE: ${v.cliente}`, 15, 57); doc.text(`NIT: ${v.nit}`, 15, 64);
+        doc.text(`MÉTODO: ${v.metodoPago}`, 140, 57);
 
-        doc.autoTable({
-            startY: 85,
-            head: [['Descripción', 'Cant', 'Precio', 'Subtotal']],
-            body: v.productos.map(p => [p.nombre, p.cantidad, `$${p.precio}`, `$${p.subtotal}`]),
-            headStyles: { fillColor: [30, 64, 175] }
-        });
-
-        doc.setFontSize(14);
-        doc.text(`TOTAL PAGADO: $${v.total.toFixed(2)}`, 140, doc.lastAutoTable.finalY + 15);
-        doc.save(`Factura_${v.cliente}.pdf`);
+        doc.autoTable({ startY: 75, head: [['Ítem', 'Cant', 'Precio', 'Subtotal']], body: v.productos.map(p => [p.nombre, p.cantidad, `$${p.precio}`, `$${p.subtotal}`]), headStyles: {fillColor:[30,64,175]} });
+        doc.setFontSize(16); doc.text(`TOTAL PAGADO: $${v.total.toFixed(2)}`, 130, doc.lastAutoTable.finalY + 15);
+        
+        if(download) doc.save(`Factura_${v.cliente}.pdf`);
+        return doc.output('blob');
     }
 
-    // --- HISTORIAL ---
+    // COMPARTIR WHATSAPP/REDES
+    window.compartir = async (v) => {
+        const txt = `📄 *FACTURA DE VENTA*\n\n👤 *Cliente:* ${v.cliente}\n💰 *Total:* $${v.total.toFixed(2)}\n🗓️ *Fecha:* ${v.fecha}\n\nGracias por su compra.`;
+        
+        if (navigator.share) {
+            try {
+                const blob = generarPDF(v, false);
+                const file = new File([blob], `Factura_${v.cliente}.pdf`, { type: 'application/pdf' });
+                await navigator.share({ title: 'Recibo de Pago', text: txt, files: [file] });
+            } catch { window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); }
+        } else {
+            window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+    };
+
     function cargarVentas() {
         const q = query(collection(db, "ventas"), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
-            tablaVentas.innerHTML = "";
-            let gTotal = 0;
+            tablaVentas.innerHTML = ""; let gt = 0;
             snapshot.forEach(docSnap => {
-                const v = docSnap.data();
-                gTotal += v.total;
-                const prods = v.productos.map(p => `${p.nombre} (x${p.cantidad})`).join(", ");
-                tablaVentas.innerHTML += `
-                    <tr>
-                        <td><small>${v.fecha}</small></td>
-                        <td><span class="badge-user">${v.vendedor}</span></td>
-                        <td><b>${v.cliente}</b><br><small>ID: ${v.nit}</small></td>
-                        <td><small>${prods}</small></td>
-                        <td><b style="color:var(--primary)">$${v.total.toFixed(2)}</b></td>
-                        <td><button class="btn-main" onclick='reimprimirFactura(${JSON.stringify(v)})'><i class="fas fa-print"></i></button></td>
-                    </tr>`;
+                const v = docSnap.data(); gt += v.total;
+                const vJson = JSON.stringify(v).replace(/'/g, "&apos;");
+                const listaP = v.productos.map(p => `• ${p.nombre}`).join("<br>");
+                
+                tablaVentas.innerHTML += `<tr>
+                    <td><small>${v.fecha}</small></td>
+                    <td><span class="badge-user">${v.vendedor}</span></td>
+                    <td><b>${v.cliente}</b><br><small>NIT: ${v.nit}</small></td>
+                    <td><small>${listaP}</small></td>
+                    <td><b style="color:var(--primary)">$${v.total.toFixed(2)}</b></td>
+                    <td class="action-btns">
+                        <button class="btn-main" onclick='generarPDF(${vJson})' title="Descargar"><i class="fas fa-download"></i></button>
+                        <button class="btn-share" onclick='compartir(${vJson})' title="Compartir"><i class="fas fa-share-alt"></i></button>
+                    </td></tr>`;
             });
-            granTotalHistorial.innerText = `Total General en Caja: $${gTotal.toFixed(2)}`;
+            granTotalHistorial.innerHTML = `Ventas Totales del Sistema: <span style="font-size:24px; margin-left:15px;">$${gt.toFixed(2)}</span>`;
         });
     }
-    window.reimprimirFactura = (v) => generarFacturaHermosa(v);
+    window.generarPDF = (v) => generarPDF(v);
 
 </script>
 </body>
