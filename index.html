@@ -22,10 +22,10 @@
         .btn-main { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-success { background: var(--success); color: white; }
-        .btn-share { background: #25d366; color: white; } /* Color WhatsApp */
+        .btn-share { background: #25d366; color: white; }
 
         .table-container { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th { background: #f8fafc; padding: 15px; text-align: left; color: var(--secondary); font-size: 12px; text-transform: uppercase; }
         td { padding: 15px; border-top: 1px solid #e2e8f0; font-size: 14px; }
 
@@ -151,7 +151,6 @@
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, query, orderBy, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Tu configuración de Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
         authDomain: "sistema-ventas-64a4c.firebaseapp.com",
@@ -167,7 +166,6 @@
 
     let usuarioActual = null, rolActual = null, carrito = [], productosData = [];
 
-    // --- ACCESO ---
     window.login = async () => {
         try { 
             const uC = await signInWithEmailAndPassword(auth, email.value, password.value); 
@@ -189,7 +187,6 @@
         } else { loginBox.style.display = "block"; app.style.display = "none"; }
     });
 
-    // --- ADMIN USUARIOS ---
     function cargarUsuarios() {
         onSnapshot(collection(db, "usuarios"), (snapshot) => {
             tablaUsuarios.innerHTML = "";
@@ -212,7 +209,6 @@
         alert("Usuario Registrado"); 
     };
 
-    // --- STOCK ---
     function cargarStock() {
         onSnapshot(collection(db, "productos"), (snapshot) => {
             productoSelect.innerHTML = ""; tablaStock.innerHTML = ""; productosData = [];
@@ -225,11 +221,9 @@
     }
     window.crearProducto = async () => { 
         await addDoc(collection(db, "productos"), { nombre: nombreProd.value, precio: parseFloat(precioProd.value), stock: parseInt(stockProd.value) }); 
-        nombreProd.value = ""; precioProd.value = ""; stockProd.value = "";
     };
     window.eliminarProducto = async (id) => { if(confirm("¿Eliminar producto?")) await deleteDoc(doc(db, "productos", id)); };
 
-    // --- VENTA ---
     window.agregarAlCarrito = () => {
         const prod = productosData.find(p => p.id === productoSelect.value);
         const cant = parseInt(cantidadVenta.value);
@@ -248,49 +242,45 @@
         if (!cliente.value || carrito.length === 0) return alert("Ingresa el cliente y añade productos.");
         const total = carrito.reduce((s, i) => s + i.subtotal, 0);
         const v = { cliente: cliente.value, nit: nit.value || "S/N", vendedor: usuarioActual, metodoPago: metodoPago.value, productos: [...carrito], total: total, fecha: new Date().toLocaleString(), timestamp: new Date() };
-        
         await addDoc(collection(db, "ventas"), v);
         for (const it of carrito) { await updateDoc(doc(db, "productos", it.id), { stock: increment(-it.cantidad) }); }
-        
-        generarPDF(v); // Descarga automática
-        alert("¡Venta completada con éxito!");
+        generarPDF(v);
+        alert("¡Venta completada!");
         carrito = []; cliente.value = ""; nit.value = ""; renderCarrito();
     };
 
-    // --- PDF Y COMPARTIR ---
     function generarPDF(v, download = true) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // Cabecera Pro
         doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255); doc.setFontSize(22); doc.text("SISTEMA PRO - FACTURA", 15, 25);
-        
-        // Datos
+        doc.setTextColor(255); doc.setFontSize(22); doc.text("FACTURA PRO", 15, 25);
         doc.setTextColor(40); doc.setFontSize(10);
         doc.text(`VENDEDOR: ${v.vendedor}`, 15, 50); doc.text(`FECHA: ${v.fecha}`, 140, 50);
         doc.text(`CLIENTE: ${v.cliente}`, 15, 57); doc.text(`NIT: ${v.nit}`, 15, 64);
-        doc.text(`MÉTODO: ${v.metodoPago}`, 140, 57);
-
         doc.autoTable({ startY: 75, head: [['Ítem', 'Cant', 'Precio', 'Subtotal']], body: v.productos.map(p => [p.nombre, p.cantidad, `$${p.precio}`, `$${p.subtotal}`]), headStyles: {fillColor:[30,64,175]} });
-        doc.setFontSize(16); doc.text(`TOTAL PAGADO: $${v.total.toFixed(2)}`, 130, doc.lastAutoTable.finalY + 15);
-        
+        doc.setFontSize(16); doc.text(`TOTAL: $${v.total.toFixed(2)}`, 130, doc.lastAutoTable.finalY + 15);
         if(download) doc.save(`Factura_${v.cliente}.pdf`);
         return doc.output('blob');
     }
 
-    // COMPARTIR WHATSAPP/REDES
     window.compartir = async (v) => {
-        const txt = `📄 *FACTURA DE VENTA*\n\n👤 *Cliente:* ${v.cliente}\n💰 *Total:* $${v.total.toFixed(2)}\n🗓️ *Fecha:* ${v.fecha}\n\nGracias por su compra.`;
-        
+        const txt = `📄 *FACTURA PRO*\n👤 *Cliente:* ${v.cliente}\n💰 *Total:* $${v.total.toFixed(2)}\n🗓️ *Fecha:* ${v.fecha}`;
         if (navigator.share) {
             try {
                 const blob = generarPDF(v, false);
-                const file = new File([blob], `Factura_${v.cliente}.pdf`, { type: 'application/pdf' });
-                await navigator.share({ title: 'Recibo de Pago', text: txt, files: [file] });
+                const file = new File([blob], `Factura.pdf`, { type: 'application/pdf' });
+                await navigator.share({ title: 'Factura', text: txt, files: [file] });
             } catch { window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); }
-        } else {
-            window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+        } else { window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); }
+    };
+
+    // FUNCIÓN PARA ELIMINAR VENTA DEL HISTORIAL
+    window.eliminarVenta = async (id) => {
+        if(confirm("¿Estás seguro de eliminar esta venta del historial? Esta acción no se puede deshacer.")) {
+            try {
+                await deleteDoc(doc(db, "ventas", id));
+                alert("Venta eliminada correctamente.");
+            } catch (e) { alert("Error al eliminar: " + e.message); }
         }
     };
 
@@ -300,6 +290,7 @@
             tablaVentas.innerHTML = ""; let gt = 0;
             snapshot.forEach(docSnap => {
                 const v = docSnap.data(); gt += v.total;
+                const vid = docSnap.id;
                 const vJson = JSON.stringify(v).replace(/'/g, "&apos;");
                 const listaP = v.productos.map(p => `• ${p.nombre}`).join("<br>");
                 
@@ -310,11 +301,12 @@
                     <td><small>${listaP}</small></td>
                     <td><b style="color:var(--primary)">$${v.total.toFixed(2)}</b></td>
                     <td class="action-btns">
-                        <button class="btn-main" onclick='generarPDF(${vJson})' title="Descargar"><i class="fas fa-download"></i></button>
+                        <button class="btn-main" onclick='generarPDF(${vJson})' title="Bajar PDF"><i class="fas fa-download"></i></button>
                         <button class="btn-share" onclick='compartir(${vJson})' title="Compartir"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-danger" onclick="eliminarVenta('${vid}')" title="Eliminar Venta"><i class="fas fa-trash-alt"></i></button>
                     </td></tr>`;
             });
-            granTotalHistorial.innerHTML = `Ventas Totales del Sistema: <span style="font-size:24px; margin-left:15px;">$${gt.toFixed(2)}</span>`;
+            granTotalHistorial.innerHTML = `Ventas Totales: <span style="font-size:24px; margin-left:15px;">$${gt.toFixed(2)}</span>`;
         });
     }
     window.generarPDF = (v) => generarPDF(v);
