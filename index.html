@@ -1,241 +1,414 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Ventas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Pro - Ventas & Stock</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary: #2563eb; --danger: #ef4444; --success: #22c55e; --dark: #1e293b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; margin: 0; color: var(--dark); }
+        
+        .container { width: 95%; max-width: 1200px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        
+        /* Diseño Responsive Table */
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: var(--primary); color: white; }
 
-<style>
-body{font-family:Arial;background:#f4f6f9;margin:0;}
-.container{width:90%;max-width:1100px;margin:30px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-input,select,button,textarea{width:100%;padding:8px;margin:5px 0;}
-button{background:#007bff;color:white;border:none;cursor:pointer;border-radius:5px;}
-button:hover{opacity:0.9;}
-.delete-btn{background:#dc3545;}
-.logout{background:#dc3545;}
-table{width:100%;border-collapse:collapse;margin-top:15px;}
-th,td{border:1px solid #ddd;padding:8px;text-align:center;}
-th{background:#007bff;color:white;}
-.admin-panel{background:#f1f1f1;padding:15px;border-radius:8px;margin-top:15px;}
-.note-box{background:#fff3cd;padding:15px;border-radius:8px;margin-top:15px;}
-</style>
+        /* Grid para inputs */
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        input, select, button { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+        
+        button { cursor: pointer; transition: 0.3s; font-weight: 600; border: none; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        
+        /* Carrito de Compras */
+        .cart-item { display: flex; justify-content: space-between; padding: 8px; background: #f1f5f9; margin-bottom: 5px; border-radius: 4px; }
+        
+        .status-on { color: var(--success); font-weight: bold; }
+        .status-off { color: var(--danger); font-weight: bold; }
+        
+        .admin-section { border: 2px solid #e2e8f0; padding: 20px; border-radius: 10px; margin-top: 30px; }
+    </style>
 </head>
-
 <body>
+
 <div class="container">
+    <div id="loginBox">
+        <h2><i class="fas fa-lock"></i> Acceso al Sistema</h2>
+        <input type="email" id="email" placeholder="Correo Electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button class="btn-main" onclick="login()">Entrar al Sistema</button>
+    </div>
 
-<div id="loginBox">
-  <h2>Login</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="login()">Ingresar</button>
-</div>
+    <div id="app" style="display:none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="infoUsuario"></h3>
+            <button class="btn-danger" onclick="logout()">Salir <i class="fas fa-sign-out-alt"></i></button>
+        </div>
 
-<div id="app" style="display:none;">
+        <hr>
 
-<h3 id="infoUsuario"></h3>
-<button class="logout" onclick="logout()">Cerrar sesión</button>
+        <section>
+            <h2><i class="fas fa-shopping-cart"></i> Nueva Venta</h2>
+            <div class="grid-form">
+                <input type="text" id="cliente" placeholder="Nombre del Cliente">
+                <input type="text" id="telefono" placeholder="Teléfono">
+                <select id="metodoPago">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                </select>
+            </div>
+            
+            <div class="grid-form" style="background: #f8fafc; padding: 15px; border-radius: 8px;">
+                <select id="productoSelect"></select>
+                <input type="number" id="cantidadVenta" value="1" min="1" placeholder="Cant.">
+                <button class="btn-success" onclick="agregarAlCarrito()">+ Añadir</button>
+            </div>
 
-<div id="panelAdmin" class="admin-panel" style="display:none;">
+            <div id="carritoContenedor">
+                <h4>Productos en esta venta:</h4>
+                <div id="listaCarrito"></div>
+                <h3 id="totalVentaTemporal">Total: $0.00</h3>
+                <button class="btn-main" style="width: auto; padding: 10px 40px;" onclick="finalizarVenta()">Confirmar y Generar Venta</button>
+            </div>
+        </section>
 
-<h2>Crear Usuario</h2>
-<input type="email" id="nuevoEmail" placeholder="Email">
-<input type="password" id="nuevoPassword" placeholder="Contraseña">
-<select id="nuevoRol">
-<option value="vendedor">Vendedor</option>
-<option value="admin">Admin</option>
-</select>
-<button onclick="crearUsuario()">Crear Usuario</button>
+        <div id="panelAdmin" class="admin-section" style="display:none;">
+            <h2><i class="fas fa-user-shield"></i> Panel de Control (Admin)</h2>
+            
+            <h3>Usuarios</h3>
+            <div class="grid-form">
+                <input type="email" id="nuevoEmail" placeholder="Nuevo Email">
+                <input type="password" id="nuevoPassword" placeholder="Contraseña">
+                <select id="nuevoRol">
+                    <option value="vendedor">Vendedor</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button class="btn-main" onclick="crearUsuario()">Registrar</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <tbody id="tablaUsuarios"></tbody>
+                </table>
+            </div>
 
-<hr>
+            <h3><i class="fas fa-boxes"></i> Inventario (Stock)</h3>
+            <div class="grid-form">
+                <input type="text" id="nombreProd" placeholder="Nombre Producto">
+                <input type="number" id="precioProd" placeholder="Precio $">
+                <input type="number" id="stockProd" placeholder="Stock Inicial">
+                <button class="btn-success" onclick="crearProducto()">Guardar Producto</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+                    <tbody id="tablaStock"></tbody>
+                </table>
+            </div>
+        </div>
 
-<h2>Administrar Productos</h2>
-<input type="text" id="nombreProducto" placeholder="Nombre del producto">
-<input type="number" id="precioProducto" placeholder="Precio">
-<input type="number" id="stockProducto" placeholder="Stock">
-<button onclick="crearProducto()">Crear Producto</button>
-<ul id="listaProductos"></ul>
-
-<hr>
-
-<h2>Bloc de Notas Privado</h2>
-<div class="note-box">
-<input type="text" id="notaPlataforma" placeholder="Plataforma">
-<input type="text" id="notaCorreo" placeholder="Correo">
-<input type="text" id="notaClave" placeholder="Clave">
-<button onclick="guardarNota()">Guardar Nota</button>
-<ul id="listaNotas"></ul>
-</div>
-
-</div>
-
-<hr>
-
-<h2>Nueva Venta</h2>
-<input type="text" id="cliente" placeholder="Cliente">
-<input type="text" id="telefono" placeholder="Teléfono">
-<select id="productoSelect"></select>
-<input type="text" id="metodoPago" placeholder="Método de Pago">
-<button onclick="guardarVenta()">Guardar Venta</button>
-
-<h2>Historial de Ventas</h2>
-<table>
-<thead>
-<tr>
-<th>Fecha</th>
-<th>Vendedor</th>
-<th>Cliente</th>
-<th>Producto</th>
-<th>Método</th>
-<th>Precio</th>
-<th>Acciones</th>
-</tr>
-</thead>
-<tbody id="tablaVentas"></tbody>
-</table>
-
-<h3 id="total"></h3>
-
-</div>
+        <h2><i class="fas fa-history"></i> Historial de Ventas</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha/Hora</th>
+                        <th>Vendedor</th>
+                        <th>Cliente</th>
+                        <th>Productos</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaVentas"></tbody>
+            </table>
+        </div>
+        <h3 id="granTotalHistorial"></h3>
+    </div>
 </div>
 
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, query, orderBy, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
+        authDomain: "sistema-ventas-64a4c.firebaseapp.com",
+        projectId: "sistema-ventas-64a4c",
+        storageBucket: "sistema-ventas-64a4c.firebasestorage.app",
+        messagingSenderId: "291577824119",
+        appId: "1:291577824119:web:894fe9842b427c9ac3d772"
+    };
 
-const firebaseConfig={
-apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-authDomain:"sistema-ventas-64a4c.firebaseapp.com",
-projectId:"sistema-ventas-64a4c",
-storageBucket:"sistema-ventas-64a4c.firebasestorage.app",
-messagingSenderId:"291577824119",
-appId:"1:291577824119:web:894fe9842b427c9ac3d772"
-};
+    const appFirebase = initializeApp(firebaseConfig);
+    const auth = getAuth(appFirebase);
+    const db = getFirestore(appFirebase);
 
-const appFirebase=initializeApp(firebaseConfig);
-const auth=getAuth(appFirebase);
-const db=getFirestore(appFirebase);
+    let usuarioActual = null;
+    let rolActual = null;
+    let carrito = [];
+    let productosData = []; // Para búsqueda rápida de stock
 
-let usuarioActual=null;
-let rolActual=null;
+    // --- AUTENTICACIÓN ---
+    window.login = async () => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+            const userSnap = await getDoc(doc(db, "usuarios", userCredential.user.uid));
+            
+            if (userSnap.exists() && userSnap.data().estado === "inactivo") {
+                await signOut(auth);
+                alert("Tu cuenta está desactivada. Contacta al administrador.");
+                return;
+            }
+        } catch (e) { alert("Error: " + e.message); }
+    };
 
-window.login=async()=>{
-await signInWithEmailAndPassword(auth,email.value,password.value);
-};
+    window.logout = () => signOut(auth);
 
-window.logout=()=>signOut(auth);
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const snap = await getDoc(doc(db, "usuarios", user.uid));
+            if (!snap.exists()) return;
+            
+            usuarioActual = user.email;
+            rolActual = snap.data().role;
+            
+            infoUsuario.innerHTML = `<i class="fas fa-user"></i> ${usuarioActual} (${rolActual})`;
+            loginBox.style.display = "none";
+            app.style.display = "block";
+            panelAdmin.style.display = (rolActual === "admin") ? "block" : "none";
 
-onAuthStateChanged(auth,async(user)=>{
-if(user){
-usuarioActual=user.email;
-const snap=await getDoc(doc(db,"usuarios",user.uid));
-rolActual=snap.data().role;
+            cargarStock();
+            cargarVentas();
+            if (rolActual === "admin") cargarUsuarios();
+        } else {
+            loginBox.style.display = "block";
+            app.style.display = "none";
+        }
+    });
 
-infoUsuario.innerText="Usuario: "+usuarioActual+" | Rol: "+rolActual;
-loginBox.style.display="none";
-app.style.display="block";
-panelAdmin.style.display=(rolActual==="admin")?"block":"none";
+    // --- GESTIÓN DE STOCK ---
+    function cargarStock() {
+        onSnapshot(collection(db, "productos"), (snapshot) => {
+            productoSelect.innerHTML = "";
+            tablaStock.innerHTML = "";
+            productosData = [];
+            
+            snapshot.forEach(docSnap => {
+                const p = docSnap.data();
+                const id = docSnap.id;
+                productosData.push({ id, ...p });
 
-cargarProductos();
-cargarVentas();
-if(rolActual==="admin") cargarNotas();
+                // Llenar select de ventas
+                productoSelect.innerHTML += `<option value="${id}">${p.nombre} ($${p.precio}) - Stock: ${p.stock}</option>`;
 
-}else{
-loginBox.style.display="block";
-app.style.display="none";
-}
-});
+                // Llenar tabla admin
+                tablaStock.innerHTML += `
+                    <tr>
+                        <td>${p.nombre}</td>
+                        <td>$${p.precio}</td>
+                        <td>${p.stock}</td>
+                        <td>
+                            <button onclick="editarProducto('${id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-danger" onclick="eliminarProducto('${id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
 
-/* VENTAS */
-function cargarVentas(){
-const q=query(collection(db,"ventas"),orderBy("timestamp","desc"));
-onSnapshot(q,(snapshot)=>{
-tablaVentas.innerHTML="";
-let totalVentas=0;
+    window.crearProducto = async () => {
+        await addDoc(collection(db, "productos"), {
+            nombre: nombreProd.value,
+            precio: parseFloat(precioProd.value),
+            stock: parseInt(stockProd.value)
+        });
+        alert("Producto agregado");
+    };
 
-snapshot.forEach(docSnap=>{
-const v=docSnap.data();
-totalVentas+=v.precio;
+    window.eliminarProducto = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "productos", id)); };
 
-let botones=`
-<button onclick="generarFactura('${docSnap.id}')">PDF</button>
-<button onclick="enviarWhatsApp('${docSnap.id}')">WhatsApp</button>
-`;
+    // --- CARRITO Y VENTAS ---
+    window.agregarAlCarrito = () => {
+        const id = productoSelect.value;
+        const cant = parseInt(cantidadVenta.value);
+        const prod = productosData.find(p => p.id === id);
 
-if(rolActual==="admin"){
-botones+=`
-<button onclick="editarVenta('${docSnap.id}')">Editar</button>
-<button class="delete-btn" onclick="eliminarVenta('${docSnap.id}')">Eliminar</button>`;
-}
+        if (cant > prod.stock) return alert("No hay suficiente stock");
 
-if(rolActual==="vendedor" && v.vendedor===usuarioActual){
-botones+=`<button onclick="editarVenta('${docSnap.id}')">Editar</button>`;
-}
+        carrito.push({ ...prod, cantidad: cant, subtotal: prod.precio * cant });
+        renderCarrito();
+    };
 
-tablaVentas.innerHTML+=`
-<tr>
-<td>${v.fecha}</td>
-<td>${v.vendedor}</td>
-<td>${v.cliente}</td>
-<td>${v.producto}</td>
-<td>${v.metodoPago}</td>
-<td>$${v.precio}</td>
-<td>${botones}</td>
-</tr>`;
-});
+    function renderCarrito() {
+        listaCarrito.innerHTML = "";
+        let t = 0;
+        carrito.forEach((item, index) => {
+            t += item.subtotal;
+            listaCarrito.innerHTML += `
+                <div class="cart-item">
+                    ${item.nombre} x ${item.cantidad} - $${item.subtotal}
+                    <button onclick="quitarDelCarrito(${index})">❌</button>
+                </div>`;
+        });
+        totalVentaTemporal.innerText = `Total: $${t.toFixed(2)}`;
+    }
 
-total.innerText="Total: $"+totalVentas;
-});
-}
+    window.quitarDelCarrito = (i) => { carrito.splice(i, 1); renderCarrito(); };
 
-window.editarVenta=async(id)=>{
-const snap=await getDoc(doc(db,"ventas",id));
-const v=snap.data();
-const c=prompt("Cliente:",v.cliente);
-const m=prompt("Método:",v.metodoPago);
-const p=parseFloat(prompt("Precio:",v.precio));
-await updateDoc(doc(db,"ventas",id),{cliente:c,metodoPago:m,precio:p});
-};
+    window.finalizarVenta = async () => {
+        if (carrito.length === 0) return alert("Carrito vacío");
+        
+        const total = carrito.reduce((sum, item) => sum + item.subtotal, 0);
+        const ventaData = {
+            cliente: cliente.value,
+            telefono: telefono.value,
+            vendedor: usuarioActual,
+            metodoPago: metodoPago.value,
+            productos: carrito,
+            total: total,
+            fecha: new Date().toLocaleString(),
+            timestamp: new Date()
+        };
 
-window.eliminarVenta=async(id)=>{
-if(confirm("¿Eliminar venta?")){
-await deleteDoc(doc(db,"ventas",id));
-}
-};
+        try {
+            // 1. Guardar Venta
+            const docRef = await addDoc(collection(db, "ventas"), ventaData);
+            
+            // 2. Descontar Stock
+            for (const item of carrito) {
+                await updateDoc(doc(db, "productos", item.id), {
+                    stock: increment(-item.cantidad)
+                });
+            }
 
-/* NOTAS PRIVADAS */
-window.guardarNota=async()=>{
-await addDoc(collection(db,"notas"),{
-plataforma:notaPlataforma.value,
-correo:notaCorreo.value,
-clave:notaClave.value,
-fecha:new Date().toLocaleString()
-});
-};
+            alert("Venta realizada con éxito");
+            generarFactura(ventaData); // Generar PDF
+            carrito = [];
+            renderCarrito();
+        } catch (e) { alert("Error: " + e.message); }
+    };
 
-function cargarNotas(){
-onSnapshot(collection(db,"notas"),(snapshot)=>{
-listaNotas.innerHTML="";
-snapshot.forEach(docSnap=>{
-const n=docSnap.data();
-listaNotas.innerHTML+=`
-<li>
-${n.plataforma} | ${n.correo} | ${n.clave}
-<button class="delete-btn" onclick="eliminarNota('${docSnap.id}')">Eliminar</button>
-</li>`;
-});
-});
-}
+    // --- HISTORIAL Y PDF ---
+    function cargarVentas() {
+        const q = query(collection(db, "ventas"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            tablaVentas.innerHTML = "";
+            let gTotal = 0;
+            snapshot.forEach(docSnap => {
+                const v = docSnap.data();
+                gTotal += v.total;
+                const prods = v.productos.map(p => p.nombre).join(", ");
+                
+                tablaVentas.innerHTML += `
+                    <tr>
+                        <td>${v.fecha}</td>
+                        <td>${v.vendedor}</td>
+                        <td>${v.cliente}</td>
+                        <td>${prods}</td>
+                        <td>$${v.total.toFixed(2)}</td>
+                        <td>
+                            <button onclick='reimprimirFactura(${JSON.stringify(v)})'><i class="fas fa-file-pdf"></i></button>
+                        </td>
+                    </tr>`;
+            });
+            granTotalHistorial.innerText = "Total Histórico: $" + gTotal.toFixed(2);
+        });
+    }
 
-window.eliminarNota=async(id)=>{
-await deleteDoc(doc(db,"notas",id));
-};
+    function generarFactura(v) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Encabezado Empresa
+        doc.setFontSize(20);
+        doc.text("MI EMPRESA S.A.", 105, 20, { align: "center" });
+        doc.setFontSize(10);
+        doc.text("Nit: 123456789-0 | Tel: " + v.telefono, 105, 28, { align: "center" });
+
+        // Detalles Venta
+        doc.text(`Factura de Venta`, 15, 40);
+        doc.text(`Fecha/Hora: ${v.fecha}`, 15, 46);
+        doc.text(`Cliente: ${v.cliente}`, 15, 52);
+        doc.text(`Vendedor: ${v.vendedor}`, 15, 58);
+        doc.text(`Método de Pago: ${v.metodoPago}`, 15, 64);
+
+        // Tabla de Productos
+        const body = v.productos.map(p => [p.nombre, p.cantidad, `$${p.precio}`, `$${p.subtotal}`]);
+        doc.autoTable({
+            startY: 75,
+            head: [['Producto', 'Cant', 'Precio Unit.', 'Subtotal']],
+            body: body,
+        });
+
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(14);
+        doc.text(`TOTAL A PAGAR: $${v.total.toFixed(2)}`, 140, finalY);
+
+        doc.save(`Factura_${v.cliente}_${Date.now()}.pdf`);
+    }
+    window.reimprimirFactura = (v) => generarFactura(v);
+
+    // --- GESTIÓN USUARIOS (ADMIN) ---
+    function cargarUsuarios() {
+        onSnapshot(collection(db, "usuarios"), (snapshot) => {
+            tablaUsuarios.innerHTML = "";
+            snapshot.forEach(docSnap => {
+                const u = docSnap.data();
+                const id = docSnap.id;
+                const estadoTxt = u.estado === "activo" ? "Activo" : "Inactivo";
+                const btnColor = u.estado === "activo" ? "btn-danger" : "btn-success";
+                
+                tablaUsuarios.innerHTML += `
+                    <tr>
+                        <td>${u.email}</td>
+                        <td>${u.role}</td>
+                        <td class="status-${u.estado === 'activo' ? 'on' : 'off'}">${estadoTxt}</td>
+                        <td>
+                            <button class="${btnColor}" onclick="toggleUser('${id}', '${u.estado}')">
+                                ${u.estado === 'activo' ? 'Apagar' : 'Prender'}
+                            </button>
+                            <button class="btn-danger" onclick="eliminarUsuario('${id}')"><i class="fas fa-user-minus"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    window.crearUsuario = async () => {
+        try {
+            const emailN = nuevoEmail.value;
+            const passN = nuevoPassword.value;
+            const rolN = nuevoRol.value;
+            // Nota: Firebase Auth no permite crear usuarios sin cerrar sesión actual fácilmente.
+            // Aquí se usa addDoc en la colección usuarios para que el admin los registre manualmente.
+            alert("Para nuevos usuarios, el admin debe registrarlos en la consola de Firebase o usar una Cloud Function. Por seguridad, los agregaremos a la base de datos.");
+            await setDoc(doc(db, "usuarios", Date.now().toString()), {
+                email: emailN,
+                role: rolN,
+                estado: "activo"
+            });
+        } catch (e) { alert(e.message); }
+    };
+
+    window.toggleUser = async (id, estadoActual) => {
+        const nuevoEstado = estadoActual === "activo" ? "inactivo" : "activo";
+        await updateDoc(doc(db, "usuarios", id), { estado: nuevoEstado });
+    };
+
+    window.eliminarUsuario = async (id) => { if(confirm("¿Eliminar usuario?")) await deleteDoc(doc(db, "usuarios", id)); };
 
 </script>
 </body>
