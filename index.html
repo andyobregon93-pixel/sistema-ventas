@@ -1,424 +1,456 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMERCIO PRO - Ventas Avanzado</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { --primary: #1e40af; --secondary: #64748b; --danger: #dc2626; --success: #10b981; --warning: #f59e0b; --dark: #0f172a; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; transition: 0.3s; }
-        body.dark { background: #0f172a; color: #e2e8f0; }
-        .container { width: 95%; max-width: 1400px; margin: 20px auto; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        body.dark .container { background: #1e293b; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 12px 24px; border-radius: 40px; z-index: 999; animation: fadeOut 3s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        input, select, button { padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; }
-        button { cursor: pointer; font-weight: 600; border: none; display: inline-flex; align-items: center; gap: 8px; justify-content: center; transition: 0.2s; }
-        .btn-main { background: var(--primary); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; }
-        .badge-pendiente { background: #fef3c7; color: #92400e; }
-        .badge-pagado { background: #d1fae5; color: #065f46; }
-        .badge-enviado { background: #dbeafe; color: #1e40af; }
-        .stats-card { background: #f8fafc; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        body.dark .stats-card { background: #334155; }
-        canvas { max-height: 300px; }
-        .producto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .producto-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
-        .producto-card:hover { transform: translateY(-4px); }
-        .producto-img { height: 120px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--primary); }
-        .producto-info { padding: 12px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEMBRESÍA VIP 🍄‍🟫 - FACTURACIÓN PROFESIONAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* === TEMAS DORADO PREMIUM === */
+:root {
+    --bg: #1c180f;
+    --card-bg: #2c261b;
+    --text: #fff3e0;
+    --primary: #f5b042;
+    --primary-dark: #e09d32;
+    --primary-light: #ffe0a3;
+    --accent: #ffd966;
+    --danger: #ff6644;
+    --warning: #ffaa33;
+    --success: #d4af37;
+    --border: #4a3e2c;
+    --input-bg: #3a301f;
+    --sidebar-bg: #1c180fcc;
+    --table-header: #2c2418;
+    --progress-bg: #4a3e2c;
+}
+[data-theme="light"] {
+    --bg: #fef7e6;
+    --card-bg: #ffffff;
+    --text: #3a2a1a;
+    --primary: #d4af37;
+    --primary-dark: #b8902a;
+    --primary-light: #fce9b4;
+    --accent: #f5bc70;
+    --border: #e6d5b8;
+    --input-bg: #fff7e8;
+    --sidebar-bg: #fef7e6cc;
+    --table-header: #f5e6ce;
+    --progress-bg: #e6d5b8;
+}
+* { box-sizing: border-box; transition: background 0.2s, color 0.2s, border 0.2s; }
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin:0; 
+    overflow-x: hidden;
+}
+body::before {
+    content: "✨🍄‍🟫✨";
+    font-size: 300px;
+    position: fixed;
+    bottom: -100px;
+    right: -100px;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
+}
+.sidebar { 
+    width: 100%; 
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(12px);
+    padding: 12px 20px; 
+    display: flex; 
+    overflow-x: auto; 
+    gap: 12px; 
+    border-bottom: 2px solid var(--primary);
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    scrollbar-width: none;
+    align-items: center;
+}
+.sidebar::-webkit-scrollbar { display: none; }
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    padding: 6px 18px;
+    border-radius: 60px;
+    font-weight: 800;
+    font-size: 1.2rem;
+    box-shadow: 0 0 15px rgba(245,176,66,0.6);
+    margin-right: 16px;
+    white-space: nowrap;
+    color: #1c180f;
+}
+.nav-btn { 
+    background: var(--card-bg); 
+    color: var(--text); 
+    padding: 10px 20px; 
+    border-radius: 40px; 
+    font-size: 13px; 
+    font-weight: 800; 
+    white-space: nowrap; 
+    border: 1px solid var(--border);
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.nav-btn.active { 
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #1c180f; 
+    box-shadow: 0 0 12px rgba(245,176,66,0.8);
+    border-color: var(--accent);
+}
+.nav-btn:hover:not(.active) { transform: translateY(-2px); background: var(--primary-dark); color: white; }
+.container{padding: 20px; max-width: 1000px; margin: auto;}
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.card{
+    background: var(--card-bg);
+    backdrop-filter: blur(4px);
+    padding: 24px;
+    border-radius: 32px;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+input,button,select,textarea{
+    width:100%;
+    padding: 12px 16px;
+    margin-top: 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-sizing: border-box;
+    font-family: inherit;
+    font-weight: 500;
+    background: var(--input-bg);
+    color: var(--text);
+}
+button{
+    background: linear-gradient(95deg, var(--primary), var(--accent));
+    color: #1c180f;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+}
+button:active { transform: scale(0.97); }
+.table-container { width: 100%; overflow-x: auto; border-radius: 24px; background: var(--card-bg); margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
+th { background: var(--table-header); color: var(--primary); padding: 14px 12px; text-align: left; font-weight: 800; }
+td { padding: 12px 12px; border-bottom: 1px solid var(--border); }
+.datos-detalle { background: var(--input-bg); padding: 8px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 6px; border: 1px dashed var(--primary); }
+.btn-small { width: auto; padding: 6px 12px; font-size: 11px; margin: 3px; border-radius: 30px; font-weight: 700; }
+.badge { padding: 4px 10px; border-radius: 40px; background: var(--border); }
+.logout, .theme-toggle { width: auto; padding: 8px 18px; margin-left: auto; }
+.btn-clear { background: var(--danger); color: white; }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4a3e2c; transition: .3s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--success); }
+input:checked + .slider:before { transform: translateX(20px); }
+.progress-bar-container { background: var(--progress-bg); border-radius: 20px; height: 10px; width: 100%; margin: 8px 0; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 20px; width: 0%; transition: width 0.3s; }
+.clientes-grid, .notas-grid, .pagos-grid, .facturas-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 15px; }
+.cliente-card, .nota-card, .pago-card, .factura-card { background: var(--card-bg); border-radius: 24px; padding: 16px; border-left: 5px solid var(--primary); }
+.flex-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.pago-enlace { display: inline-block; margin-top: 10px; background: var(--primary); color: #1c180f; padding: 8px 16px; border-radius: 40px; text-decoration: none; font-weight: bold; }
+.invoice { background: white; color: #1a1a2e; padding: 20px; border-radius: 20px; max-width: 800px; margin: auto; font-family: monospace; }
+.invoice h2, .invoice h3 { color: #d4af37; }
+@media print {
+    body * { visibility: hidden; }
+    .invoice-print, .invoice-print * { visibility: visible; }
+    .invoice-print { position: absolute; top: 0; left: 0; width: 100%; }
+}
+</style>
 </head>
 <body>
-<div class="container">
-    <div id="loginBox" style="max-width: 400px; margin: 100px auto; text-align: center;">
-        <i class="fas fa-store fa-3x" style="color: var(--primary);"></i>
-        <h2>Acceso al Comercio Digital</h2>
-        <input type="email" id="email" placeholder="Correo" style="width:90%; margin-bottom:15px;"><br>
-        <input type="password" id="password" placeholder="Contraseña" style="width:90%; margin-bottom:15px;"><br>
-        <button class="btn-main" onclick="login()" style="width:95%">Ingresar</button>
-    </div>
-
-    <div id="app" style="display:none;">
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
-            <h3 id="infoUsuario"></h3>
-            <div>
-                <button class="btn-warning" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Modo</button>
-                <button class="btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
-            </div>
-        </header>
-
-        <!-- PANEL ADMIN -->
-        <div id="panelAdmin" style="display:none; margin-bottom: 30px;">
-            <div class="admin-section" style="background: #f1f5f9; padding: 20px; border-radius: 24px;">
-                <h3><i class="fas fa-chart-line"></i> Dashboard</h3>
-                <div class="grid-form">
-                    <div class="stats-card"><i class="fas fa-chart-simple"></i><h4 id="totalVentasHoy">$0</h4><small>Ventas hoy</small></div>
-                    <div class="stats-card"><i class="fas fa-box"></i><h4 id="productosBajoStock">0</h4><small>Productos con stock bajo</small></div>
-                    <div class="stats-card"><i class="fas fa-tags"></i><h4 id="cuponesActivos">0</h4><small>Cupones activos</small></div>
-                </div>
-                <canvas id="ventasChart" width="400" height="200"></canvas>
-            </div>
-
-            <div style="background: white; padding: 20px; border-radius: 24px; margin-top: 20px;">
-                <h3><i class="fas fa-tags"></i> Cupones de Descuento</h3>
-                <div class="grid-form">
-                    <input type="text" id="codigoCupon" placeholder="Código (ej: PRO20)">
-                    <input type="number" id="descuentoCupon" placeholder="Descuento %">
-                    <input type="date" id="fechaExpiracion">
-                    <button class="btn-success" onclick="crearCupon()">Crear Cupón</button>
-                </div>
-                <div class="table-container" style="overflow-x: auto;">
-                    <table style="width:100%"><thead><tr><th>Código</th><th>Descuento</th><th>Válido hasta</th><th>Acción</th></tr></thead><tbody id="tablaCupones"></tbody></table>
-                </div>
-            </div>
-
-            <div style="background: white; padding: 20px; border-radius: 24px; margin-top: 20px;">
-                <h3><i class="fas fa-users-cog"></i> Usuarios</h3>
-                <div class="grid-form">
-                    <input type="email" id="nuevoEmail" placeholder="Email">
-                    <input type="password" id="nuevoPassword" placeholder="Contraseña">
-                    <select id="nuevoRol"><option value="vendedor">Vendedor</option><option value="admin">Admin</option></select>
-                    <button class="btn-main" onclick="crearUsuario()">Registrar</button>
-                </div>
-                <div class="table-container"><table><thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="tablaUsuarios"></tbody></table></div>
-            </div>
-
-            <div style="background: white; padding: 20px; border-radius: 24px; margin-top: 20px;">
-                <h3><i class="fas fa-box-open"></i> Inventario + Categorías</h3>
-                <div class="grid-form">
-                    <input type="text" id="nombreProd" placeholder="Producto">
-                    <input type="number" id="precioProd" placeholder="Precio">
-                    <input type="number" id="stockProd" placeholder="Stock">
-                    <select id="categoriaProd">
-                        <option value="Electrónica">Electrónica</option><option value="Ropa">Ropa</option><option value="Hogar">Hogar</option>
-                    </select>
-                    <button class="btn-success" onclick="crearProducto()">Guardar</button>
-                </div>
-                <div class="table-container"><table><thead><tr><th>Producto</th><th>Cat</th><th>Precio</th><th>Stock</th><th>Acción</th></tr></thead><tbody id="tablaStock"></tbody></table></div>
-            </div>
-        </div>
-
-        <!-- VENTAS RÁPIDAS -->
-        <section>
-            <h2><i class="fas fa-cart-shopping"></i> Nueva Venta</h2>
-            <div class="grid-form">
-                <div><label>Cliente</label><input type="text" id="cliente" placeholder="Nombre"></div>
-                <div><label>NIT/Cédula</label><input type="text" id="nit" placeholder="ID"></div>
-                <div><label>Método Pago</label><select id="metodoPago"><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option></select></div>
-                <div><label>Cupón descuento</label><input type="text" id="cuponAplicado" placeholder="Código"><button class="btn-main" onclick="aplicarCupon()">Aplicar</button></div>
-            </div>
-
-            <!-- Catálogo visual -->
-            <h4>🛍️ Catálogo (haz clic para agregar)</h4>
-            <div id="catalogoGrid" class="producto-grid"></div>
-
-            <div id="carritoContenedor">
-                <div id="listaCarrito"></div>
-                <div style="text-align: right;"><h2 id="totalVentaTemporal">Total: $0.00</h2>
-                <button class="btn-main" onclick="finalizarVenta()"><i class="fas fa-check-double"></i> Procesar venta</button></div>
-            </div>
-        </section>
-
-        <!-- Historial con filtros -->
-        <section style="margin-top: 50px;">
-            <h2><i class="fas fa-history"></i> Historial de Ventas</h2>
-            <div class="grid-form">
-                <input type="date" id="filtroFechaInicio">
-                <input type="date" id="filtroFechaFin">
-                <button class="btn-main" onclick="filtrarVentas()">Filtrar</button>
-                <button class="btn-warning" onclick="exportarExcel()">Exportar Excel</button>
-            </div>
-            <div class="table-container">
-                <table><thead><tr><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Items</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaVentas"></tbody></table>
-            </div>
-            <div style="background: var(--dark); color: white; padding: 20px; text-align: right;"><h3 id="granTotalHistorial">Ventas Totales: $0.00</h3></div>
-        </section>
+<div id="login" class="container">
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 64px;">✨🍄‍🟫✨</div>
+        <h1 style="background: linear-gradient(135deg,var(--primary),var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent;">MEMBRESÍA VIP DORADA</h1>
+        <input id="log-email" placeholder="Usuario">
+        <input id="log-pass" type="password" placeholder="Clave">
+        <button onclick="handleLogin()">⚜️ INGRESAR ⚜️</button>
     </div>
 </div>
-
+<div id="app" style="display:none">
+    <div class="sidebar">
+        <div class="logo-area"><span>✨🍄‍🟫✨</span> <strong>VIP DORADO</strong></div>
+        <button class="nav-btn seller-only" data-page="p-solicitar">🎁 Pedir Cuenta</button>
+        <button class="nav-btn" data-page="p-quejas">📩 Chat Soporte</button>
+        <button class="nav-btn admin-only" data-page="p-cuentas">📺 Stock Público</button>
+        <button class="nav-btn admin-only" data-page="p-notas">📓 Block Notas</button>
+        <button class="nav-btn admin-only" data-page="p-pedidos">📊 Historial</button>
+        <button class="nav-btn admin-only" data-page="p-clientes">📋 Clientes</button>
+        <button class="nav-btn admin-only" data-page="p-pagos">💰 Métodos de Pago</button>
+        <button class="nav-btn admin-only" data-page="p-facturas">🧾 Facturas</button>
+        <button class="nav-btn admin-only" data-page="p-admin">🔑 Accesos</button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Modo</button>
+        <button class="logout" onclick="logout()">Salir</button>
+    </div>
+    <div class="container">
+        <!-- PEDIR CUENTA -->
+        <div id="p-solicitar" class="page">
+            <div class="card">
+                <h3>🎟️ Reclamar cuenta VIP</h3>
+                <input id="c-cliente-nombre" placeholder="Nombre completo">
+                <input id="c-cliente-phone" placeholder="Celular (Ej: +593987654321)">
+                <select id="select-plataforma"><option>Cargando...</option></select>
+                <div id="stock-info" class="stock-indicator">📦 Stock disponible: <span class="stock-value">--</span></div>
+                <div id="precio-info" class="precio-indicator">💰 Precio: --</div>
+                <button id="btn-pedir" onclick="pedirCuenta()">🔥 OBTENER ACCESO</button>
+                <div id="resultado-entrega"></div>
+            </div>
+            <div class="card" id="metodos-pago-cliente">
+                <h3>💳 Métodos de pago disponibles</h3>
+                <div id="lista-pagos-cliente" class="pagos-grid">Cargando...</div>
+            </div>
+        </div>
+        <!-- SOPORTE -->
+        <div id="p-quejas" class="page">
+            <div class="card"><h3>💬 Buzón de Soporte</h3>
+                <input id="q-nombre" placeholder="Tu Nombre"><input id="q-phone" placeholder="Tu número">
+                <textarea id="q-texto" placeholder="¿En qué ayudarte?"></textarea>
+                <button onclick="enviarQueja()">✉️ Enviar mensaje</button>
+            </div>
+            <div class="admin-only"><div class="card"><h3>📨 Mensajes</h3><div id="lista-quejas"></div></div></div>
+        </div>
+        <!-- STOCK PÚBLICO con precio -->
+        <div id="p-cuentas" class="page">
+            <div class="card"><h3>➕ Agregar al Stock</h3>
+                <input id="c-app" placeholder="App"><textarea id="c-datos" placeholder="Datos"></textarea>
+                <input id="c-cupo" type="number" placeholder="Stock">
+                <input id="c-precio" type="number" step="0.01" placeholder="Precio unitario (USD)">
+                <button onclick="addCuenta()">📤 Subir</button>
+            </div>
+            <div class="card"><div class="table-container"><table><thead><tr><th>App + Datos</th><th>Stock</th><th>Precio</th><th>Acciones</th></tr></thead><tbody id="lista-cuentas-admin"></tbody></table></div></div>
+        </div>
+        <!-- NOTAS -->
+        <div id="p-notas" class="page">
+            <div class="card"><h3>📝 Mis Notas / Stocks Internos</h3>
+                <input id="nota-titulo" placeholder="Título"><textarea id="nota-contenido" placeholder="Datos completos..." rows="3"></textarea>
+                <button onclick="agregarNota()">➕ Guardar Nota</button>
+            </div>
+            <div class="card"><h3>📚 Lista de Notas</h3><div id="lista-notas-container" class="notas-grid"></div></div>
+        </div>
+        <!-- HISTORIAL -->
+        <div id="p-pedidos" class="page">
+            <div class="card"><h3>📜 Historial General</h3><div class="table-container"><table><thead><tr><th>Miembro</th><th>App</th><th>WhatsApp</th><th>Total</th><th>Acción</th></tr></thead><tbody id="historial-tabla-body"></tbody></table></div><button class="btn-clear" onclick="limpiarHistorial()">🗑️ Vaciar Historial</button></div>
+        </div>
+        <!-- CLIENTES -->
+        <div id="p-clientes" class="page">
+            <div class="card"><h3>📋 Registrar Cliente</h3>
+                <input id="cli-nombre" placeholder="Nombre"><input id="cli-telefono" placeholder="Teléfono">
+                <input id="cli-metodos-pago" placeholder="Métodos de pago (Ej: Efectivo, Transferencia)">
+                <label>📅 Último pago</label><input type="date" id="cli-fecha-pago">
+                <label>⏰ Fecha de corte</label><input type="date" id="cli-fecha-corte">
+                <button onclick="agregarCliente()">➕ Guardar</button>
+            </div>
+            <div class="card"><h3>📋 Clientes</h3><div id="lista-clientes-container" class="clientes-grid"></div></div>
+        </div>
+        <!-- MÉTODOS DE PAGO ADMIN -->
+        <div id="p-pagos" class="page">
+            <div class="card"><h3>💳 Configurar métodos de pago</h3>
+                <input id="pago-nombre" placeholder="Nombre (Ej: PayPal, Transferencia)">
+                <input id="pago-enlace" placeholder="Enlace o datos (Ej: https://paypal.me/tuusuario)">
+                <select id="pago-tipo"><option value="paypal">PayPal</option><option value="transferencia">Transferencia</option><option value="cripto">Criptomoneda</option><option value="otro">Otro</option></select>
+                <button onclick="agregarMetodoPago()">➕ Agregar método</button>
+            </div>
+            <div class="card"><h3>📋 Métodos activos</h3><div id="lista-pagos-admin" class="pagos-grid"></div></div>
+        </div>
+        <!-- FACTURAS (admin) -->
+        <div id="p-facturas" class="page">
+            <div class="card"><h3>🧾 Historial de Facturas</h3><div id="lista-facturas" class="facturas-grid"></div></div>
+        </div>
+        <!-- ADMIN USUARIOS -->
+        <div id="p-admin" class="page">
+            <div class="card"><h3>👑 Crear Admin/Seller</h3>
+                <input id="new-email" placeholder="Correo"><input id="new-pass" type="password" placeholder="Clave">
+                <select id="new-role"><option value="seller">SELLER</option><option value="admin">ADMIN</option></select>
+                <button onclick="crearUsuario()">Crear Acceso</button>
+            </div>
+            <div class="card"><h3>🔐 Usuarios</h3><div id="lista-usuarios-admin"></div></div>
+        </div>
+    </div>
+</div>
+<!-- Modal de factura (oculto) -->
+<div id="invoiceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; overflow:auto; padding:20px;">
+    <div style="max-width:800px; margin:20px auto; background:var(--card-bg); border-radius:32px; padding:20px;">
+        <div id="invoiceContent"></div>
+        <div class="flex-btns" style="margin-top:20px;">
+            <button onclick="printInvoice()">🖨️ Imprimir Factura</button>
+            <button onclick="closeInvoiceModal()">❌ Cerrar</button>
+        </div>
+    </div>
+</div>
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, query, orderBy, onSnapshot, increment, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = { /* TU CONFIGURACIÓN ORIGINAL */ 
-        apiKey: "AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM",
-        authDomain: "sistema-ventas-64a4c.firebaseapp.com",
-        projectId: "sistema-ventas-64a4c",
-        storageBucket: "sistema-ventas-64a4c.firebasestorage.app",
-        messagingSenderId: "291577824119",
-        appId: "1:291577824119:web:894fe9842b427c9ac3d772"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, getDocs, query, deleteDoc, doc, updateDoc, serverTimestamp, orderBy, writeBatch, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const firebaseConfig = { apiKey:"AIzaSyArnqs6NzzauyMJlx6w3vfUaQqZaithGpM", authDomain:"sistema-ventas-64a4c.firebaseapp.com", projectId:"sistema-ventas-64a4c" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const MASTER = "andyobregon799@gmail.com";
+let cuentasMap = new Map(); // id -> {app, cupo, precio}
+window.toggleTheme = () => { const current = document.documentElement.getAttribute('data-theme'); if (current === 'light') document.documentElement.setAttribute('data-theme', 'dark'); else document.documentElement.setAttribute('data-theme', 'light'); };
+window.showPage = (pageId, btnElement) => { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); if (btnElement) btnElement.classList.add('active'); };
+function setDefaultPage(isAdmin) { let defaultPageId = isAdmin ? 'p-cuentas' : 'p-solicitar'; let defaultButton = document.querySelector(`.nav-btn[data-page="${defaultPageId}"]`); if (defaultButton) showPage(defaultPageId, defaultButton); else showPage(defaultPageId, null); }
+window.handleLogin = async () => { const e = document.getElementById("log-email").value.trim(); const p = document.getElementById("log-pass").value.trim(); if (!e || !p) return alert("Completa ambos campos."); try { if(e !== MASTER) { const userDoc = await getDoc(doc(db, "usuarios_permisos", e)); if (!userDoc.exists() || !userDoc.data().estado) return alert("No autorizado."); } await signInWithEmailAndPassword(auth, e, p); } catch (err) { alert("Error credenciales."); } };
+window.logout = () => signOut(auth).then(() => location.reload());
+// CLIENTES
+function calcularDiasRestantes(fechaCorteStr) { if (!fechaCorteStr) return null; const hoy = new Date(); hoy.setHours(0,0,0,0); const corte = new Date(fechaCorteStr); if (isNaN(corte)) return null; return Math.ceil((corte - hoy) / (1000*60*60*24)); }
+function getColorPorDias(dias) { if (dias === null) return "#b8860b"; if (dias < 0) return "#ff6644"; if (dias <= 2) return "#ffaa33"; if (dias <= 7) return "#f5b042"; return "#d4af37"; }
+function renderClientes(clientesData) { const sorted = [...clientesData].sort((a,b) => new Date(a.fechaCorte||'9999') - new Date(b.fechaCorte||'9999')); let html = ""; for (const c of sorted) { const dias = calcularDiasRestantes(c.fechaCorte); let progressPercent = 0, statusText = ""; if (dias !== null) { let maxDias = 30; if (dias <= 0) progressPercent = 100; else if (dias >= maxDias) progressPercent = 0; else progressPercent = 100 - (dias / maxDias * 100); progressPercent = Math.min(100, Math.max(0, progressPercent)); statusText = dias < 0 ? `⚠️ Vencido hace ${Math.abs(dias)} días` : `📅 ${dias} días restantes`; } else { statusText = "Sin fecha"; progressPercent = 0; } const colorFill = getColorPorDias(dias); const metodosPago = c.metodosPago ? c.metodosPago : "No especificado"; html += `<div class="cliente-card"><strong>👤 ${c.nombre}</strong><br>📞 ${c.telefono}<br>💳 Métodos de pago: <span style="color:var(--accent); font-weight:bold;">${metodosPago}</span><br>💰 Último pago: ${c.fechaPago || '—'}<br>⏰ Corte: ${c.fechaCorte || '—'} — ${statusText}<div class="progress-bar-container"><div class="progress-fill" style="width: ${progressPercent}%; background-color: ${colorFill};"></div></div><div class="flex-btns"><button class="btn-small" style="background:var(--primary);color:#1c180f;" onclick="editarCliente('${c.id}','${c.nombre.replace(/'/g, "\\'")}','${c.telefono}','${c.metodosPago ? c.metodosPago.replace(/'/g, "\\'") : ''}','${c.fechaPago}','${c.fechaCorte}')">✏️ Editar</button><button class="btn-small" style="background:var(--danger);color:white;" onclick="eliminarCliente('${c.id}')">🗑️ Eliminar</button></div></div>`; } document.getElementById("lista-clientes-container").innerHTML = html || "<p>Sin clientes registrados.</p>"; }
+window.agregarCliente = async () => { const nombre = document.getElementById("cli-nombre").value.trim(); const telefono = document.getElementById("cli-telefono").value.trim(); const metodosPago = document.getElementById("cli-metodos-pago").value.trim(); const fechaPago = document.getElementById("cli-fecha-pago").value; const fechaCorte = document.getElementById("cli-fecha-corte").value; if (!nombre || !telefono) return alert("Nombre y teléfono obligatorios."); if (!fechaPago || !fechaCorte) return alert("Selecciona ambas fechas."); await addDoc(collection(db, "clientes"), { nombre, telefono, metodosPago: metodosPago || "No registrado", fechaPago, fechaCorte, creado: serverTimestamp() }); document.getElementById("cli-nombre").value = ""; document.getElementById("cli-telefono").value = ""; document.getElementById("cli-metodos-pago").value = ""; document.getElementById("cli-fecha-pago").value = ""; document.getElementById("cli-fecha-corte").value = ""; };
+window.editarCliente = async (id, nom, tel, metodos, pago, corte) => { const nuevoNom = prompt("Nuevo nombre:", nom) || nom; const nuevoTel = prompt("Nuevo teléfono:", tel) || tel; const nuevoMetodos = prompt("Métodos de pago (Ej: Efectivo, Transferencia):", metodos) || metodos; const nuevoPago = prompt("Fecha pago (AAAA-MM-DD):", pago) || pago; const nuevoCorte = prompt("Fecha corte (AAAA-MM-DD):", corte) || corte; await updateDoc(doc(db, "clientes", id), { nombre: nuevoNom, telefono: nuevoTel, metodosPago: nuevoMetodos, fechaPago: nuevoPago, fechaCorte: nuevoCorte }); };
+window.eliminarCliente = async (id) => { if(confirm("Eliminar cliente?")) await deleteDoc(doc(db, "clientes", id)); };
+// NOTAS
+window.agregarNota = async () => { const titulo = document.getElementById("nota-titulo").value.trim(); const contenido = document.getElementById("nota-contenido").value.trim(); if (!titulo || !contenido) return alert("Título y contenido requeridos"); await addDoc(collection(db, "notas_admin"), { titulo, contenido, fecha: serverTimestamp() }); document.getElementById("nota-titulo").value = ""; document.getElementById("nota-contenido").value = ""; };
+window.editarNota = async (id, tit, cont) => { const nt = prompt("Editar título:", tit); if(nt===null) return; const nc = prompt("Editar contenido:", cont); if(nc===null) return; await updateDoc(doc(db, "notas_admin", id), { titulo: nt, contenido: nc }); };
+window.eliminarNota = async (id) => { if(confirm("Eliminar nota?")) await deleteDoc(doc(db, "notas_admin", id)); };
+window.subirNotaAlStock = async (titulo, contenido) => { let stock = prompt(`¿Cuántas unidades de "${titulo}" al stock público?`, "1"); if(!stock) return; stock = parseInt(stock); if(isNaN(stock) || stock<1) return alert("Stock inválido"); let precio = prompt("Precio unitario (USD):", "0"); precio = parseFloat(precio); if(isNaN(precio)) precio = 0; await addDoc(collection(db, "cuentas"), { app: titulo, datos: contenido, cupo: stock, precio }); alert(`✅ Agregado al stock público.`); };
+// STOCK CON PRECIO
+window.editarCuentaCompleta = async (id, app, datos, cupo, precio) => { const newApp = prompt("Nueva App:", app); if(!newApp) return; const newDatos = prompt("Nuevos datos:", datos); if(newDatos===null) return; let newCupo = parseInt(prompt("Nuevo stock:", cupo)); if(isNaN(newCupo)) newCupo = cupo; let newPrecio = parseFloat(prompt("Nuevo precio (USD):", precio)); if(isNaN(newPrecio)) newPrecio = precio; await updateDoc(doc(db, "cuentas", id), { app: newApp, datos: newDatos, cupo: newCupo, precio: newPrecio }); };
+window.resetCupo = async (id) => { const n = prompt("Nuevo Stock:"); if(n && !isNaN(parseInt(n))) await updateDoc(doc(db, "cuentas", id), { cupo: parseInt(n) }); };
+window.eliminarDoc = async (col, id) => { if(confirm("Eliminar?")) await deleteDoc(doc(db, col, id)); };
+// FUNCIÓN PARA GENERAR FACTURA
+async function generarFactura(cliente, telefono, cuentaData, cuentaId) {
+    const fecha = new Date();
+    const numeroFactura = `FAC-${fecha.getFullYear()}${(fecha.getMonth()+1).toString().padStart(2,'0')}${fecha.getDate().toString().padStart(2,'0')}-${Math.floor(Math.random()*10000).toString().padStart(4,'0')}`;
+    const subtotal = cuentaData.precio || 0;
+    const iva = subtotal * 0; // 0% IVA por defecto, se puede cambiar
+    const total = subtotal + iva;
+    const facturaData = {
+        numero: numeroFactura,
+        cliente: cliente,
+        telefono: telefono,
+        producto: cuentaData.app,
+        descripcion: cuentaData.datos,
+        cantidad: 1,
+        precioUnitario: subtotal,
+        subtotal: subtotal,
+        iva: iva,
+        total: total,
+        fecha: serverTimestamp(),
+        fechaStr: fecha.toLocaleString(),
+        cuentaId: cuentaId
     };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let usuarioActual = null, rolActual = null, carrito = [], productosData = [], cuponActivo = null;
-    let allVentas = []; // para filtros
-    let ventasChart = null;
-
-    // Helper toast
-    function toast(msg, color = "#10b981") { let d = document.createElement("div"); d.className = "toast"; d.style.background = color; d.innerText = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
-
-    // Login/Logout
-    window.login = async () => { try { await signInWithEmailAndPassword(auth, email.value, password.value); } catch(e) { toast(e.message, "#dc2626"); } };
-    window.logout = () => signOut(auth);
-
-    onAuthStateChanged(auth, async (user) => {
-        if(user) {
-            const snap = await getDoc(doc(db, "usuarios", user.uid));
-            usuarioActual = user.email;
-            rolActual = snap.exists() ? snap.data().role : "vendedor";
-            document.getElementById("infoUsuario").innerHTML = `<span class="badge"><i class="fas fa-user"></i> ${usuarioActual} (${rolActual})</span>`;
-            document.getElementById("loginBox").style.display = "none";
-            document.getElementById("app").style.display = "block";
-            const adminPanel = document.getElementById("panelAdmin");
-            if(rolActual === "admin") adminPanel.style.display = "block";
-            else adminPanel.style.display = "none";
-            
-            cargarProductos();
-            cargarVentas();
-            cargarCupones();
-            if(rolActual === "admin") { cargarUsuarios(); cargarDashboard(); }
-            // Recuperar carrito guardado
-            let saved = localStorage.getItem("carritoPro");
-            if(saved) { carrito = JSON.parse(saved); renderCarrito(); }
-        } else {
-            document.getElementById("loginBox").style.display = "block";
-            document.getElementById("app").style.display = "none";
-        }
-    });
-
-    // ========== PRODUCTOS ==========
-    function cargarProductos() {
-        onSnapshot(collection(db, "productos"), (snap) => {
-            productosData = [];
-            let htmlSelect = `<option value="">-- Selecciona --</option>`;
-            let catalogoHtml = "";
-            snap.forEach(d => {
-                let p = d.data(); p.id = d.id;
-                productosData.push(p);
-                htmlSelect += `<option value="${p.id}">${p.nombre} - $${p.precio}</option>`;
-                catalogoHtml += `<div class="producto-card" onclick="agregarProductoDirecto('${p.id}')">
-                    <div class="producto-img"><i class="fas fa-box"></i></div>
-                    <div class="producto-info"><b>${p.nombre}</b><br>$${p.precio}<br><small>Stock: ${p.stock}</small></div>
-                </div>`;
-            });
-            document.getElementById("productoSelect").innerHTML = htmlSelect;
-            document.getElementById("catalogoGrid").innerHTML = catalogoHtml;
-            document.getElementById("tablaStock").innerHTML = productosData.map(p => `<tr><td>${p.nombre}</td><td>${p.categoria || '-'}</td><td>$${p.precio}</td><td>${p.stock}</td><td><button class="btn-danger" onclick="eliminarProducto('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-        });
-    }
-    window.agregarProductoDirecto = (id) => {
-        let prod = productosData.find(p => p.id == id);
-        if(prod.stock <= 0) return toast("Sin stock", "#dc2626");
-        let exist = carrito.find(i => i.id === id);
-        if(exist) exist.cantidad++;
-        else carrito.push({...prod, cantidad: 1, subtotal: prod.precio});
-        renderCarrito();
-    };
-    window.eliminarProducto = async (id) => { if(confirm("Eliminar?")) await deleteDoc(doc(db, "productos", id)); };
-    window.crearProducto = async () => {
-        await addDoc(collection(db, "productos"), {
-            nombre: nombreProd.value, precio: parseFloat(precioProd.value), stock: parseInt(stockProd.value), categoria: categoriaProd.value
-        });
-        toast("Producto creado");
-    };
-
-    // ========== CARRITO ==========
-    function renderCarrito() {
-        let cont = document.getElementById("listaCarrito");
-        if(!cont) return;
-        cont.innerHTML = "";
-        let total = 0;
-        carrito.forEach((item, i) => {
-            total += item.precio * item.cantidad;
-            cont.innerHTML += `<div class="cart-item"><span><b>${item.nombre}</b> x${item.cantidad} = $${(item.precio*item.cantidad).toFixed(2)}</span><span><button onclick="carrito.splice(${i},1);renderCarrito()"><i class="fas fa-trash"></i></button></span></div>`;
-        });
-        if(cuponActivo) {
-            let desc = total * (cuponActivo.descuento/100);
-            total -= desc;
-            cont.innerHTML += `<div style="color:green;">Cupón ${cuponActivo.codigo}: -${cuponActivo.descuento}% ($${desc.toFixed(2)})</div>`;
-        }
-        document.getElementById("totalVentaTemporal").innerText = `Total: $${total.toFixed(2)}`;
-        localStorage.setItem("carritoPro", JSON.stringify(carrito));
-    }
-    window.aplicarCupon = async () => {
-        let cod = document.getElementById("cuponAplicado").value.trim();
-        let cupRef = doc(db, "cupones", cod);
-        let snap = await getDoc(cupRef);
-        if(!snap.exists()) return toast("Cupón inválido", "#dc2626");
-        let data = snap.data();
-        if(new Date(data.expiracion) < new Date()) return toast("Cupón expirado", "#dc2626");
-        cuponActivo = { codigo: cod, descuento: data.descuento };
-        toast(`Cupón aplicado: ${data.descuento}% descuento`);
-        renderCarrito();
-    };
-    window.finalizarVenta = async () => {
-        if(!cliente.value || carrito.length===0) return toast("Cliente y productos requeridos", "#dc2626");
-        let total = carrito.reduce((s,i)=>s+i.precio*i.cantidad,0);
-        let descuento = cuponActivo ? total * cuponActivo.descuento/100 : 0;
-        let totalFinal = total - descuento;
-        let venta = {
-            cliente: cliente.value, nit: nit.value || "S/N", vendedor: usuarioActual,
-            metodoPago: metodoPago.value, productos: carrito.map(p=>({id:p.id, nombre:p.nombre, cantidad:p.cantidad, precio:p.precio})),
-            total: totalFinal, descuento, cupon: cuponActivo?.codigo || null,
-            fecha: new Date().toLocaleString(), timestamp: Timestamp.now(), estado: "pagado" // por defecto, podrías poner pendiente
-        };
-        await addDoc(collection(db, "ventas"), venta);
-        for(let p of carrito) await updateDoc(doc(db, "productos", p.id), { stock: increment(-p.cantidad) });
-        generarPDF(venta);
-        toast("Venta completada");
-        carrito = []; cuponActivo = null; cliente.value = ""; nit.value = ""; renderCarrito();
-    };
-
-    function generarPDF(v, download=true) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFillColor(30,64,175); doc.rect(0,0,210,40,'F');
-        doc.setTextColor(255); doc.setFontSize(22); doc.text("FACTURA PRO", 15,25);
-        doc.setTextColor(0); doc.setFontSize(10);
-        doc.text(`Cliente: ${v.cliente}`,15,50); doc.text(`Vendedor: ${v.vendedor}`,15,57);
-        doc.text(`Total: $${v.total}`,15,64);
-        doc.autoTable({startY:75, head:[['Producto','Cant','Precio','Subtotal']], body: v.productos.map(p=>[p.nombre, p.cantidad, `$${p.precio}`, `$${p.precio*p.cantidad}`])});
-        if(download) doc.save(`factura_${v.cliente}.pdf`);
-        else return doc.output('blob');
-    }
-
-    // ========== VENTAS (con filtros) ==========
-    function cargarVentas() {
-        const q = query(collection(db, "ventas"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snap) => {
-            allVentas = [];
-            snap.forEach(d => { allVentas.push({id:d.id, ...d.data()}); });
-            aplicarFiltroVentas();
-        });
-    }
-    function aplicarFiltroVentas() {
-        let inicio = document.getElementById("filtroFechaInicio").value;
-        let fin = document.getElementById("filtroFechaFin").value;
-        let filtradas = allVentas.filter(v => {
-            let fechaV = new Date(v.fecha);
-            if(inicio && fechaV < new Date(inicio)) return false;
-            if(fin && fechaV > new Date(fin)) return false;
-            return true;
-        });
-        renderTablaVentas(filtradas);
-        let total = filtradas.reduce((s,v)=>s+v.total,0);
-        document.getElementById("granTotalHistorial").innerHTML = `Ventas Totales filtradas: $${total.toFixed(2)}`;
-        if(rolActual === "admin") actualizarDashboardConFiltro(filtradas);
-    }
-    window.filtrarVentas = () => aplicarFiltroVentas();
-    function renderTablaVentas(ventas) {
-        let tbody = document.getElementById("tablaVentas");
-        tbody.innerHTML = "";
-        ventas.forEach(v => {
-            let estadoClass = `badge-${v.estado || 'pagado'}`;
-            tbody.innerHTML += `<tr>
-                <td>${v.fecha}</td><td>${v.vendedor}</td><td>${v.cliente}</td>
-                <td>${v.productos.length} items</td><td>$${v.total}</td>
-                <td><span class="badge ${estadoClass}">${v.estado || 'pagado'}</span></td>
-                <td><button class="btn-main" onclick='generarPDF(${JSON.stringify(v)})'><i class="fas fa-download"></i></button>
-                <button class="btn-danger" onclick="eliminarVenta('${v.id}')"><i class="fas fa-trash"></i></button>
-                <button class="btn-success" onclick="repetirPedido('${v.id}')"><i class="fas fa-copy"></i></button></td>
-            </tr>`;
-        });
-    }
-    window.eliminarVenta = async (id) => { if(confirm("Eliminar venta?")) await deleteDoc(doc(db,"ventas",id)); toast("Venta eliminada"); };
-    window.repetirPedido = async (id) => {
-        let venta = allVentas.find(v=>v.id==id);
-        if(!venta) return;
-        for(let prod of venta.productos) {
-            let pOriginal = productosData.find(p=>p.id==prod.id);
-            if(pOriginal && pOriginal.stock >= prod.cantidad) {
-                let exist = carrito.find(i=>i.id==prod.id);
-                if(exist) exist.cantidad += prod.cantidad;
-                else carrito.push({...pOriginal, cantidad: prod.cantidad, subtotal: pOriginal.precio*prod.cantidad});
-            } else toast(`Sin stock suficiente para ${prod.nombre}`, "#dc2626");
-        }
-        renderCarrito();
-    };
-    window.exportarExcel = () => {
-        let html = `<table>${document.querySelector("#tablaVentas").innerHTML}</table>`;
-        let blob = new Blob([html], {type: "application/vnd.ms-excel"});
-        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "ventas.xls"; link.click();
-    };
-
-    // ========== ADMIN: usuarios, cupones, dashboard ==========
-    function cargarUsuarios() {
-        onSnapshot(collection(db, "usuarios"), (snap) => {
-            let html = "";
-            snap.forEach(d => {
-                let u = d.data();
-                html += `<tr><td>${u.email}</td><td>${u.role}</td><td><span class="badge ${u.estado=='activo'?'badge-pagado':'badge-pendiente'}">${u.estado}</span></td>
-                <td><button class="btn-danger" onclick="toggleUser('${d.id}','${u.estado}')">${u.estado=='activo'?'Suspender':'Activar'}</button></td></tr>`;
-            });
-            document.getElementById("tablaUsuarios").innerHTML = html;
-        });
-    }
-    window.toggleUser = async (id, est) => { await updateDoc(doc(db,"usuarios",id), { estado: est==='activo'?'inactivo':'activo' }); };
-    window.crearUsuario = async () => {
-        let id = Date.now().toString();
-        await setDoc(doc(db,"usuarios",id), { email: nuevoEmail.value, role: nuevoRol.value, estado: "activo" });
-        toast("Usuario agregado");
-    };
-    function cargarCupones() {
-        onSnapshot(collection(db, "cupones"), (snap) => {
-            let html = "";
-            snap.forEach(d => {
-                let c = d.data();
-                html += `<tr><td>${c.codigo}</td><td>${c.descuento}%</td><td>${c.expiracion}</td><td><button class="btn-danger" onclick="deleteDoc(doc(db,'cupones','${d.id}'))">Eliminar</button></td></tr>`;
-            });
-            document.getElementById("tablaCupones").innerHTML = html;
-        });
-    }
-    window.crearCupon = async () => {
-        let cod = codigoCupon.value.trim();
-        if(!cod) return;
-        await setDoc(doc(db,"cupones",cod), { codigo: cod, descuento: parseInt(descuentoCupon.value), expiracion: fechaExpiracion.value });
-        toast("Cupón creado");
-    };
-    async function cargarDashboard() {
-        // ventas de hoy
-        let hoy = new Date().toLocaleDateString();
-        let ventasHoy = allVentas.filter(v => new Date(v.fecha).toLocaleDateString() === hoy);
-        let totalHoy = ventasHoy.reduce((s,v)=>s+v.total,0);
-        document.getElementById("totalVentasHoy").innerText = `$${totalHoy.toFixed(2)}`;
-        let bajoStock = productosData.filter(p => p.stock < 5).length;
-        document.getElementById("productosBajoStock").innerText = bajoStock;
-        let cuponesAct = 0; // contado desde la colección
-        const snapCup = await getDocs(collection(db, "cupones"));
-        document.getElementById("cuponesActivos").innerText = snapCup.size;
-        // gráfico
-        let ventasPorDia = {};
-        allVentas.forEach(v => { let d = new Date(v.fecha).toISOString().slice(0,10); ventasPorDia[d] = (ventasPorDia[d]||0)+v.total; });
-        let labels = Object.keys(ventasPorDia).slice(-7);
-        let data = labels.map(l=>ventasPorDia[l]);
-        if(ventasChart) ventasChart.destroy();
-        let ctx = document.getElementById("ventasChart").getContext("2d");
-        ventasChart = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'Ventas $', data, borderColor: '#1e40af' }] } });
-    }
-    function actualizarDashboardConFiltro(ventasFiltradas) {
-        if(rolActual !== "admin") return;
-        let ventasPorDia = {};
-        ventasFiltradas.forEach(v => { let d = new Date(v.fecha).toISOString().slice(0,10); ventasPorDia[d] = (ventasPorDia[d]||0)+v.total; });
-        let labels = Object.keys(ventasPorDia);
-        let data = labels.map(l=>ventasPorDia[l]);
-        if(ventasChart) ventasChart.destroy();
-        let ctx = document.getElementById("ventasChart").getContext("2d");
-        ventasChart = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'Ventas $', data, borderColor: '#1e40af' }] } });
-    }
-
-    window.toggleDarkMode = () => document.body.classList.toggle("dark");
+    await addDoc(collection(db, "facturas"), facturaData);
+    return facturaData;
+}
+function mostrarFactura(factura) {
+    const invoiceHTML = `
+    <div class="invoice-print" style="background:white; color:#1a1a2e; padding:20px; border-radius:20px; font-family:'Plus Jakarta Sans',sans-serif;">
+        <div style="text-align:center; border-bottom:2px solid #d4af37; padding-bottom:10px;">
+            <h2 style="color:#d4af37;">✨ MEMBRESÍA VIP DORADA ✨</h2>
+            <p>🍄‍🟫 Tu tienda de confianza</p>
+            <p>RUC: 0999999999 | Tel: +593 99 999 9999</p>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin:20px 0;">
+            <div><strong>FACTURA N°:</strong> ${factura.numero}</div>
+            <div><strong>FECHA:</strong> ${factura.fechaStr}</div>
+        </div>
+        <div style="margin-bottom:20px;">
+            <strong>CLIENTE:</strong> ${factura.cliente}<br>
+            <strong>TELÉFONO:</strong> ${factura.telefono}
+        </div>
+        <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+            <thead><tr style="background:#f0e6d2;"><th>Producto</th><th>Cantidad</th><th>Precio Unit.</th><th>Subtotal</th></tr></thead>
+            <tbody><tr><td>${factura.producto}</td><td>${factura.cantidad}</td><td>$${factura.precioUnitario.toFixed(2)}</td><td>$${factura.subtotal.toFixed(2)}</td></tr></tbody>
+        </table>
+        <div style="text-align:right; margin-top:10px;">
+            <p>Subtotal: $${factura.subtotal.toFixed(2)}</p>
+            <p>IVA (0%): $${factura.iva.toFixed(2)}</p>
+            <h3>TOTAL: $${factura.total.toFixed(2)}</h3>
+        </div>
+        <div style="margin-top:30px; text-align:center; border-top:1px solid #ccc; padding-top:15px;">
+            <p style="font-size:18px; font-weight:bold;">✨ ¡Gracias por tu compra! ✨</p>
+            <p>🍄‍🟫 Vuelve pronto - ID Transacción: ${factura.numero}</p>
+        </div>
+    </div>`;
+    document.getElementById("invoiceContent").innerHTML = invoiceHTML;
+    document.getElementById("invoiceModal").style.display = "block";
+}
+window.printInvoice = () => { window.print(); };
+window.closeInvoiceModal = () => { document.getElementById("invoiceModal").style.display = "none"; };
+// PEDIR CUENTA (ahora con factura)
+window.pedirCuenta = async () => {
+    const nombre = document.getElementById("c-cliente-nombre").value.trim();
+    const telefono = document.getElementById("c-cliente-phone").value.trim();
+    const cuentaId = document.getElementById("select-plataforma").value;
+    if(!nombre || !telefono) return alert("Nombre y teléfono requeridos");
+    if(!cuentaId) return alert("Selecciona app");
+    const btn = document.getElementById("btn-pedir");
+    btn.disabled = true; btn.textContent = "PROCESANDO...";
+    try {
+        const snap = await getDoc(doc(db, "cuentas", cuentaId));
+        if(!snap.exists()) throw new Error("No existe");
+        const data = snap.data();
+        if(data.cupo <= 0) throw new Error("Sin stock");
+        // generar factura
+        const factura = await generarFactura(nombre, telefono, data, cuentaId);
+        // actualizar stock
+        await updateDoc(doc(db, "cuentas", cuentaId), { cupo: data.cupo - 1 });
+        // guardar en historial con total
+        await addDoc(collection(db, "historial"), { miembro: nombre, telefono, app: data.app, total: factura.total, fecha: serverTimestamp() });
+        // mostrar factura
+        mostrarFactura(factura);
+        document.getElementById("c-cliente-nombre").value = ""; document.getElementById("c-cliente-phone").value = "";
+        document.getElementById("resultado-entrega").innerHTML = `<div class="card"><p>✅ Cuenta entregada. Factura generada con éxito.</p></div>`;
+    } catch(e) { alert("Error: "+e.message); } finally { btn.disabled = false; btn.textContent = "🔥 OBTENER ACCESO"; }
+};
+window.copyToClipboard = () => { const t = document.getElementById('copy-text')?.innerText; if(t) navigator.clipboard.writeText(t); alert("Copiado"); };
+// SOPORTE
+window.enviarQueja = async () => { const n = document.getElementById("q-nombre").value.trim(), p = document.getElementById("q-phone").value.trim(), m = document.getElementById("q-texto").value.trim(); if(!n||!p||!m) return alert("Completa todos"); await addDoc(collection(db, "quejas"), { nombre: n, telefono: p, mensaje: m, fecha: serverTimestamp() }); alert("Enviado"); document.getElementById("q-nombre").value=""; document.getElementById("q-phone").value=""; document.getElementById("q-texto").value=""; };
+window.responderWhatsApp = (tel, nombre) => { const resp = document.getElementById(`reply-${tel}`).value; if(!resp) return alert("Escribe respuesta"); window.open(`https://wa.me/${tel.replace(/\s+/g, '')}?text=${encodeURIComponent("Hola "+nombre+", soy Andy. "+resp)}`,'_blank'); };
+// MÉTODOS DE PAGO
+window.agregarMetodoPago = async () => { const nombre = document.getElementById("pago-nombre").value.trim(); const enlace = document.getElementById("pago-enlace").value.trim(); const tipo = document.getElementById("pago-tipo").value; if (!nombre || !enlace) return alert("Nombre y enlace/datos requeridos"); await addDoc(collection(db, "metodos_pago"), { nombre, enlace, tipo, activo: true, creado: serverTimestamp() }); document.getElementById("pago-nombre").value = ""; document.getElementById("pago-enlace").value = ""; alert("Método agregado"); };
+window.eliminarMetodoPago = async (id) => { if(confirm("Eliminar método de pago?")) await deleteDoc(doc(db, "metodos_pago", id)); };
+window.toggleMetodoPago = async (id, activo) => { await updateDoc(doc(db, "metodos_pago", id), { activo: !activo }); };
+function renderMetodosPago(metodos, isAdmin = false) { if (!metodos.length) return "<p>No hay métodos de pago configurados.</p>"; let html = ""; for (const m of metodos) { if (isAdmin) { html += `<div class="pago-card"><strong>${m.nombre}</strong> (${m.tipo})<br><span style="word-break:break-all;">🔗 ${m.enlace}</span><br><label class="switch" style="margin-top:8px;"><input type="checkbox" ${m.activo ? 'checked' : ''} onchange="toggleMetodoPago('${m.id}', ${m.activo})"><span class="slider"></span></label> Activo<div class="flex-btns"><button class="btn-small" style="background:var(--danger);color:white;" onclick="eliminarMetodoPago('${m.id}')">🗑️ Eliminar</button></div></div>`; } else { if (!m.activo) continue; let boton = `<a href="${m.enlace}" target="_blank" class="pago-enlace">Pagar con ${m.nombre}</a>`; if (m.tipo === "transferencia") boton = `<div><strong>${m.nombre}</strong><br><span>${m.enlace}</span><button class="btn-small" onclick="navigator.clipboard.writeText('${m.enlace.replace(/'/g, "\\'")}')">📋 Copiar datos</button></div>`; html += `<div class="pago-card"><strong>💳 ${m.nombre}</strong><br>${boton}</div>`; } } return html; }
+// ADMIN DATA
+function loadAdminData() {
+    onSnapshot(collection(db, "cuentas"), snap => { let html = ""; snap.forEach(d => { const c = d.data(); html += `<tr><td><b>${c.app}</b><div class="datos-detalle">${c.datos}</div></td><td><span class="badge">${c.cupo}</span></td><td>$${(c.precio || 0).toFixed(2)}</td><td><button class="btn-small" style="background:var(--primary);color:#1c180f;" onclick="editarCuentaCompleta('${d.id}','${c.app.replace(/'/g, "\\'")}','${c.datos.replace(/'/g, "\\'")}',${c.cupo},${c.precio || 0})">✏️</button> <button class="btn-small" style="background:var(--warning);color:#1c180f;" onclick="resetCupo('${d.id}')">🔄</button> <button class="btn-small" style="background:var(--danger);color:white;" onclick="eliminarDoc('cuentas','${d.id}')">🗑️</button></td></tr>`; }); document.getElementById("lista-cuentas-admin").innerHTML = html; });
+    onSnapshot(query(collection(db, "historial"), orderBy("fecha","desc")), snap => { let h=""; snap.forEach(d=>{ const data=d.data(); h+=`<tr><td>${data.miembro}</td><td>${data.app}</td><td>${data.telefono||'N/A'}</td><td>$${(data.total || 0).toFixed(2)}</td><td><button class="btn-small" onclick="mandarAdvertencia('${data.telefono}')">💬 Avisar</button></td></tr>`; }); document.getElementById("historial-tabla-body").innerHTML=h; });
+    onSnapshot(query(collection(db, "quejas"), orderBy("fecha","desc")), snap => { let h=""; snap.forEach(d=>{ const q=d.data(); h+=`<div class="card"><b>🧑 ${q.nombre} (${q.telefono})</b><p>📝 ${q.mensaje}</p><div><input id="reply-${q.telefono}" placeholder="Respuesta..."><button class="btn-small" onclick="responderWhatsApp('${q.telefono}','${q.nombre}')">📲 Responder</button> <button class="btn-small" style="background:var(--danger);color:white;" onclick="eliminarDoc('quejas','${d.id}')">🗑️</button></div></div>`; }); document.getElementById("lista-quejas").innerHTML=h; });
+    onSnapshot(collection(db, "usuarios_permisos"), snap => { let h=""; snap.forEach(d=>{ if(d.id!==MASTER) h+=`<div style="display:flex; justify-content:space-between; padding:12px;"><span>📧 ${d.id}</span><label class="switch"><input type="checkbox" ${d.data().estado?'checked':''} onchange="toggleUser('${d.id}', this.checked)"><span class="slider"></span></label></div>`; }); document.getElementById("lista-usuarios-admin").innerHTML=h; });
+    onSnapshot(collection(db, "clientes"), snap => { let clientesArray = []; snap.forEach(d => { clientesArray.push({ id: d.id, ...d.data() }); }); renderClientes(clientesArray); });
+    onSnapshot(query(collection(db, "notas_admin"), orderBy("fecha","desc")), snap => { let html=""; snap.forEach(d=>{ const nota=d.data(); html+=`<div class="nota-card"><strong>📌 ${nota.titulo}</strong><pre style="background:var(--input-bg); padding:10px; border-radius:14px; margin:10px 0;">${nota.contenido}</pre><div class="flex-btns"><button class="btn-small" style="background:var(--primary);color:#1c180f;" onclick="editarNota('${d.id}','${nota.titulo.replace(/'/g, "\\'")}','${nota.contenido.replace(/'/g, "\\'")}')">✏️ Editar</button><button class="btn-small" style="background:var(--success);color:#1c180f;" onclick="subirNotaAlStock('${nota.titulo.replace(/'/g, "\\'")}','${nota.contenido.replace(/'/g, "\\'")}')">📤 Subir al Stock</button><button class="btn-small" style="background:var(--danger);color:white;" onclick="eliminarNota('${d.id}')">🗑️ Eliminar</button></div></div>`; }); document.getElementById("lista-notas-container").innerHTML=html||"<p>Sin notas</p>"; });
+    onSnapshot(collection(db, "metodos_pago"), snap => { let methods = []; snap.forEach(d => { methods.push({ id: d.id, ...d.data() }); }); document.getElementById("lista-pagos-admin").innerHTML = renderMetodosPago(methods, true); });
+    onSnapshot(query(collection(db, "facturas"), orderBy("fecha","desc")), snap => { let html=""; snap.forEach(d=>{ const f=d.data(); html+=`<div class="factura-card"><strong>🧾 ${f.numero}</strong><br>Cliente: ${f.cliente}<br>Total: $${f.total.toFixed(2)}<br>Fecha: ${f.fechaStr}<br><button class="btn-small" onclick="verFactura('${d.id}')">Ver Detalle</button></div>`; }); document.getElementById("lista-facturas").innerHTML=html||"<p>Sin facturas</p>"; });
+}
+window.verFactura = async (id) => { const docSnap = await getDoc(doc(db, "facturas", id)); if(docSnap.exists()) mostrarFactura(docSnap.data()); };
+window.mandarAdvertencia = (num) => { if(num) { const msg=prompt("Mensaje:"); if(msg) window.open(`https://wa.me/${num.replace(/\s+/g,'')}?text=${encodeURIComponent("⚠️ AVISO: "+msg)}`,'_blank'); } };
+window.toggleUser = async (e,s) => { await updateDoc(doc(db,"usuarios_permisos",e),{ estado:s }); };
+window.addCuenta = async () => { const a=document.getElementById("c-app").value.trim(); const d=document.getElementById("c-datos").value.trim(); const c=parseInt(document.getElementById("c-cupo").value); const p=parseFloat(document.getElementById("c-precio").value); if(!a||!d) return; if(isNaN(c)||c<0) return; if(isNaN(p)) p=0; await addDoc(collection(db,"cuentas"),{app:a,datos:d,cupo:c,precio:p}); document.getElementById("c-app").value=""; document.getElementById("c-datos").value=""; document.getElementById("c-cupo").value=""; document.getElementById("c-precio").value=""; };
+window.crearUsuario = async () => { const e=document.getElementById("new-email").value.trim(); const p=document.getElementById("new-pass").value.trim(); const r=document.getElementById("new-role").value; if(!e||!p) return; try{ await createUserWithEmailAndPassword(auth,e,p); await setDoc(doc(db,"usuarios_permisos",e),{rol:r,estado:true}); alert("Creado"); document.getElementById("new-email").value=""; document.getElementById("new-pass").value=""; }catch(err){ alert(err.message); } };
+window.limpiarHistorial = async () => { if(confirm("Vaciar historial?")){ const q=await getDocs(collection(db,"historial")); const b=writeBatch(db); q.forEach(d=>b.delete(d.ref)); await b.commit(); alert("Historial vaciado"); } };
+function loadUserData() {
+    onSnapshot(collection(db,"cuentas"), snap => { cuentasMap.clear(); let opts='<option value="">-- Selecciona --</option>'; snap.forEach(d=>{ const data=d.data(); cuentasMap.set(d.id,{app:data.app,cupo:data.cupo,precio:data.precio||0}); if(data.cupo>0) opts+=`<option value="${d.id}">${data.app} (${data.cupo}) - $${(data.precio||0).toFixed(2)}</option>`; else opts+=`<option value="${d.id}" disabled>${data.app} (AGOTADO)</option>`; }); document.getElementById("select-plataforma").innerHTML=opts; const sel=document.getElementById("select-plataforma"); sel.onchange=e=>{ const v=e.target.value; if(v && cuentasMap.has(v)) { updateStockDisplay(v); const precio = cuentasMap.get(v).precio; document.getElementById("precio-info").innerHTML = `💰 Precio: $${precio.toFixed(2)}`; } else { document.getElementById("stock-info").innerHTML=`📦 Stock: --`; document.getElementById("precio-info").innerHTML=`💰 Precio: --`; } }; if(sel.value && cuentasMap.has(sel.value)) { updateStockDisplay(sel.value); document.getElementById("precio-info").innerHTML = `💰 Precio: $${cuentasMap.get(sel.value).precio.toFixed(2)}`; } else document.getElementById("btn-pedir").disabled=true; });
+    onSnapshot(collection(db,"metodos_pago"), snap => { let methods = []; snap.forEach(d => { methods.push({ id: d.id, ...d.data() }); }); document.getElementById("lista-pagos-cliente").innerHTML = renderMetodosPago(methods.filter(m => m.activo), false); });
+}
+function updateStockDisplay(id) { const c = cuentasMap.get(id); if(c && c.cupo>0) { document.getElementById("stock-info").innerHTML = `📦 Stock: <span class="stock-value">${c.cupo}</span>`; document.getElementById("btn-pedir").disabled = false; } else { document.getElementById("stock-info").innerHTML = `📦 Stock: AGOTADO`; document.getElementById("btn-pedir").disabled = true; } }
+// AUTH
+onAuthStateChanged(auth, async (user) => {
+    if(user) {
+        document.getElementById("login").style.display="none"; document.getElementById("app").style.display="block";
+        const isAdmin = user.email === MASTER;
+        if(isAdmin) { document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); document.querySelectorAll('.seller-only').forEach(el=>el.style.display='none'); loadAdminData(); }
+        else { document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none'); document.querySelectorAll('.seller-only').forEach(el=>el.style.display='block'); }
+        loadUserData();
+        setDefaultPage(isAdmin);
+    } else { document.getElementById("login").style.display="block"; document.getElementById("app").style.display="none"; }
+});
+document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.nav-btn').forEach(btn => { const pageId = btn.getAttribute('data-page'); if (pageId) btn.addEventListener('click', () => showPage(pageId, btn)); }); });
 </script>
 </body>
 </html>
