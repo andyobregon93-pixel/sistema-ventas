@@ -161,22 +161,49 @@
     .imagenes-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
     .imagenes-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #2d3a4e; }
 
-    /* Upload de imágenes */
+    /* Upload de imágenes - BOTÓN VISIBLE */
     .upload-area {
-      border: 2px dashed #334155;
+      border: 2px dashed #f97316;
       border-radius: 14px;
-      padding: 20px;
+      padding: 30px 20px;
       text-align: center;
       cursor: pointer;
       transition: 0.3s;
       margin: 8px 0 16px 0;
+      background: #1a1a2e;
     }
-    .upload-area:hover { border-color: #f97316; background: #1e293b; }
-    .upload-area i { font-size: 2rem; color: #f97316; margin-bottom: 8px; }
-    .upload-area p { color: #9ca3af; font-size: 0.9rem; }
+    .upload-area:hover { border-color: #fb923c; background: #1e293b; transform: scale(1.01); }
+    .upload-area i { font-size: 3rem; color: #f97316; margin-bottom: 12px; display: block; }
+    .upload-area p { color: #9ca3af; font-size: 1rem; }
+    .upload-area .sub-texto { font-size: 0.8rem; color: #6b7280; }
     .upload-area input[type="file"] { display: none; }
-    .preview-imagenes { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-    .preview-imagenes img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #f97316; }
+    
+    .preview-imagenes { 
+      display: flex; 
+      gap: 12px; 
+      flex-wrap: wrap; 
+      margin: 12px 0;
+      padding: 12px;
+      background: #0f111a;
+      border-radius: 12px;
+      min-height: 60px;
+    }
+    .preview-imagenes img { 
+      width: 80px; 
+      height: 80px; 
+      object-fit: cover; 
+      border-radius: 10px; 
+      border: 2px solid #f97316;
+      transition: 0.2s;
+    }
+    .preview-imagenes img:hover { transform: scale(1.05); }
+    .preview-imagenes .sin-imagenes {
+      color: #6b7280;
+      font-size: 0.9rem;
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+    }
 
     .cart-item { background: #1e293b; border-radius: 16px; padding: 12px; margin-bottom: 8px; }
     .btn-small { padding: 4px 12px; font-size: 0.8rem; border-radius: 8px; }
@@ -188,6 +215,23 @@
       .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #f97316; border-radius: 12px; padding: 8px 12px; }
     }
     .menu-toggle { display: none; }
+
+    .btn-subir-foto {
+      background: #f97316;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      margin: 8px 0;
+    }
+    .btn-subir-foto:hover { background: #ea580c; transform: scale(1.02); }
   </style>
 </head>
 <body>
@@ -223,7 +267,7 @@
       <div class="nav-item" data-page="trabajadores"><i class="fas fa-users"></i> Trabajadores</div>
       <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
       <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
-      <div class="nav-item admin-only" data-page="admin"><i class="fas fa-crown"></i> Admin</div>
+      <div class="nav-item admin-only" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
 
@@ -257,16 +301,20 @@
         <div class="card">
           <div class="card-header"><h3><i class="fas fa-plus-circle"></i> Nuevo Producto</h3></div>
           
-          <!-- UPLOAD DE IMÁGENES INTEGRADO -->
-          <div class="upload-area" id="upload-area">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p><strong>Haz clic o arrastra imágenes</strong></p>
-            <p style="font-size: 0.8rem;">Sube tus fotos de ropa (JPG, PNG, WEBP)</p>
-            <input type="file" id="file-input" accept="image/*" multiple>
+          <!-- BOTÓN PARA SUBIR FOTOS - VISIBLE Y CLARO -->
+          <div style="margin: 12px 0;">
+            <button class="btn-subir-foto" id="btn-subir-foto">
+              <i class="fas fa-camera"></i> 📸 SUBIR FOTOS DESDE MI DISPOSITIVO
+            </button>
+            <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+            <p style="color: #9ca3af; font-size: 0.8rem; margin-top: 4px;">
+              <i class="fas fa-info-circle"></i> Haz clic en el botón para seleccionar fotos de tu galería o almacenamiento
+            </p>
           </div>
-          <div id="preview-container" class="preview-imagenes"></div>
-          <div style="display: none;" id="urls-imagenes-container">
-            <input type="text" id="prod-imagenes" placeholder="URLs de imágenes (se llenan automáticamente)">
+
+          <!-- PREVIEW DE IMÁGENES -->
+          <div id="preview-container" class="preview-imagenes">
+            <div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>
           </div>
 
           <div class="flex">
@@ -281,12 +329,15 @@
           </div>
           <textarea id="prod-desc" placeholder="Descripción completa del producto"></textarea>
           
+          <!-- Campo oculto para URLs -->
+          <input type="hidden" id="prod-imagenes" value="">
+          
           <button id="btn-add-producto"><i class="fas fa-save"></i> Guardar Producto</button>
         </div>
         
         <div class="card">
           <div class="card-header">
-            <h3><i class="fas fa-edit"></i> Gestionar Productos</h3>
+            <h3><i class="fas fa-edit"></i> Inventario actual</h3>
             <button class="btn-outline" id="btn-limpiar-filtros"><i class="fas fa-undo"></i> Mostrar todos</button>
           </div>
           <input type="text" id="filtro-productos" placeholder="🔍 Buscar producto por nombre..." style="margin-bottom: 16px;">
@@ -395,7 +446,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDocs, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   const firebaseConfig = {
@@ -424,7 +475,6 @@
   const logoutSidebar = document.getElementById("logout-sidebar");
 
   const isAdmin = () => currentUserRol === "admin";
-  const isSeller = () => ["admin", "seller"].includes(currentUserRol);
 
   function updateAdminVisibility() {
     document.querySelectorAll('.admin-only').forEach(el => {
@@ -486,41 +536,26 @@
     }
   });
 
-  // ---------- UPLOAD DE IMÁGENES ----------
-  const uploadArea = document.getElementById("upload-area");
+  // ---------- SUBIR FOTOS DESDE EL DISPOSITIVO ----------
+  const btnSubirFoto = document.getElementById("btn-subir-foto");
   const fileInput = document.getElementById("file-input");
   const previewContainer = document.getElementById("preview-container");
 
-  uploadArea.addEventListener("click", () => fileInput.click());
-  
-  uploadArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = "#f97316";
-    uploadArea.style.background = "#1e293b";
-  });
-  
-  uploadArea.addEventListener("dragleave", () => {
-    uploadArea.style.borderColor = "#334155";
-    uploadArea.style.background = "transparent";
-  });
-  
-  uploadArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = "#334155";
-    uploadArea.style.background = "transparent";
-    if (e.dataTransfer.files.length > 0) {
-      handleFiles(e.dataTransfer.files);
-    }
-  });
+  btnSubirFoto.addEventListener("click", () => fileInput.click());
 
-  fileInput.addEventListener("change", (e) => {
-    if (e.target.files.length > 0) {
-      handleFiles(e.target.files);
+  fileInput.addEventListener("change", async (e) => {
+    if (e.target.files.length === 0) return;
+    
+    // Limpiar preview anterior si es nueva carga
+    if (uploadedImageUrls.length === 0) {
+      previewContainer.innerHTML = '';
     }
-  });
+    
+    // Eliminar mensaje "sin imágenes"
+    const sinImg = previewContainer.querySelector('.sin-imagenes');
+    if (sinImg) sinImg.remove();
 
-  async function handleFiles(files) {
-    for (const file of files) {
+    for (const file of e.target.files) {
       if (!file.type.startsWith("image/")) continue;
       
       // Mostrar preview
@@ -543,9 +578,17 @@
         alert("Error al subir imagen: " + error.message);
       }
     }
-    // Actualizar campo de URLs
+    
+    // Actualizar campo oculto con URLs
     document.getElementById("prod-imagenes").value = uploadedImageUrls.join(", ");
-  }
+    
+    // Resetear input para poder subir más archivos después
+    fileInput.value = '';
+    
+    if (uploadedImageUrls.length > 0) {
+      alert(`✅ ${uploadedImageUrls.length} imagen(es) subidas exitosamente`);
+    }
+  });
 
   // ---------- CARGA DE DATOS ----------
   function loadAllData() {
@@ -746,10 +789,8 @@
     document.getElementById("prod-color").value = product.color || '';
     document.getElementById("prod-medidas").value = product.medidas || '';
     document.getElementById("prod-desc").value = product.descripcion || '';
-    document.getElementById("prod-imagenes").value = product.imagenes || '';
-    document.getElementById("btn-add-producto").dataset.editId = id;
-    document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Actualizar Producto';
-    // Limpiar previews
+    
+    // Cargar imágenes
     previewContainer.innerHTML = '';
     uploadedImageUrls = [];
     if (product.imagenes) {
@@ -759,7 +800,13 @@
         img.src = url;
         previewContainer.appendChild(img);
       });
+      document.getElementById("prod-imagenes").value = product.imagenes;
+    } else {
+      previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
     }
+    
+    document.getElementById("btn-add-producto").dataset.editId = id;
+    document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Actualizar Producto';
   };
 
   window.eliminarMiembro = async (id) => {
@@ -823,7 +870,7 @@
     document.getElementById("prod-medidas").value = "";
     document.getElementById("prod-desc").value = "";
     document.getElementById("prod-imagenes").value = "";
-    previewContainer.innerHTML = "";
+    previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
     uploadedImageUrls = [];
   });
 
