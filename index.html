@@ -136,7 +136,6 @@
     th, td { padding: 12px; text-align: left; border-bottom: 1px solid #2d3a4e; }
     th { color: #f97316; font-weight: 600; }
 
-    /* UPLOAD */
     .upload-area {
       border: 2px dashed #f97316;
       border-radius: 14px;
@@ -179,7 +178,6 @@
       padding: 20px 0;
     }
 
-    /* TIENDA ESTILO DEPRATIK */
     .tienda-header {
       background: linear-gradient(135deg, #f97316, #fb923c);
       border-radius: 24px;
@@ -836,7 +834,7 @@
     // GUARDAR URLs en el campo oculto (separadas por coma)
     const urlsString = uploadedImageUrls.join(", ");
     document.getElementById("prod-imagenes").value = urlsString;
-    console.log("📸 URLs guardadas:", urlsString);
+    console.log("📸 URLs guardadas en campo oculto:", urlsString);
     
     fileInput.value = '';
     
@@ -934,19 +932,21 @@
     // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = [];
-      let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Acciones</th></tr></thead><tbody>`;
+      let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
       snap.forEach(doc => {
         const p = doc.data();
         allProducts.push({ id: doc.id, ...p });
         const imagenes = p.imagenes ? p.imagenes.split(',').map(i => i.trim()) : [];
+        // Mostrar si tiene imagen o no
+        const tieneImagen = imagenes.length > 0 ? '✅ Sí' : '❌ No';
+        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'">` : '📷';
         html += `<tr>
-          <td><strong>${p.nombre || 'Sin nombre'}</strong><br><small>${p.descripcion || ''}</small>
-            ${imagenes.length > 0 ? `<div class="imagenes-preview">${imagenes.slice(0, 3).map(img => `<img src="${img}" alt="preview" onerror="this.style.display='none'">`).join('')}</div>` : '📷 Sin foto'}
-          </td>
+          <td><strong>${p.nombre || 'Sin nombre'}</strong><br><small>${p.descripcion || ''}</small></td>
           <td>$${p.precio || 0}</td>
           <td><span class="stock-badge ${p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo'}">${p.stock || 0}</span></td>
           <td>${p.talla || 'N/A'}</td>
           <td>${p.color || 'N/A'}</td>
+          <td>${previewImg}</td>
           <td>
             <button class="btn-small btn-info" onclick="editarProducto('${doc.id}')"><i class="fas fa-edit"></i></button>
             <button class="btn-small btn-danger" onclick="eliminarProducto('${doc.id}')"><i class="fas fa-trash"></i></button>
@@ -1087,15 +1087,17 @@
     document.getElementById("prod-medidas").value = product.medidas || '';
     document.getElementById("prod-desc").value = product.descripcion || '';
     
+    // Cargar imágenes existentes
     previewContainer.innerHTML = '';
     uploadedImageUrls = [];
     if (product.imagenes) {
-      uploadedImageUrls = product.imagenes.split(',').map(i => i.trim());
-      uploadedImageUrls.forEach(url => {
+      const urls = product.imagenes.split(',').map(i => i.trim()).filter(i => i);
+      urls.forEach(url => {
         const img = document.createElement("img");
         img.src = url;
         previewContainer.appendChild(img);
       });
+      uploadedImageUrls = urls;
       document.getElementById("prod-imagenes").value = product.imagenes;
     } else {
       previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
@@ -1132,7 +1134,7 @@
     renderCarrito();
   };
 
-  // ========== AGREGAR/ACTUALIZAR PRODUCTO - CORREGIDO ==========
+  // ========== AGREGAR/ACTUALIZAR PRODUCTO ==========
   document.getElementById("btn-add-producto")?.addEventListener("click", async () => {
     const nombre = document.getElementById("prod-nombre").value.trim();
     const precio = parseFloat(document.getElementById("prod-precio").value);
@@ -1145,7 +1147,6 @@
     
     if (!nombre || isNaN(precio) || isNaN(stock)) return alert("Completa nombre, precio y stock");
     
-    // Guardar URLs en el campo imagenes (YA ESTÁN EN EL CAMPO OCULTO)
     const data = { 
       nombre, 
       precio, 
@@ -1154,7 +1155,7 @@
       color, 
       medidas, 
       descripcion, 
-      imagenes: imagenes // <--- ESTO es lo que se guarda en Firestore
+      imagenes: imagenes // URLs de las imágenes
     };
     
     console.log("📦 Guardando producto:", data);
