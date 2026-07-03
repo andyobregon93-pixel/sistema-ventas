@@ -134,34 +134,182 @@
     .active-page { display: block; }
     @keyframes fade { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
     
-    .productos-grid {
+    /* ========== ESTILO TIPO DEPRATIK PARA LA TIENDA ========== */
+    .tienda-header {
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      border-radius: 24px;
+      padding: 40px 30px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .tienda-header h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .tienda-header p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.9);
+      margin-top: 8px;
+    }
+    .tienda-header i {
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    /* Grid de productos estilo DepratiK */
+    .productos-grid-depratik {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 25px;
       margin-top: 20px;
     }
-    .producto-card {
-      background: #1e293b;
-      border-radius: 16px;
+    .producto-card-depratik {
+      background: #1a1a2e;
+      border-radius: 20px;
       overflow: hidden;
       border: 1px solid #2d3a4e;
-      transition: transform 0.2s;
+      transition: all 0.3s ease;
+      position: relative;
     }
-    .producto-card:hover { transform: translateY(-5px); border-color: #f97316; }
-    .producto-card img { width: 100%; height: 200px; object-fit: cover; }
-    .producto-info { padding: 16px; }
-    .producto-info h4 { font-size: 1rem; margin-bottom: 4px; }
-    .producto-info .precio { font-size: 1.3rem; font-weight: 800; color: #f97316; }
-    .producto-info .detalles { font-size: 0.8rem; color: #9ca3af; margin: 8px 0; }
-    .stock-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
-    .stock-alto { background: #10b981; color: white; }
-    .stock-medio { background: #f59e0b; color: white; }
-    .stock-bajo { background: #ef4444; color: white; }
+    .producto-card-depratik:hover {
+      transform: translateY(-8px);
+      border-color: #f97316;
+      box-shadow: 0 12px 40px rgba(249,115,22,0.15);
+    }
+    .producto-card-depratik .imagen-container {
+      position: relative;
+      overflow: hidden;
+      height: 220px;
+      background: #0f111a;
+    }
+    .producto-card-depratik .imagen-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .producto-card-depratik:hover .imagen-container img {
+      transform: scale(1.05);
+    }
+    .producto-card-depratik .etiqueta-stock {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .producto-card-depratik .info {
+      padding: 20px;
+    }
+    .producto-card-depratik .info .nombre {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .producto-card-depratik .info .precio {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #f97316;
+      margin: 8px 0;
+    }
+    .producto-card-depratik .info .detalles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
+    .producto-card-depratik .info .detalles span {
+      background: #1e293b;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      border: 1px solid #2d3a4e;
+    }
+    .producto-card-depratik .info .descripcion {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin: 8px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .producto-card-depratik .info .btn-comprar {
+      width: 100%;
+      margin-top: 12px;
+      background: #f97316;
+      border: none;
+      padding: 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+    .producto-card-depratik .info .btn-comprar:hover {
+      background: #ea580c;
+      transform: scale(1.02);
+    }
+    .producto-card-depratik .info .btn-comprar i {
+      margin-right: 8px;
+    }
 
-    .imagenes-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-    .imagenes-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #2d3a4e; }
+    /* Badge de oferta */
+    .producto-card-depratik .oferta-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #ef4444;
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+    }
 
-    /* Upload de imágenes - BOTÓN VISIBLE */
+    /* Sección de categorías estilo DepratiK */
+    .categorias-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 30px 0;
+    }
+    .categoria-item {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid #2d3a4e;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+    .categoria-item:hover {
+      border-color: #f97316;
+      transform: translateY(-4px);
+    }
+    .categoria-item i {
+      font-size: 2rem;
+      color: #f97316;
+      margin-bottom: 8px;
+    }
+    .categoria-item h4 {
+      font-size: 0.9rem;
+      color: white;
+    }
+
     .upload-area {
       border: 2px dashed #f97316;
       border-radius: 14px;
@@ -208,14 +356,6 @@
     .cart-item { background: #1e293b; border-radius: 16px; padding: 12px; margin-bottom: 8px; }
     .btn-small { padding: 4px 12px; font-size: 0.8rem; border-radius: 8px; }
 
-    @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; }
-      .sidebar.open { transform: translateX(0); }
-      .main-content { margin-left: 0; padding: 16px; }
-      .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #f97316; border-radius: 12px; padding: 8px 12px; }
-    }
-    .menu-toggle { display: none; }
-
     .btn-subir-foto {
       background: #f97316;
       color: white;
@@ -232,6 +372,16 @@
       margin: 8px 0;
     }
     .btn-subir-foto:hover { background: #ea580c; transform: scale(1.02); }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 16px; }
+      .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #f97316; border-radius: 12px; padding: 8px 12px; }
+      .productos-grid-depratik { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+      .tienda-header h1 { font-size: 1.8rem; }
+    }
+    .menu-toggle { display: none; }
   </style>
 </head>
 <body>
@@ -285,34 +435,50 @@
         <div class="card"><h3>Últimas ventas</h3><div id="ultimas-ventas-lista"></div></div>
       </div>
 
-      <!-- TIENDA -->
+      <!-- TIENDA - ESTILO DEPRATIK -->
       <div id="page-tienda" class="page">
+        <!-- Header de la tienda -->
+        <div class="tienda-header">
+          <i class="fas fa-gift"></i>
+          <h1>LOS AMIGOS ESTORE 🎁</h1>
+          <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
+        </div>
+
+        <!-- Categorías -->
+        <div class="categorias-section">
+          <div class="categoria-item"><i class="fas fa-tshirt"></i><h4>Ropa</h4></div>
+          <div class="categoria-item"><i class="fas fa-shoe-prints"></i><h4>Zapatos</h4></div>
+          <div class="categoria-item"><i class="fas fa-hat-cowboy"></i><h4>Accesorios</h4></div>
+          <div class="categoria-item"><i class="fas fa-tags"></i><h4>Ofertas</h4></div>
+        </div>
+
+        <!-- Productos en grid estilo DepratiK -->
         <div class="card">
           <div class="card-header">
-            <h3><i class="fas fa-store"></i> Nuestra Tienda</h3>
-            <span style="color: #9ca3af; font-size: 0.9rem;">Productos disponibles</span>
+            <h3><i class="fas fa-store"></i> Productos destacados</h3>
+            <span style="color: #9ca3af; font-size: 0.9rem;">Lo último en moda</span>
           </div>
-          <div id="vitrina-productos" class="productos-grid"></div>
+          <div id="vitrina-productos" class="productos-grid-depratik"></div>
         </div>
       </div>
 
-      <!-- PRODUCTOS -->
+      <!-- PRODUCTOS - GESTIÓN -->
       <div id="page-productos" class="page">
         <div class="card">
           <div class="card-header"><h3><i class="fas fa-plus-circle"></i> Nuevo Producto</h3></div>
           
-          <!-- BOTÓN PARA SUBIR FOTOS - VISIBLE Y CLARO -->
+          <!-- Botón para subir fotos -->
           <div style="margin: 12px 0;">
             <button class="btn-subir-foto" id="btn-subir-foto">
               <i class="fas fa-camera"></i> 📸 SUBIR FOTOS DESDE MI DISPOSITIVO
             </button>
             <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
             <p style="color: #9ca3af; font-size: 0.8rem; margin-top: 4px;">
-              <i class="fas fa-info-circle"></i> Haz clic en el botón para seleccionar fotos de tu galería o almacenamiento
+              <i class="fas fa-info-circle"></i> Haz clic en el botón para seleccionar fotos de tu galería
             </p>
           </div>
 
-          <!-- PREVIEW DE IMÁGENES -->
+          <!-- PREVIEW -->
           <div id="preview-container" class="preview-imagenes">
             <div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>
           </div>
@@ -329,7 +495,6 @@
           </div>
           <textarea id="prod-desc" placeholder="Descripción completa del producto"></textarea>
           
-          <!-- Campo oculto para URLs -->
           <input type="hidden" id="prod-imagenes" value="">
           
           <button id="btn-add-producto"><i class="fas fa-save"></i> Guardar Producto</button>
@@ -468,7 +633,6 @@
   let allProducts = [];
   let uploadedImageUrls = [];
 
-  // Elementos UI
   const loginContainer = document.getElementById("login-container");
   const dashboardApp = document.getElementById("dashboard-app");
   const loginBtn = document.getElementById("login-btn");
@@ -499,7 +663,6 @@
     });
   });
 
-  // Login
   loginBtn.addEventListener('click', async () => {
     const email = document.getElementById("login-email").value.trim();
     const pass = document.getElementById("login-password").value.trim();
@@ -536,7 +699,7 @@
     }
   });
 
-  // ---------- SUBIR FOTOS DESDE EL DISPOSITIVO ----------
+  // ---------- SUBIR FOTOS ----------
   const btnSubirFoto = document.getElementById("btn-subir-foto");
   const fileInput = document.getElementById("file-input");
   const previewContainer = document.getElementById("preview-container");
@@ -546,19 +709,16 @@
   fileInput.addEventListener("change", async (e) => {
     if (e.target.files.length === 0) return;
     
-    // Limpiar preview anterior si es nueva carga
     if (uploadedImageUrls.length === 0) {
       previewContainer.innerHTML = '';
     }
     
-    // Eliminar mensaje "sin imágenes"
     const sinImg = previewContainer.querySelector('.sin-imagenes');
     if (sinImg) sinImg.remove();
 
     for (const file of e.target.files) {
       if (!file.type.startsWith("image/")) continue;
       
-      // Mostrar preview
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = document.createElement("img");
@@ -567,7 +727,6 @@
       };
       reader.readAsDataURL(file);
       
-      // Subir a Firebase Storage
       try {
         const storageRef = ref(storage, `productos/${Date.now()}_${file.name}`);
         const snapshot = await uploadBytes(storageRef, file);
@@ -579,16 +738,85 @@
       }
     }
     
-    // Actualizar campo oculto con URLs
     document.getElementById("prod-imagenes").value = uploadedImageUrls.join(", ");
-    
-    // Resetear input para poder subir más archivos después
     fileInput.value = '';
     
     if (uploadedImageUrls.length > 0) {
       alert(`✅ ${uploadedImageUrls.length} imagen(es) subidas exitosamente`);
     }
   });
+
+  // ---------- RENDER TIENDA ESTILO DEPRATIK ----------
+  function renderTiendaDepratik(filter = '') {
+    const container = document.getElementById("vitrina-productos");
+    let filtered = allProducts;
+    if (filter) {
+      filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(filter.toLowerCase()));
+    }
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:#9ca3af;">
+          <i class="fas fa-box-open" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
+          <p>No hay productos disponibles</p>
+          <p style="font-size:0.8rem;">Agrega productos desde el panel de administración</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    filtered.forEach(p => {
+      const imagenes = p.imagenes ? p.imagenes.split(',').map(i => i.trim()) : [];
+      const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
+      const stockText = p.stock > 0 ? `${p.stock} disponibles` : 'Agotado';
+      
+      html += `
+        <div class="producto-card-depratik">
+          <div class="imagen-container">
+            ${imagenes.length > 0 
+              ? `<img src="${imagenes[0]}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/300x300/1e293b/9ca3af?text=Sin+Imagen'">` 
+              : `<img src="https://via.placeholder.com/300x300/1e293b/9ca3af?text=Sin+Imagen" alt="placeholder">`
+            }
+            <span class="etiqueta-stock ${p.stock > 0 ? 'stock-alto' : 'stock-bajo'}">${stockText}</span>
+            ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
+          </div>
+          <div class="info">
+            <div class="nombre">${p.nombre}</div>
+            <div class="precio">$${p.precio}</div>
+            <div class="detalles">
+              ${p.talla ? `<span>📏 ${p.talla}</span>` : ''}
+              ${p.color ? `<span>🎨 ${p.color}</span>` : ''}
+              ${p.medidas ? `<span>📐 ${p.medidas}</span>` : ''}
+            </div>
+            <div class="descripcion">${p.descripcion || 'Descripción no disponible'}</div>
+            ${imagenes.length > 1 ? `
+              <div style="display:flex; gap:6px; margin:8px 0; flex-wrap:wrap;">
+                ${imagenes.slice(1, 4).map(img => `<img src="${img}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;border:1px solid #2d3a4e;" onerror="this.style.display='none'">`).join('')}
+              </div>
+            ` : ''}
+            <button class="btn-comprar" onclick="agregarAlCarrito('${p.id}', '${p.nombre}', ${p.precio})">
+              <i class="fas fa-cart-plus"></i> Agregar al carrito
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // Función global para agregar al carrito desde la tienda
+  window.agregarAlCarrito = (id, nombre, precio) => {
+    const existing = cart.find(item => item.productoId === id);
+    if (existing) {
+      existing.cantidad += 1;
+    } else {
+      cart.push({ productoId: id, nombre, precio, cantidad: 1 });
+    }
+    renderCarrito();
+    alert(`✅ ${nombre} agregado al carrito`);
+    // Cambiar a la pestaña de facturación
+    showPage('ventas');
+  };
 
   // ---------- CARGA DE DATOS ----------
   function loadAllData() {
@@ -617,8 +845,11 @@
       html += `</tbody></table>`;
       document.getElementById("lista-productos").innerHTML = html || "<p>No hay productos.</p>";
       document.getElementById("stat-productos").innerText = snap.size;
-      renderVitrina();
+      
+      // Renderizar tienda estilo DepratiK
+      renderTiendaDepratik();
 
+      // Select carrito
       const selectCarrito = document.getElementById("select-producto-carrito");
       selectCarrito.innerHTML = '<option value="">Selecciona producto</option>';
       snap.forEach(doc => {
@@ -728,50 +959,14 @@
     });
   }
 
-  // ---------- RENDER VITRINA ----------
-  function renderVitrina(filter = '') {
-    const container = document.getElementById("vitrina-productos");
-    let filtered = allProducts;
-    if (filter) {
-      filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(filter.toLowerCase()));
-    }
-    if (filtered.length === 0) {
-      container.innerHTML = '<p style="text-align:center; color:#9ca3af;">No hay productos disponibles</p>';
-      return;
-    }
-    let html = '';
-    filtered.forEach(p => {
-      const imagenes = p.imagenes ? p.imagenes.split(',').map(i => i.trim()) : [];
-      const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
-      html += `
-        <div class="producto-card">
-          ${imagenes.length > 0 ? `<img src="${imagenes[0]}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/200x200/1e293b/9ca3af?text=No+Image'">` : `<img src="https://via.placeholder.com/200x200/1e293b/9ca3af?text=Sin+Imagen" alt="placeholder">`}
-          <div class="producto-info">
-            <h4>${p.nombre}</h4>
-            <div class="precio">$${p.precio}</div>
-            <div class="detalles">
-              ${p.talla ? `📏 Tallas: ${p.talla}` : ''}
-              ${p.color ? ` | 🎨 ${p.color}` : ''}
-              ${p.medidas ? ` | 📐 ${p.medidas}` : ''}
-            </div>
-            <div class="detalles">${p.descripcion || ''}</div>
-            <span class="stock-badge ${stockClass}">${p.stock} disponibles</span>
-            ${imagenes.length > 1 ? `<div class="imagenes-preview">${imagenes.slice(1, 4).map(img => `<img src="${img}" alt="preview" onerror="this.style.display='none'">`).join('')}</div>` : ''}
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-  }
-
   // Filtro
   document.getElementById("filtro-productos")?.addEventListener('input', (e) => {
-    renderVitrina(e.target.value);
+    renderTiendaDepratik(e.target.value);
   });
 
   document.getElementById("btn-limpiar-filtros")?.addEventListener('click', () => {
     document.getElementById("filtro-productos").value = '';
-    renderVitrina('');
+    renderTiendaDepratik('');
   });
 
   // ---------- FUNCIONES GLOBALES ----------
@@ -790,7 +985,6 @@
     document.getElementById("prod-medidas").value = product.medidas || '';
     document.getElementById("prod-desc").value = product.descripcion || '';
     
-    // Cargar imágenes
     previewContainer.innerHTML = '';
     uploadedImageUrls = [];
     if (product.imagenes) {
@@ -861,7 +1055,6 @@
       alert("✅ Producto agregado");
     }
     
-    // Limpiar formulario
     document.getElementById("prod-nombre").value = "";
     document.getElementById("prod-precio").value = "";
     document.getElementById("prod-stock").value = "";
