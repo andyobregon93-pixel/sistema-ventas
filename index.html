@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ===== ESTILOS GENERALES ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -235,88 +234,88 @@
       padding: 20px 0;
     }
 
-    /* ===== TIENDA ===== */
+    /* ===== HEADER CON IMAGEN ===== */
     .tienda-header {
-      background: linear-gradient(135deg, rgba(204,0,0,0.85), rgba(204,0,0,0.75)), url('https://i.imgur.com/7LK1I1L.jpeg');
-      background-size: cover;
-      background-position: center;
       border-radius: 16px;
-      padding: 50px 30px;
       margin-bottom: 30px;
-      text-align: center;
+      overflow: hidden;
       box-shadow: 0 4px 20px rgba(204,0,0,0.15);
-      min-height: 200px;
+      background: #cc0000;
+      min-height: 150px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
-    .tienda-header h1 {
-      font-size: 3rem;
-      font-weight: 900;
-      color: white;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      margin-bottom: 8px;
-    }
-    .tienda-header p {
-      font-size: 1.2rem;
-      color: rgba(255,255,255,0.9);
-      margin-top: 4px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-    .tienda-header .icono-header {
-      font-size: 4rem;
-      color: white;
-      margin-bottom: 10px;
+    .tienda-header img {
+      width: 100%;
+      height: auto;
+      max-height: 250px;
+      object-fit: cover;
       display: block;
+    }
+    .tienda-header .sin-imagen-header {
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+      width: 100%;
+    }
+    .tienda-header .sin-imagen-header h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
       text-shadow: 0 2px 20px rgba(0,0,0,0.2);
     }
+    .tienda-header .sin-imagen-header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
 
-    /* BANNER PUBLICITARIO */
+    /* ===== BANNER PUBLICITARIO GRANDE ===== */
     .banner-publicidad-dinamico {
       background: #ffffff;
       border-radius: 16px;
-      padding: 16px 20px;
+      padding: 20px 25px;
       margin: 15px 0 25px 0;
       border: 2px solid #cc0000;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 20px;
       box-shadow: 0 2px 12px rgba(204,0,0,0.08);
       transition: 0.3s;
+      min-height: 120px;
     }
     .banner-publicidad-dinamico:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(204,0,0,0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(204,0,0,0.15);
     }
     .banner-publicidad-dinamico .banner-contenido {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 25px;
       flex-wrap: wrap;
+      flex: 1;
     }
     .banner-publicidad-dinamico .banner-contenido img {
-      height: 70px;
+      height: 100px;
       width: auto;
-      max-width: 200px;
+      max-width: 250px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #e0e0e0;
     }
     .banner-publicidad-dinamico .banner-contenido .texto h3 {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       color: #cc0000;
       font-weight: 900;
     }
     .banner-publicidad-dinamico .banner-contenido .texto p {
       color: #333;
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
     .banner-publicidad-dinamico .btn-banner {
       background: #cc0000;
-      padding: 10px 24px;
+      padding: 12px 30px;
       border-radius: 12px;
       font-weight: 700;
       color: white;
@@ -324,6 +323,7 @@
       cursor: pointer;
       transition: 0.2s;
       white-space: nowrap;
+      font-size: 1rem;
     }
     .banner-publicidad-dinamico .btn-banner:hover {
       background: #b30000;
@@ -471,7 +471,7 @@
       line-height: 1.5;
     }
 
-    /* ===== MODAL DE PRODUCTO ===== */
+    /* ===== MODAL ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -486,9 +486,7 @@
       align-items: center;
       animation: fadeIn 0.3s ease;
     }
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -702,17 +700,46 @@
     .admin-only { display: none; }
     .seller-only { display: none; }
 
+    /* ===== CONFIGURACIÓN HEADER ===== */
+    .config-header-panel {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 20px;
+    }
+    .config-header-panel h4 {
+      color: #cc0000;
+      margin-bottom: 12px;
+    }
+    .config-header-panel .preview-header-actual {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .config-header-panel .preview-header-actual img {
+      height: 80px;
+      width: auto;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    .config-header-panel .preview-header-actual .sin-img {
+      color: #999;
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
       .main-content { margin-left: 0; padding: 16px; }
       .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #cc0000; border-radius: 12px; padding: 8px 12px; color: white; border: none; }
       .productos-grid-depratik { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-      .tienda-header h1 { font-size: 2rem; }
-      .tienda-header { padding: 30px 20px; min-height: 150px; }
+      .tienda-header img { max-height: 150px; }
       .categorias-section { grid-template-columns: repeat(2, 1fr); }
       .banner-publicidad-dinamico { flex-direction: column; text-align: center; }
       .banner-publicidad-dinamico .banner-contenido { flex-direction: column; text-align: center; }
+      .banner-publicidad-dinamico .banner-contenido img { height: 80px; }
       .modal-grid { grid-template-columns: 1fr; }
       .modal-imagen-principal { height: 220px; }
       .modal-contenido { padding: 20px; }
@@ -748,10 +775,13 @@
           <p>ESTORE 🎁</p>
         </div>
       </div>
+      
+      <!-- Elementos visibles para ADMIN -->
       <div class="admin-only">
         <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
         <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
         <div class="nav-item" data-page="productos"><i class="fas fa-boxes"></i> Productos</div>
+        <div class="nav-item" data-page="configuracion"><i class="fas fa-cog"></i> Configuración</div>
         <div class="nav-item" data-page="publicidad"><i class="fas fa-ad"></i> Publicidad</div>
         <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
         <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
@@ -760,9 +790,12 @@
         <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
         <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
       </div>
+      
+      <!-- Elementos visibles para SELLER y WORKER -->
       <div class="seller-only">
         <div class="nav-item active" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
       </div>
+      
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
 
@@ -771,7 +804,7 @@
       <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
       
       <!-- DASHBOARD -->
-      <div id="page-dashboard" class="page admin-only">
+      <div id="page-dashboard" class="page admin-only active-page">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-title">Productos</div><div class="stat-value" id="stat-productos">0</div></div>
           <div class="stat-card"><div class="stat-title">Ventas (mes)</div><div class="stat-value" id="stat-ventas">0</div></div>
@@ -782,11 +815,15 @@
       </div>
 
       <!-- TIENDA -->
-      <div id="page-tienda" class="page active-page">
-        <div class="tienda-header">
-          <i class="fas fa-gift icono-header"></i>
-          <h1>LOS AMIGOS ESTORE 🎁</h1>
-          <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
+      <div id="page-tienda" class="page">
+        <!-- HEADER CON IMAGEN -->
+        <div class="tienda-header" id="tienda-header">
+          <img id="header-imagen-tienda" src="" alt="Header" style="display:none;">
+          <div class="sin-imagen-header" id="header-placeholder">
+            <i class="fas fa-gift" style="font-size:3rem; display:block; margin-bottom:10px;"></i>
+            <h1>LOS AMIGOS ESTORE 🎁</h1>
+            <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
+          </div>
         </div>
 
         <div id="banners-container"></div>
@@ -828,30 +865,6 @@
           </div>
           <input type="text" id="filtro-productos-tienda" placeholder="🔍 Buscar productos..." style="margin-bottom: 16px;" oninput="renderTiendaDepratik()">
           <div id="vitrina-productos" class="productos-grid-depratik"></div>
-        </div>
-      </div>
-
-      <!-- MODAL DE PRODUCTO -->
-      <div class="modal-overlay" id="modal-producto">
-        <div class="modal-contenido">
-          <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
-          <div class="modal-grid">
-            <div class="modal-imagenes">
-              <img class="modal-imagen-principal" id="modal-img-principal" src="" alt="Producto">
-              <div class="modal-miniaturas" id="modal-miniaturas"></div>
-            </div>
-            <div class="modal-info">
-              <div class="nombre" id="modal-nombre">Nombre</div>
-              <div class="precio" id="modal-precio">$0.00</div>
-              <div class="codigo" id="modal-codigo">Código: ---</div>
-              <div class="detalles" id="modal-detalles"></div>
-              <div class="descripcion" id="modal-descripcion">Descripción</div>
-              <div class="stock-info" id="modal-stock">Stock disponible</div>
-              <button class="btn-agregar-modal" id="modal-btn-agregar" onclick="agregarDelModal()">
-                <i class="fas fa-cart-plus"></i> Agregar al carrito
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -909,6 +922,39 @@
         </div>
       </div>
 
+      <!-- ===== CONFIGURACIÓN (HEADER) ===== -->
+      <div id="page-configuracion" class="page admin-only">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-cog" style="color:#cc0000;"></i> Configuración de la Tienda</h3>
+            <span style="color: #666; font-size: 0.8rem;">Personaliza el header de tu tienda</span>
+          </div>
+
+          <div class="config-header-panel">
+            <h4>📸 Imagen del Header</h4>
+            <p style="color:#666; font-size:0.9rem; margin-bottom:12px;">Sube una imagen para reemplazar el texto "LOS AMIGOS ESTORE 🎁" en la parte superior de la tienda.</p>
+            
+            <div class="flex">
+              <input type="text" id="header-imagen-url" placeholder="URL de la imagen del header" style="flex:3;">
+              <button id="btn-guardar-header" class="btn-success"><i class="fas fa-save"></i> Guardar</button>
+            </div>
+            
+            <div style="margin-top:12px;">
+              <button id="btn-restaurar-header" class="btn-outline" style="background:transparent; border:2px solid #dc3545; color:#dc3545;">
+                <i class="fas fa-undo"></i> Restaurar texto original
+              </button>
+            </div>
+            
+            <div class="preview-header-actual" style="margin-top:16px; padding-top:16px; border-top:1px solid #e0e0e0;">
+              <span style="font-weight:600; color:#333;">Vista actual:</span>
+              <div id="preview-header-actual-container">
+                <span class="sin-img">📝 Texto original</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- PUBLICIDAD -->
       <div id="page-publicidad" class="page admin-only">
         <div class="card">
@@ -944,7 +990,7 @@
         </div>
       </div>
 
-      <!-- FACTURACIÓN (solo admin) -->
+      <!-- FACTURACIÓN -->
       <div id="page-ventas" class="page admin-only">
         <div class="card">
           <h3>🛒 Carrito de compras</h3>
@@ -1072,6 +1118,7 @@
   let uploadedImageUrls = [];
   let categoriaSeleccionada = "todos";
   let productoModal = null;
+  let headerImageUrl = "";
 
   function addDebugLog(message, type = 'info') {
     const panel = document.getElementById('debug-panel');
@@ -1159,11 +1206,93 @@
       updateVisibilityByRole();
       addDebugLog(`👤 Usuario: ${user.email} (${currentUserRol})`, 'success');
       loadAllData();
+      cargarHeader();
     } else {
       loginContainer.style.display = "flex";
       dashboardApp.style.display = "none";
       currentUser = null;
       currentUserRol = "visitor";
+    }
+  });
+
+  // ===== HEADER =====
+  function cargarHeader() {
+    // Cargar URL del header desde Firestore
+    const headerDocRef = doc(db, "configuracion", "header");
+    getDoc(headerDocRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        headerImageUrl = docSnap.data().imagen || "";
+        actualizarHeader();
+        actualizarPreviewHeader();
+      }
+    }).catch(err => {
+      console.log("Error cargando header:", err);
+    });
+  }
+
+  function actualizarHeader() {
+    const headerDiv = document.getElementById('tienda-header');
+    const img = document.getElementById('header-imagen-tienda');
+    const placeholder = document.getElementById('header-placeholder');
+    
+    if (headerImageUrl && headerImageUrl.trim() !== "") {
+      img.src = headerImageUrl;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      // Verificar que la imagen cargue bien
+      img.onerror = function() {
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+      };
+    } else {
+      img.style.display = 'none';
+      placeholder.style.display = 'block';
+    }
+  }
+
+  function actualizarPreviewHeader() {
+    const container = document.getElementById('preview-header-actual-container');
+    if (headerImageUrl && headerImageUrl.trim() !== "") {
+      container.innerHTML = `<img src="${headerImageUrl}" style="height:60px; width:auto; border-radius:8px; border:1px solid #e0e0e0;" onerror="this.outerHTML='<span class=\\'sin-img\\'>❌ Error al cargar imagen</span>'">`;
+    } else {
+      container.innerHTML = `<span class="sin-img">📝 Texto original: "LOS AMIGOS ESTORE 🎁"</span>`;
+    }
+  }
+
+  // Guardar header
+  document.getElementById("btn-guardar-header")?.addEventListener("click", async () => {
+    const url = document.getElementById("header-imagen-url").value.trim();
+    if (!url) {
+      alert("Por favor, ingresa la URL de la imagen.");
+      return;
+    }
+    try {
+      await setDoc(doc(db, "configuracion", "header"), { imagen: url });
+      headerImageUrl = url;
+      actualizarHeader();
+      actualizarPreviewHeader();
+      document.getElementById("header-imagen-url").value = "";
+      addDebugLog(`✅ Header actualizado: ${url}`, 'success');
+      alert("✅ Imagen del header guardada correctamente");
+    } catch (error) {
+      addDebugLog(`❌ Error guardando header: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+  });
+
+  // Restaurar header
+  document.getElementById("btn-restaurar-header")?.addEventListener("click", async () => {
+    if (!confirm("¿Restaurar el texto original del header?")) return;
+    try {
+      await setDoc(doc(db, "configuracion", "header"), { imagen: "" });
+      headerImageUrl = "";
+      actualizarHeader();
+      actualizarPreviewHeader();
+      addDebugLog(`✅ Header restaurado a texto original`, 'success');
+      alert("✅ Header restaurado");
+    } catch (error) {
+      addDebugLog(`❌ Error restaurando header: ${error.message}`, 'error');
+      alert("Error: " + error.message);
     }
   });
 
@@ -1219,19 +1348,15 @@
     }
   });
 
-  // ===== RENDER TIENDA CON CATEGORÍAS =====
+  // ===== RENDER TIENDA =====
   window.renderTiendaDepratik = function() {
     const container = document.getElementById("vitrina-productos");
     const filtroTexto = document.getElementById("filtro-productos-tienda")?.value?.toLowerCase() || '';
     
     let filtered = allProducts;
-    
-    // Filtrar por categoría
     if (categoriaSeleccionada !== "todos") {
       filtered = filtered.filter(p => p.categoria === categoriaSeleccionada);
     }
-    
-    // Filtrar por texto
     if (filtroTexto) {
       filtered = filtered.filter(p => p.nombre && p.nombre.toLowerCase().includes(filtroTexto));
     }
@@ -1288,7 +1413,6 @@
   window.abrirModal = function(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
-    
     productoModal = product;
     
     let imagenes = [];
@@ -1299,7 +1423,6 @@
         imagenes = product.imagenes;
       }
     }
-    
     const primeraImagen = imagenes.length > 0 ? imagenes[0] : 'https://via.placeholder.com/300x300/f0f0f0/999?text=Sin+Imagen';
     
     document.getElementById('modal-img-principal').src = primeraImagen;
@@ -1307,7 +1430,6 @@
     document.getElementById('modal-precio').textContent = `$${product.precio || 0}`;
     document.getElementById('modal-codigo').textContent = `Código: ${product.id?.slice(0, 8) || '---'}`;
     
-    // Detalles (tallas, colores, medidas)
     let detallesHtml = '';
     if (product.talla) detallesHtml += `<span>📏 ${product.talla}</span>`;
     if (product.color) detallesHtml += `<span>🎨 ${product.color}</span>`;
@@ -1329,7 +1451,6 @@
       btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al carrito';
     }
     
-    // Miniaturas
     const miniContainer = document.getElementById('modal-miniaturas');
     miniContainer.innerHTML = '';
     if (imagenes.length > 0) {
@@ -1360,7 +1481,6 @@
     productoModal = null;
   };
 
-  // Cerrar modal al hacer clic fuera
   document.getElementById('modal-producto').addEventListener('click', function(e) {
     if (e.target === this) cerrarModal();
   });
