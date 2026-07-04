@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ===== ESTILOS BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -87,6 +88,7 @@
       background: #f5f5f5;
     }
 
+    /* ===== CARDS ===== */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -269,7 +271,7 @@
       opacity: 0.9;
     }
 
-    /* ===== BANNER PUBLICITARIO GRANDE ===== */
+    /* ===== BANNER PUBLICITARIO ===== */
     .banner-publicidad-dinamico {
       background: #ffffff;
       border-radius: 16px;
@@ -700,7 +702,6 @@
     .admin-only { display: none; }
     .seller-only { display: none; }
 
-    /* ===== CONFIGURACIÓN HEADER ===== */
     .config-header-panel {
       background: #f9f9f9;
       border-radius: 12px;
@@ -728,6 +729,24 @@
       color: #999;
       font-size: 0.9rem;
     }
+
+    /* ===== BOTÓN CREAR SELLER ===== */
+    .btn-crear-seller {
+      background: #28a745;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      margin: 8px 0;
+    }
+    .btn-crear-seller:hover { background: #218838; transform: scale(1.02); }
 
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
@@ -776,7 +795,7 @@
         </div>
       </div>
       
-      <!-- Elementos visibles para ADMIN -->
+      <!-- Elementos ADMIN -->
       <div class="admin-only">
         <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
         <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
@@ -785,13 +804,13 @@
         <div class="nav-item" data-page="publicidad"><i class="fas fa-ad"></i> Publicidad</div>
         <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
         <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
-        <div class="nav-item" data-page="trabajadores"><i class="fas fa-users"></i> Trabajadores</div>
+        <div class="nav-item" data-page="usuarios"><i class="fas fa-users-cog"></i> Usuarios</div>
         <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
         <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
         <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
       </div>
       
-      <!-- Elementos visibles para SELLER y WORKER -->
+      <!-- Elementos SELLER -->
       <div class="seller-only">
         <div class="nav-item active" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
       </div>
@@ -803,7 +822,7 @@
     <div class="main-content">
       <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
       
-      <!-- DASHBOARD -->
+      <!-- ===== DASHBOARD ===== -->
       <div id="page-dashboard" class="page admin-only active-page">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-title">Productos</div><div class="stat-value" id="stat-productos">0</div></div>
@@ -814,9 +833,8 @@
         <div class="card"><h3>Últimas ventas</h3><div id="ultimas-ventas-lista"></div></div>
       </div>
 
-      <!-- TIENDA -->
+      <!-- ===== TIENDA ===== -->
       <div id="page-tienda" class="page">
-        <!-- HEADER CON IMAGEN -->
         <div class="tienda-header" id="tienda-header">
           <img id="header-imagen-tienda" src="" alt="Header" style="display:none;">
           <div class="sin-imagen-header" id="header-placeholder">
@@ -828,36 +846,24 @@
 
         <div id="banners-container"></div>
 
-        <!-- CATEGORÍAS -->
         <div class="categorias-section" id="categorias-container">
           <div class="categoria-item active-categoria" data-categoria="todos">
-            <i class="fas fa-th-large"></i>
-            <h4>Todos</h4>
-            <p>Todos los productos</p>
+            <i class="fas fa-th-large"></i><h4>Todos</h4><p>Todos los productos</p>
           </div>
           <div class="categoria-item" data-categoria="ropa">
-            <i class="fas fa-tshirt"></i>
-            <h4>Ropa</h4>
-            <p>Camisas, pantalones</p>
+            <i class="fas fa-tshirt"></i><h4>Ropa</h4><p>Camisas, pantalones</p>
           </div>
           <div class="categoria-item" data-categoria="zapatos">
-            <i class="fas fa-shoe-prints"></i>
-            <h4>Zapatos</h4>
-            <p>Tenis, zapatillas</p>
+            <i class="fas fa-shoe-prints"></i><h4>Zapatos</h4><p>Tenis, zapatillas</p>
           </div>
           <div class="categoria-item" data-categoria="accesorios">
-            <i class="fas fa-hat-cowboy"></i>
-            <h4>Accesorios</h4>
-            <p>Gorras, cinturones</p>
+            <i class="fas fa-hat-cowboy"></i><h4>Accesorios</h4><p>Gorras, cinturones</p>
           </div>
           <div class="categoria-item" data-categoria="ofertas">
-            <i class="fas fa-tags"></i>
-            <h4>Ofertas</h4>
-            <p>Descuentos especiales</p>
+            <i class="fas fa-tags"></i><h4>Ofertas</h4><p>Descuentos especiales</p>
           </div>
         </div>
 
-        <!-- PRODUCTOS -->
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-store" style="color:#cc0000;"></i> Productos destacados</h3>
@@ -868,7 +874,7 @@
         </div>
       </div>
 
-      <!-- PRODUCTOS (solo admin) -->
+      <!-- ===== PRODUCTOS ===== -->
       <div id="page-productos" class="page admin-only">
         <div class="card">
           <div class="card-header"><h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3></div>
@@ -922,29 +928,25 @@
         </div>
       </div>
 
-      <!-- ===== CONFIGURACIÓN (HEADER) ===== -->
+      <!-- ===== CONFIGURACIÓN ===== -->
       <div id="page-configuracion" class="page admin-only">
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-cog" style="color:#cc0000;"></i> Configuración de la Tienda</h3>
             <span style="color: #666; font-size: 0.8rem;">Personaliza el header de tu tienda</span>
           </div>
-
           <div class="config-header-panel">
             <h4>📸 Imagen del Header</h4>
             <p style="color:#666; font-size:0.9rem; margin-bottom:12px;">Sube una imagen para reemplazar el texto "LOS AMIGOS ESTORE 🎁" en la parte superior de la tienda.</p>
-            
             <div class="flex">
               <input type="text" id="header-imagen-url" placeholder="URL de la imagen del header" style="flex:3;">
               <button id="btn-guardar-header" class="btn-success"><i class="fas fa-save"></i> Guardar</button>
             </div>
-            
             <div style="margin-top:12px;">
               <button id="btn-restaurar-header" class="btn-outline" style="background:transparent; border:2px solid #dc3545; color:#dc3545;">
                 <i class="fas fa-undo"></i> Restaurar texto original
               </button>
             </div>
-            
             <div class="preview-header-actual" style="margin-top:16px; padding-top:16px; border-top:1px solid #e0e0e0;">
               <span style="font-weight:600; color:#333;">Vista actual:</span>
               <div id="preview-header-actual-container">
@@ -955,7 +957,7 @@
         </div>
       </div>
 
-      <!-- PUBLICIDAD -->
+      <!-- ===== PUBLICIDAD ===== -->
       <div id="page-publicidad" class="page admin-only">
         <div class="card">
           <div class="card-header">
@@ -990,7 +992,7 @@
         </div>
       </div>
 
-      <!-- FACTURACIÓN -->
+      <!-- ===== FACTURACIÓN ===== -->
       <div id="page-ventas" class="page admin-only">
         <div class="card">
           <h3>🛒 Carrito de compras</h3>
@@ -1020,7 +1022,7 @@
         <div class="card"><h3>Historial de ventas</h3><div id="historial-ventas"></div></div>
       </div>
 
-      <!-- LINKS DE PAGO -->
+      <!-- ===== LINKS DE PAGO ===== -->
       <div id="page-pagos" class="page admin-only">
         <div class="card">
           <h3>Crear link de pago</h3>
@@ -1031,22 +1033,39 @@
         <div class="card"><h3>Links activos</h3><div id="lista-links-pago"></div></div>
       </div>
 
-      <!-- TRABAJADORES -->
-      <div id="page-trabajadores" class="page admin-only">
+      <!-- ===== USUARIOS (CREAR SELLER) ===== -->
+      <div id="page-usuarios" class="page admin-only">
         <div class="card">
-          <h3>Registrar trabajador</h3>
-          <input type="email" id="worker-email" placeholder="Correo electrónico">
-          <input type="text" id="worker-nombre" placeholder="Nombre completo">
-          <select id="worker-rol">
-            <option value="seller">VENDEDOR</option>
-            <option value="worker">AYUDANTE</option>
-          </select>
-          <button id="btn-registrar-trabajador"><i class="fas fa-user-plus"></i> Crear cuenta</button>
+          <div class="card-header">
+            <h3><i class="fas fa-users-cog" style="color:#cc0000;"></i> Crear Usuario Seller</h3>
+            <span style="color: #666; font-size: 0.8rem;">Crea cuentas para vendedores (solo verán la tienda)</span>
+          </div>
+          
+          <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; border: 1px solid #e0e0e0;">
+            <div class="flex">
+              <input type="email" id="seller-email" placeholder="Correo electrónico*" style="flex:2">
+              <input type="text" id="seller-nombre" placeholder="Nombre completo*" style="flex:2">
+            </div>
+            <div class="flex">
+              <select id="seller-rol" style="flex:1;">
+                <option value="seller">VENDEDOR</option>
+                <option value="worker">AYUDANTE</option>
+              </select>
+              <button id="btn-crear-seller" class="btn-crear-seller"><i class="fas fa-user-plus"></i> Crear Cuenta Seller</button>
+            </div>
+            <p style="color: #666; font-size: 0.8rem; margin-top: 8px;">
+              <i class="fas fa-info-circle"></i> Al crear, se generará una contraseña temporal que el usuario deberá cambiar al iniciar sesión.
+            </p>
+          </div>
         </div>
-        <div class="card"><h3>Lista de trabajadores</h3><div id="lista-trabajadores"></div></div>
+
+        <div class="card">
+          <h3>Lista de Usuarios</h3>
+          <div id="lista-usuarios"></div>
+        </div>
       </div>
 
-      <!-- MIEMBROS -->
+      <!-- ===== MIEMBROS ===== -->
       <div id="page-miembros" class="page admin-only">
         <div class="card">
           <h3>Nuevo miembro</h3>
@@ -1060,7 +1079,7 @@
         <div class="card"><h3>Base de miembros</h3><div id="lista-miembros"></div></div>
       </div>
 
-      <!-- MÉTODOS DE PAGO -->
+      <!-- ===== MÉTODOS DE PAGO ===== -->
       <div id="page-metodos-pago" class="page admin-only">
         <div class="card">
           <h3>Agregar método de pago</h3>
@@ -1077,7 +1096,7 @@
         <div class="card"><h3>Métodos disponibles</h3><div id="lista-metodos"></div></div>
       </div>
 
-      <!-- ADMIN -->
+      <!-- ===== ADMIN / ROLES ===== -->
       <div id="page-admin" class="page admin-only">
         <div class="card">
           <h3>Crear Administrador</h3>
@@ -1086,6 +1105,30 @@
           <button id="btn-crear-admin"><i class="fas fa-user-shield"></i> Hacer Admin</button>
         </div>
         <div class="card"><h3>Usuarios y roles</h3><div id="lista-roles"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-producto">
+  <div class="modal-contenido">
+    <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-grid">
+      <div class="modal-imagenes">
+        <img class="modal-imagen-principal" id="modal-img-principal" src="" alt="Producto">
+        <div class="modal-miniaturas" id="modal-miniaturas"></div>
+      </div>
+      <div class="modal-info">
+        <div class="nombre" id="modal-nombre">Nombre</div>
+        <div class="precio" id="modal-precio">$0.00</div>
+        <div class="codigo" id="modal-codigo">Código: ---</div>
+        <div class="detalles" id="modal-detalles"></div>
+        <div class="descripcion" id="modal-descripcion">Descripción</div>
+        <div class="stock-info" id="modal-stock">Stock disponible</div>
+        <button class="btn-agregar-modal" id="modal-btn-agregar" onclick="agregarDelModal()">
+          <i class="fas fa-cart-plus"></i> Agregar al carrito
+        </button>
       </div>
     </div>
   </div>
@@ -1217,7 +1260,6 @@
 
   // ===== HEADER =====
   function cargarHeader() {
-    // Cargar URL del header desde Firestore
     const headerDocRef = doc(db, "configuracion", "header");
     getDoc(headerDocRef).then((docSnap) => {
       if (docSnap.exists()) {
@@ -1225,21 +1267,17 @@
         actualizarHeader();
         actualizarPreviewHeader();
       }
-    }).catch(err => {
-      console.log("Error cargando header:", err);
-    });
+    }).catch(err => console.log("Error cargando header:", err));
   }
 
   function actualizarHeader() {
     const headerDiv = document.getElementById('tienda-header');
     const img = document.getElementById('header-imagen-tienda');
     const placeholder = document.getElementById('header-placeholder');
-    
     if (headerImageUrl && headerImageUrl.trim() !== "") {
       img.src = headerImageUrl;
       img.style.display = 'block';
       placeholder.style.display = 'none';
-      // Verificar que la imagen cargue bien
       img.onerror = function() {
         img.style.display = 'none';
         placeholder.style.display = 'block';
@@ -1259,13 +1297,9 @@
     }
   }
 
-  // Guardar header
   document.getElementById("btn-guardar-header")?.addEventListener("click", async () => {
     const url = document.getElementById("header-imagen-url").value.trim();
-    if (!url) {
-      alert("Por favor, ingresa la URL de la imagen.");
-      return;
-    }
+    if (!url) { alert("Por favor, ingresa la URL de la imagen."); return; }
     try {
       await setDoc(doc(db, "configuracion", "header"), { imagen: url });
       headerImageUrl = url;
@@ -1280,7 +1314,6 @@
     }
   });
 
-  // Restaurar header
   document.getElementById("btn-restaurar-header")?.addEventListener("click", async () => {
     if (!confirm("¿Restaurar el texto original del header?")) return;
     try {
@@ -1313,10 +1346,7 @@
     if (sinImg) sinImg.remove();
 
     for (const file of e.target.files) {
-      if (!file.type.startsWith("image/")) {
-        addDebugLog(`⚠️ Saltando: ${file.name} (no es imagen)`, 'error');
-        continue;
-      }
+      if (!file.type.startsWith("image/")) continue;
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = document.createElement("img");
@@ -1664,10 +1694,49 @@
     showPage('ventas');
   };
 
+  // ===== CREAR SELLER =====
+  document.getElementById("btn-crear-seller")?.addEventListener("click", async () => {
+    const email = document.getElementById("seller-email").value.trim();
+    const nombre = document.getElementById("seller-nombre").value.trim();
+    const rol = document.getElementById("seller-rol").value;
+    
+    if (!email || !nombre) {
+      alert("Completa el correo y el nombre del vendedor.");
+      return;
+    }
+    
+    const tempPass = Math.random().toString(36).slice(-8);
+    
+    try {
+      // Crear usuario en Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, tempPass);
+      
+      // Guardar rol en Firestore
+      await setDoc(doc(db, "usuarios_permisos", email), { 
+        rol: rol, 
+        estado: true, 
+        nombre: nombre,
+        uid: userCredential.user.uid
+      });
+      
+      addDebugLog(`✅ Vendedor creado: ${email} (${rol})`, 'success');
+      alert(`✅ Vendedor creado exitosamente.\n📧 Email: ${email}\n🔑 Contraseña temporal: ${tempPass}\n\n¡El vendedor debe cambiar su contraseña al iniciar sesión!`);
+      
+      // Limpiar campos
+      document.getElementById("seller-email").value = "";
+      document.getElementById("seller-nombre").value = "";
+      
+    } catch (error) {
+      addDebugLog(`❌ Error creando vendedor: ${error.message}`, 'error');
+      alert("Error al crear vendedor: " + error.message);
+    }
+  });
+
   // ===== CARGA DE DATOS =====
   function loadAllData() {
     addDebugLog('🔄 Cargando datos de Firebase...', 'info');
     
+    // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = [];
       let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Categoría</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
@@ -1710,6 +1779,7 @@
       addDebugLog(`❌ Error cargando productos: ${error.message}`, 'error');
     });
 
+    // BANNERS
     onSnapshot(collection(db, "publicidad"), (snap) => {
       allBanners = [];
       snap.forEach(doc => {
@@ -1802,22 +1872,61 @@
       document.getElementById("lista-links-pago").innerHTML = html;
     });
 
-    // TRABAJADORES
+    // USUARIOS (para lista de usuarios)
     onSnapshot(collection(db, "usuarios_permisos"), (snap) => {
-      let html = `<table><thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+      // Lista de usuarios en la sección "Usuarios"
+      let usuariosHtml = `<table><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const u = doc.data();
+        if (doc.id === MASTER_EMAIL) {
+          usuariosHtml += `<tr>
+            <td><strong>${doc.id}</strong> 👑</td>
+            <td>${u.nombre || 'Master'}</td>
+            <td><span class="badge" style="background:#cc0000; color:white;">ADMIN</span></td>
+            <td>Activo ✅</td>
+            <td>-</td>
+          </tr>`;
+          return;
+        }
+        usuariosHtml += `<tr>
+          <td>${doc.id}</td>
+          <td>${u.nombre || 'Sin nombre'}</td>
+          <td><span class="badge">${u.rol || 'sin rol'}</span></td>
+          <td>${u.estado ? 'Activo ✅' : 'Inactivo ⛔'}</td>
+          <td>
+            <button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${u.estado ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarUsuario('${doc.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              🗑️
+            </button>
+          </td>
+        </tr>`;
+      });
+      usuariosHtml += `</tbody></table>`;
+      document.getElementById("lista-usuarios").innerHTML = usuariosHtml;
+      
+      // También actualizar la lista de roles en Admin
+      let rolesHtml = `<table><thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
       snap.forEach(doc => {
         const u = doc.data();
         if (doc.id === MASTER_EMAIL) return;
-        html += `<tr>
+        rolesHtml += `<tr>
           <td>${doc.id}</td>
           <td><span class="badge">${u.rol || ''}</span></td>
           <td>${u.estado ? 'Activo ✅' : 'Inactivo ⛔'}</td>
-          <td><button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})">${u.estado ? 'Desactivar' : 'Activar'}</button> <button class="btn-small btn-danger" onclick="eliminarTrabajador('${doc.id}')">🗑️</button></td>
+          <td>
+            <button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${u.estado ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarUsuario('${doc.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              🗑️
+            </button>
+          </td>
         </tr>`;
       });
-      html += `</tbody></table>`;
-      document.getElementById("lista-trabajadores").innerHTML = html;
-      document.getElementById("lista-roles").innerHTML = html;
+      rolesHtml += `</tbody></table>`;
+      document.getElementById("lista-roles").innerHTML = rolesHtml;
     });
   }
 
@@ -1880,12 +1989,18 @@
     await updateDoc(doc(db, "usuarios_permisos", email), { estado: estado });
     addDebugLog(`🔄 Estado cambiado: ${email} -> ${estado ? 'Activo' : 'Inactivo'}`, 'info');
   };
-  window.eliminarTrabajador = async (email) => {
-    if (confirm("Eliminar trabajador?")) {
+  window.eliminarUsuario = async (email) => {
+    if (!confirm(`¿Eliminar el usuario ${email}? Solo se eliminará su rol, no la cuenta de autenticación.`)) return;
+    try {
       await deleteDoc(doc(db, "usuarios_permisos", email));
-      addDebugLog(`🗑️ Trabajador eliminado: ${email}`, 'info');
+      addDebugLog(`🗑️ Usuario eliminado: ${email}`, 'info');
+      alert("✅ Usuario eliminado correctamente");
+    } catch (error) {
+      addDebugLog(`❌ Error eliminando usuario: ${error.message}`, 'error');
+      alert("Error: " + error.message);
     }
   };
+  
   window.eliminarDelCarrito = (idx) => {
     cart.splice(idx, 1);
     renderCarrito();
@@ -2030,24 +2145,6 @@
     alert("✅ Link generado");
     document.getElementById("link-monto").value = "";
     document.getElementById("link-concepto").value = "";
-  });
-
-  // ===== TRABAJADORES =====
-  document.getElementById("btn-registrar-trabajador")?.addEventListener("click", async () => {
-    const email = document.getElementById("worker-email").value.trim();
-    const nombre = document.getElementById("worker-nombre").value.trim();
-    const rol = document.getElementById("worker-rol").value;
-    if (!email || !nombre) return alert("Completa email y nombre");
-    const tempPass = Math.random().toString(36).slice(-8);
-    try {
-      await createUserWithEmailAndPassword(auth, email, tempPass);
-      await setDoc(doc(db, "usuarios_permisos", email), { rol, estado: true, nombre });
-      addDebugLog(`✅ Trabajador creado: ${email} (${rol})`, 'success');
-      alert(`✅ Trabajador creado. Contraseña temporal: ${tempPass}`);
-    } catch (err) {
-      addDebugLog(`❌ Error creando trabajador: ${err.message}`, 'error');
-      alert("Error: " + err.message);
-    }
   });
 
   // ===== MIEMBROS =====
