@@ -170,6 +170,9 @@
       font-weight: 600; 
       color: #333;
     }
+    .badge-activo { background: #d4edda; color: #155724; }
+    .badge-inactivo { background: #f8d7da; color: #721c24; }
+    
     .flex { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .page { display: none; animation: fade 0.3s ease; }
     .active-page { display: block; }
@@ -232,9 +235,7 @@
       padding: 20px 0;
     }
 
-    /* ========== TIENDA CON HEADER CON IMAGEN ========== */
-    
-    /* HEADER PRINCIPAL CON IMAGEN DE FONDO */
+    /* ========== TIENDA ========== */
     .tienda-header {
       background: linear-gradient(135deg, rgba(204,0,0,0.85), rgba(204,0,0,0.75)), url('https://i.imgur.com/7LK1I1L.jpeg');
       background-size: cover;
@@ -271,12 +272,12 @@
       text-shadow: 0 2px 20px rgba(0,0,0,0.2);
     }
 
-    /* BANNER PUBLICITARIO */
-    .banner-publicidad {
+    /* BANNER PUBLICITARIO DINÁMICO */
+    .banner-publicidad-dinamico {
       background: #ffffff;
       border-radius: 16px;
-      padding: 20px 25px;
-      margin: 20px 0 25px 0;
+      padding: 16px 20px;
+      margin: 15px 0 25px 0;
       border: 2px solid #cc0000;
       display: flex;
       align-items: center;
@@ -284,28 +285,64 @@
       flex-wrap: wrap;
       gap: 15px;
       box-shadow: 0 2px 12px rgba(204,0,0,0.08);
+      transition: 0.3s;
     }
-    .banner-publicidad .texto h3 {
-      font-size: 1.5rem;
+    .banner-publicidad-dinamico:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(204,0,0,0.12);
+    }
+    .banner-publicidad-dinamico .banner-contenido {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .banner-publicidad-dinamico .banner-contenido img {
+      height: 70px;
+      width: auto;
+      max-width: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+    }
+    .banner-publicidad-dinamico .banner-contenido .texto h3 {
+      font-size: 1.3rem;
       color: #cc0000;
       font-weight: 900;
     }
-    .banner-publicidad .texto p {
+    .banner-publicidad-dinamico .banner-contenido .texto p {
       color: #333;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
-    .banner-publicidad .btn-banner {
+    .banner-publicidad-dinamico .btn-banner {
       background: #cc0000;
-      padding: 12px 28px;
+      padding: 10px 24px;
       border-radius: 12px;
       font-weight: 700;
       color: white;
       border: none;
       cursor: pointer;
       transition: 0.2s;
+      white-space: nowrap;
     }
-    .banner-publicidad .btn-banner:hover {
+    .banner-publicidad-dinamico .btn-banner:hover {
       background: #b30000;
+      transform: scale(1.03);
+    }
+    .banner-publicidad-dinamico .btn-banner-outline {
+      background: transparent;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #cc0000;
+      border: 2px solid #cc0000;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .banner-publicidad-dinamico .btn-banner-outline:hover {
+      background: #cc0000;
+      color: white;
       transform: scale(1.03);
     }
 
@@ -339,43 +376,6 @@
     }
     .categoria-item h4 { font-size: 0.9rem; color: #1a1a1a; }
     .categoria-item p { font-size: 0.7rem; color: #666; }
-
-    /* BANNER OFERTAS */
-    .banner-ofertas {
-      background: linear-gradient(135deg, #ffffff, #f5f5f5);
-      border-radius: 16px;
-      padding: 25px 30px;
-      margin: 25px 0;
-      border: 2px solid #cc0000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 15px;
-      box-shadow: 0 2px 12px rgba(204,0,0,0.06);
-    }
-    .banner-ofertas .texto h3 {
-      font-size: 1.5rem;
-      color: #cc0000;
-      font-weight: 900;
-    }
-    .banner-ofertas .texto p {
-      color: #333;
-    }
-    .banner-ofertas .btn-oferta {
-      background: #cc0000;
-      padding: 12px 28px;
-      border-radius: 12px;
-      font-weight: 700;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .banner-ofertas .btn-oferta:hover {
-      background: #b30000;
-      transform: scale(1.03);
-    }
 
     /* PRODUCTOS GRID */
     .productos-grid-depratik {
@@ -550,6 +550,35 @@
     .debug-panel .log-entry.error { color: #dc3545; }
     .debug-panel .log-entry.info { color: #007bff; }
 
+    /* ========== PANEL DE PUBLICIDAD ========== */
+    .banner-preview-mini {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      margin: 8px 0;
+    }
+    .banner-preview-mini img {
+      height: 50px;
+      width: auto;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    .banner-preview-mini .info {
+      flex: 1;
+    }
+    .banner-preview-mini .info h4 {
+      font-size: 0.95rem;
+      color: #1a1a1a;
+    }
+    .banner-preview-mini .info p {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
@@ -559,7 +588,8 @@
       .tienda-header h1 { font-size: 2rem; }
       .tienda-header { padding: 30px 20px; min-height: 150px; }
       .categorias-section { grid-template-columns: repeat(2, 1fr); }
-      .banner-ofertas, .banner-publicidad { flex-direction: column; text-align: center; }
+      .banner-publicidad-dinamico { flex-direction: column; text-align: center; }
+      .banner-publicidad-dinamico .banner-contenido { flex-direction: column; text-align: center; }
     }
     .menu-toggle { display: none; }
   </style>
@@ -595,6 +625,7 @@
       <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
       <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
       <div class="nav-item" data-page="productos"><i class="fas fa-boxes"></i> Productos</div>
+      <div class="nav-item" data-page="publicidad"><i class="fas fa-ad"></i> Publicidad</div>
       <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
       <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
       <div class="nav-item" data-page="trabajadores"><i class="fas fa-users"></i> Trabajadores</div>
@@ -621,21 +652,14 @@
 
       <!-- TIENDA -->
       <div id="page-tienda" class="page">
-        <!-- HEADER CON IMAGEN DE FONDO -->
         <div class="tienda-header">
           <i class="fas fa-gift icono-header"></i>
           <h1>LOS AMIGOS ESTORE 🎁</h1>
           <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
         </div>
 
-        <!-- BANNER PUBLICIDAD 1 -->
-        <div class="banner-publicidad">
-          <div class="texto">
-            <h3>🔥 OFERTA ESPECIAL</h3>
-            <p>Hasta 30% de descuento en tu primera compra</p>
-          </div>
-          <button class="btn-banner" onclick="document.getElementById('filtro-productos-tienda').value=''; renderTiendaDepratik('');">Ver ofertas</button>
-        </div>
+        <!-- BANNERS DINÁMICOS DESDE FIREBASE -->
+        <div id="banners-container"></div>
 
         <!-- CATEGORÍAS -->
         <div class="categorias-section">
@@ -643,24 +667,6 @@
           <div class="categoria-item"><i class="fas fa-shoe-prints"></i><h4>Zapatos</h4><p>Tenis, zapatillas</p></div>
           <div class="categoria-item"><i class="fas fa-hat-cowboy"></i><h4>Accesorios</h4><p>Gorras, cinturones</p></div>
           <div class="categoria-item"><i class="fas fa-tags"></i><h4>Ofertas</h4><p>Descuentos especiales</p></div>
-        </div>
-
-        <!-- BANNER PUBLICIDAD 2 -->
-        <div class="banner-publicidad">
-          <div class="texto">
-            <h3>🎁 REGALO ESPECIAL</h3>
-            <p>Lleva un accesorio gratis con tu compra</p>
-          </div>
-          <button class="btn-banner" onclick="alert('¡Promoción válida por tiempo limitado!')">Ver más</button>
-        </div>
-
-        <!-- BANNER OFERTAS ESTILO DEPRATIK -->
-        <div class="banner-ofertas">
-          <div class="texto">
-            <h3>💳 Tu crédito en Los Amigos</h3>
-            <p>Conoce los beneficios que tenemos para ti.</p>
-          </div>
-          <button class="btn-oferta" onclick="alert('¡Próximamente!')">Ver más</button>
         </div>
 
         <!-- PRODUCTOS DESTACADOS -->
@@ -719,6 +725,45 @@
           </div>
           
           <div id="lista-productos"></div>
+        </div>
+      </div>
+
+      <!-- ========== PUBLICIDAD ========== -->
+      <div id="page-publicidad" class="page">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-ad" style="color:#cc0000;"></i> Gestionar Publicidad</h3>
+            <span style="color: #666; font-size: 0.8rem;">Crea y administra tus banners</span>
+          </div>
+          
+          <!-- Formulario para agregar banner -->
+          <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+            <h4 style="margin-bottom: 12px; color: #cc0000;">Agregar nuevo banner</h4>
+            <div class="flex">
+              <input type="text" id="banner-titulo" placeholder="Título del banner*" style="flex:2">
+              <input type="text" id="banner-descripcion" placeholder="Descripción corta" style="flex:2">
+            </div>
+            <div class="flex">
+              <input type="text" id="banner-imagen" placeholder="URL de la imagen* (ej: https://i.imgur.com/XXXXX.jpg)" style="flex:3">
+              <input type="text" id="banner-enlace" placeholder="Enlace del botón (ej: https://tutienda.com/oferta)" style="flex:2">
+            </div>
+            <div class="flex">
+              <select id="banner-tipo" style="flex:1;">
+                <option value="oferta">🔥 Oferta</option>
+                <option value="promocion">🎁 Promoción</option>
+                <option value="evento">📅 Evento</option>
+                <option value="info">ℹ️ Informativo</option>
+              </select>
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #333;">
+                <input type="checkbox" id="banner-activo" checked> Activo
+              </label>
+            </div>
+            <button id="btn-add-banner"><i class="fas fa-save"></i> Guardar Banner</button>
+          </div>
+
+          <!-- Lista de banners -->
+          <h4 style="margin-bottom: 12px; color: #333;">Banners actuales</h4>
+          <div id="lista-banners"></div>
         </div>
       </div>
 
@@ -843,6 +888,7 @@
   let currentUserRol = "visitor";
   let cart = [];
   let allProducts = [];
+  let allBanners = [];
   let uploadedImageUrls = [];
 
   function addDebugLog(message, type = 'info') {
@@ -1042,6 +1088,150 @@
     container.innerHTML = html;
   };
 
+  // === RENDER BANNERS EN TIENDA ===
+  function renderBannersEnTienda() {
+    const container = document.getElementById("banners-container");
+    const activos = allBanners.filter(b => b.activo === true);
+    
+    if (activos.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    let html = '';
+    activos.forEach(b => {
+      const tipoIcono = b.tipo === 'oferta' ? '🔥' : b.tipo === 'promocion' ? '🎁' : b.tipo === 'evento' ? '📅' : 'ℹ️';
+      html += `
+        <div class="banner-publicidad-dinamico">
+          <div class="banner-contenido">
+            ${b.imagen ? `<img src="${b.imagen}" alt="${b.titulo}" onerror="this.style.display='none'">` : ''}
+            <div class="texto">
+              <h3>${tipoIcono} ${b.titulo || 'Sin título'}</h3>
+              <p>${b.descripcion || ''}</p>
+            </div>
+          </div>
+          ${b.enlace ? `<button class="btn-banner" onclick="window.open('${b.enlace}', '_blank')">Ver más</button>` : ''}
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // === RENDER BANNERS EN PANEL ===
+  function renderBannersPanel() {
+    const container = document.getElementById("lista-banners");
+    if (allBanners.length === 0) {
+      container.innerHTML = '<p style="color:#999;">No hay banners creados. Agrega uno arriba.</p>';
+      return;
+    }
+
+    let html = '';
+    allBanners.forEach((b, index) => {
+      const estadoClass = b.activo ? 'badge-activo' : 'badge-inactivo';
+      const estadoText = b.activo ? 'Activo' : 'Inactivo';
+      const tipoIcono = b.tipo === 'oferta' ? '🔥' : b.tipo === 'promocion' ? '🎁' : b.tipo === 'evento' ? '📅' : 'ℹ️';
+      
+      html += `
+        <div class="banner-preview-mini" style="display:flex; align-items:center; gap:16px; padding:12px; background:#f9f9f9; border-radius:12px; border:1px solid #e0e0e0; margin:8px 0; flex-wrap:wrap;">
+          ${b.imagen ? `<img src="${b.imagen}" style="height:50px;width:auto;border-radius:8px;border:1px solid #e0e0e0;" onerror="this.style.display='none'">` : ''}
+          <div class="info" style="flex:1; min-width:150px;">
+            <h4 style="font-size:0.95rem; color:#1a1a1a;">${tipoIcono} ${b.titulo || 'Sin título'}</h4>
+            <p style="font-size:0.8rem; color:#666;">${b.descripcion || ''}</p>
+            <p style="font-size:0.7rem; color:#999;">${b.enlace || 'Sin enlace'}</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <span class="badge ${estadoClass}">${estadoText}</span>
+            <button class="btn-small" onclick="toggleBanner('${b.id}', ${!b.activo})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${b.activo ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small" onclick="editarBanner('${b.id}')" style="background:#28a745; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarBanner('${b.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // === FUNCIONES DE BANNERS ===
+  window.toggleBanner = async (id, nuevoEstado) => {
+    try {
+      await updateDoc(doc(db, "publicidad", id), { activo: nuevoEstado });
+      addDebugLog(`🔄 Banner ${id} -> ${nuevoEstado ? 'Activo' : 'Inactivo'}`, 'success');
+    } catch (error) {
+      addDebugLog(`❌ Error al cambiar estado: ${error.message}`, 'error');
+    }
+  };
+
+  window.eliminarBanner = async (id) => {
+    if (!confirm("¿Eliminar este banner?")) return;
+    try {
+      await deleteDoc(doc(db, "publicidad", id));
+      addDebugLog(`🗑️ Banner eliminado: ${id}`, 'info');
+    } catch (error) {
+      addDebugLog(`❌ Error al eliminar: ${error.message}`, 'error');
+    }
+  };
+
+  window.editarBanner = (id) => {
+    const banner = allBanners.find(b => b.id === id);
+    if (!banner) return;
+    document.getElementById("banner-titulo").value = banner.titulo || '';
+    document.getElementById("banner-descripcion").value = banner.descripcion || '';
+    document.getElementById("banner-imagen").value = banner.imagen || '';
+    document.getElementById("banner-enlace").value = banner.enlace || '';
+    document.getElementById("banner-tipo").value = banner.tipo || 'oferta';
+    document.getElementById("banner-activo").checked = banner.activo !== false;
+    document.getElementById("btn-add-banner").dataset.editId = id;
+    document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Actualizar Banner';
+    addDebugLog(`✏️ Editando banner: ${banner.titulo}`, 'info');
+  };
+
+  // === AGREGAR/ACTUALIZAR BANNER ===
+  document.getElementById("btn-add-banner")?.addEventListener("click", async () => {
+    const titulo = document.getElementById("banner-titulo").value.trim();
+    const descripcion = document.getElementById("banner-descripcion").value.trim();
+    const imagen = document.getElementById("banner-imagen").value.trim();
+    const enlace = document.getElementById("banner-enlace").value.trim();
+    const tipo = document.getElementById("banner-tipo").value;
+    const activo = document.getElementById("banner-activo").checked;
+
+    if (!titulo || !imagen) {
+      alert("Completa al menos el título y la URL de la imagen.");
+      return;
+    }
+
+    const data = { titulo, descripcion, imagen, enlace, tipo, activo };
+
+    const editId = document.getElementById("btn-add-banner").dataset.editId;
+    try {
+      if (editId) {
+        await updateDoc(doc(db, "publicidad", editId), data);
+        addDebugLog(`✅ Banner actualizado: ${titulo}`, 'success');
+        delete document.getElementById("btn-add-banner").dataset.editId;
+        document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Guardar Banner';
+      } else {
+        await addDoc(collection(db, "publicidad"), data);
+        addDebugLog(`✅ Banner agregado: ${titulo}`, 'success');
+      }
+      alert("✅ Banner guardado correctamente");
+      // Limpiar formulario
+      document.getElementById("banner-titulo").value = "";
+      document.getElementById("banner-descripcion").value = "";
+      document.getElementById("banner-imagen").value = "";
+      document.getElementById("banner-enlace").value = "";
+      document.getElementById("banner-tipo").value = "oferta";
+      document.getElementById("banner-activo").checked = true;
+    } catch (error) {
+      addDebugLog(`❌ Error al guardar banner: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+  });
+
   window.agregarAlCarrito = (id, nombre, precio) => {
     if (precio <= 0) {
       alert('Este producto no tiene precio válido');
@@ -1062,6 +1252,7 @@
   function loadAllData() {
     addDebugLog('🔄 Cargando datos de Firebase...', 'info');
     
+    // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = [];
       let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
@@ -1101,6 +1292,19 @@
       });
     }, (error) => {
       addDebugLog(`❌ Error cargando productos: ${error.message}`, 'error');
+    });
+
+    // BANNERS (PUBLICIDAD)
+    onSnapshot(collection(db, "publicidad"), (snap) => {
+      allBanners = [];
+      snap.forEach(doc => {
+        allBanners.push({ id: doc.id, ...doc.data() });
+      });
+      addDebugLog(`📢 ${allBanners.length} banners cargados`, 'success');
+      renderBannersEnTienda();
+      renderBannersPanel();
+    }, (error) => {
+      addDebugLog(`❌ Error cargando banners: ${error.message}`, 'error');
     });
 
     // VENTAS
