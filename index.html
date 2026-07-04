@@ -4,55 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>LOS AMIGOS ESTORE 🎁</title>
+  <!-- Font Awesome & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0a0c10; color: #eef2ff; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      overflow-x: hidden;
+    }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #1e1e2f; }
-    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+    ::-webkit-scrollbar-track { background: #e0e0e0; }
+    ::-webkit-scrollbar-thumb { background: #cc0000; border-radius: 10px; }
 
+    /* SIDEBAR */
     .app-wrapper { display: flex; min-height: 100vh; }
     .sidebar {
       width: 280px;
-      background: rgba(17, 24, 39, 0.96);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid #2d3a4e;
+      background: #ffffff;
+      border-right: 1px solid #e0e0e0;
       position: fixed;
       height: 100vh;
       overflow-y: auto;
       transition: all 0.3s;
       z-index: 100;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.05);
     }
     .sidebar-header {
       padding: 24px 20px;
-      border-bottom: 1px solid #2d3a4e;
+      border-bottom: 2px solid #cc0000;
       margin-bottom: 20px;
       text-align: center;
+      background: #fafafa;
     }
     .logo-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .logo-icon { font-size: 3.5rem; background: linear-gradient(135deg, #f97316, #fb923c); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .sidebar-header h2 { font-size: 1.3rem; font-weight: 900; background: linear-gradient(135deg, #f97316, #fb923c); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
-    .sidebar-header p { font-size: 0.7rem; color: #9ca3af; letter-spacing: 2px; text-transform: uppercase; }
+    .logo-icon { font-size: 3.5rem; color: #cc0000; }
+    .sidebar-header h2 { 
+      font-size: 1.5rem; 
+      font-weight: 900; 
+      color: #cc0000; 
+      letter-spacing: -0.5px;
+    }
+    .sidebar-header p { 
+      font-size: 0.7rem; 
+      color: #666; 
+      letter-spacing: 2px; 
+      text-transform: uppercase; 
+    }
     .nav-item {
       display: flex;
       align-items: center;
       gap: 14px;
       padding: 12px 20px;
       margin: 4px 12px;
-      border-radius: 14px;
-      color: #cbd5e1;
+      border-radius: 12px;
+      color: #333;
       font-weight: 500;
       transition: all 0.2s;
       cursor: pointer;
     }
-    .nav-item i { width: 24px; font-size: 1.2rem; }
-    .nav-item.active { background: #f97316; color: white; box-shadow: 0 4px 12px rgba(249,115,22,0.3); }
-    .nav-item:hover:not(.active) { background: #1e293b; color: white; }
-    .logout-btn { margin-top: 40px; border-top: 1px solid #2d3a4e; padding-top: 20px; color: #f87171; }
-    .main-content { flex: 1; margin-left: 280px; padding: 24px 32px; transition: all 0.3s; }
+    .nav-item i { width: 24px; font-size: 1.2rem; color: #666; }
+    .nav-item.active { 
+      background: #cc0000; 
+      color: white; 
+      box-shadow: 0 4px 12px rgba(204,0,0,0.2);
+    }
+    .nav-item.active i { color: white; }
+    .nav-item:hover:not(.active) { background: #f0f0f0; color: #cc0000; }
+    .nav-item:hover:not(.active) i { color: #cc0000; }
+    .logout-btn { 
+      margin-top: 40px; 
+      border-top: 1px solid #e0e0e0; 
+      padding-top: 20px; 
+      color: #cc0000; 
+    }
+    .logout-btn i { color: #cc0000; }
+    .main-content { 
+      flex: 1; 
+      margin-left: 280px; 
+      padding: 24px 32px; 
+      transition: all 0.3s; 
+      background: #f5f5f5;
+    }
 
+    /* STATS */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -60,22 +97,25 @@
       margin-bottom: 30px;
     }
     .stat-card {
-      background: #111827;
-      border: 1px solid #2d3a4e;
-      border-radius: 24px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 16px;
       padding: 20px;
       transition: transform 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    .stat-card:hover { transform: translateY(-3px); border-color: #f97316; }
-    .stat-title { font-size: 0.85rem; text-transform: uppercase; color: #9ca3af; }
-    .stat-value { font-size: 2.2rem; font-weight: 800; margin-top: 10px; }
+    .stat-card:hover { transform: translateY(-3px); border-color: #cc0000; }
+    .stat-title { font-size: 0.85rem; text-transform: uppercase; color: #666; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; color: #1a1a1a; margin-top: 10px; }
 
+    /* CARDS */
     .card {
-      background: #111827;
-      border: 1px solid #2d3a4e;
-      border-radius: 24px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 16px;
       padding: 24px;
       margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .card-header {
       display: flex;
@@ -84,13 +124,15 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
+    .card-header h3 { color: #1a1a1a; font-weight: 700; }
     
+    /* INPUTS */
     input, select, textarea {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 14px;
+      background: #f9f9f9;
+      border: 1px solid #d0d0d0;
+      border-radius: 12px;
       padding: 12px 16px;
-      color: white;
+      color: #1a1a1a;
       width: 100%;
       margin-top: 8px;
       margin-bottom: 16px;
@@ -98,13 +140,15 @@
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: #f97316;
-      box-shadow: 0 0 0 2px rgba(249,115,22,0.3);
+      border-color: #cc0000;
+      box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
     }
+    
+    /* BOTONES */
     button {
-      background: #f97316;
+      background: #cc0000;
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       padding: 12px 20px;
       font-weight: 700;
       color: white;
@@ -115,34 +159,56 @@
       align-items: center;
       gap: 8px;
     }
-    button:hover { background: #ea580c; transform: scale(0.98); }
-    .btn-outline { background: transparent; border: 1px solid #f97316; color: #f97316; }
-    .btn-danger { background: #ef4444; }
-    .btn-success { background: #10b981; }
-    .btn-info { background: #3b82f6; }
+    button:hover { background: #b30000; transform: scale(0.98); }
+    .btn-outline { background: transparent; border: 2px solid #cc0000; color: #cc0000; }
+    .btn-outline:hover { background: #cc0000; color: white; transform: scale(0.98); }
+    .btn-danger { background: #dc3545; }
+    .btn-success { background: #28a745; }
+    .btn-info { background: #007bff; }
     .btn-small { padding: 4px 12px; font-size: 0.8rem; border-radius: 8px; }
-    .badge { background: #1e293b; padding: 4px 12px; border-radius: 40px; font-size: 0.75rem; font-weight: 600; }
+    
+    .badge { 
+      background: #f0f0f0; 
+      padding: 4px 12px; 
+      border-radius: 40px; 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      color: #333;
+    }
     .flex { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .page { display: none; animation: fade 0.3s ease; }
     .active-page { display: block; }
     @keyframes fade { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+    
     table { width: 100%; border-collapse: collapse; overflow-x: auto; display: block; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #2d3a4e; }
-    th { color: #f97316; font-weight: 600; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { color: #cc0000; font-weight: 600; }
+    
+    .stock-badge { 
+      display: inline-block; 
+      padding: 2px 12px; 
+      border-radius: 20px; 
+      font-size: 0.7rem; 
+      font-weight: 600; 
+    }
+    .stock-alto { background: #d4edda; color: #155724; }
+    .stock-medio { background: #fff3cd; color: #856404; }
+    .stock-bajo { background: #f8d7da; color: #721c24; }
 
+    /* ========== UPLOAD ========== */
     .upload-area {
-      border: 2px dashed #f97316;
+      border: 2px dashed #cc0000;
       border-radius: 14px;
       padding: 30px 20px;
       text-align: center;
       cursor: pointer;
       transition: 0.3s;
       margin: 8px 0 16px 0;
-      background: #1a1a2e;
+      background: #fafafa;
     }
-    .upload-area:hover { border-color: #fb923c; background: #1e293b; }
-    .upload-area i { font-size: 3rem; color: #f97316; margin-bottom: 12px; display: block; }
-    .upload-area p { color: #9ca3af; font-size: 1rem; }
+    .upload-area:hover { border-color: #b30000; background: #f5f5f5; }
+    .upload-area i { font-size: 3rem; color: #cc0000; margin-bottom: 12px; display: block; }
+    .upload-area p { color: #666; font-size: 1rem; }
     .upload-area input[type="file"] { display: none; }
     
     .preview-imagenes { 
@@ -151,79 +217,111 @@
       flex-wrap: wrap; 
       margin: 12px 0;
       padding: 12px;
-      background: #0f111a;
+      background: #f9f9f9;
       border-radius: 12px;
       min-height: 60px;
+      border: 1px solid #e0e0e0;
     }
     .preview-imagenes img { 
       width: 80px; 
       height: 80px; 
       object-fit: cover; 
       border-radius: 10px; 
-      border: 2px solid #f97316;
+      border: 2px solid #cc0000;
     }
     .preview-imagenes img:hover { transform: scale(1.05); }
     .preview-imagenes .sin-imagenes {
-      color: #6b7280;
+      color: #999;
       font-size: 0.9rem;
       width: 100%;
       text-align: center;
       padding: 20px 0;
     }
 
+    /* ========== TIENDA ESTILO DEPRATIK - CLARO ========== */
+    
+    /* HEADER */
     .tienda-header {
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      border-radius: 24px;
-      padding: 50px 30px;
+      background: linear-gradient(135deg, #cc0000, #e60000);
+      border-radius: 16px;
+      padding: 40px 30px;
       margin-bottom: 30px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .tienda-header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -20%;
-      width: 300px;
-      height: 300px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 50%;
-    }
-    .tienda-header::after {
-      content: '';
-      position: absolute;
-      bottom: -40%;
-      left: -10%;
-      width: 200px;
-      height: 200px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 50%;
+      box-shadow: 0 4px 20px rgba(204,0,0,0.15);
     }
     .tienda-header h1 {
       font-size: 2.8rem;
       font-weight: 900;
       color: white;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.2);
-      position: relative;
-      z-index: 1;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
     .tienda-header p {
       font-size: 1.2rem;
-      color: rgba(255,255,255,0.95);
+      color: rgba(255,255,255,0.9);
       margin-top: 8px;
-      position: relative;
-      z-index: 1;
     }
     .tienda-header .icono-header {
       font-size: 4rem;
       color: white;
       margin-bottom: 10px;
       display: block;
-      position: relative;
-      z-index: 1;
     }
 
+    /* BANNER PUBLICITARIO */
+    .banner-publicidad {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 20px 0 30px 0;
+      border: 2px solid #cc0000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: 0 2px 12px rgba(204,0,0,0.08);
+    }
+    .banner-publicidad .texto h3 {
+      font-size: 1.8rem;
+      color: #cc0000;
+      font-weight: 900;
+    }
+    .banner-publicidad .texto p {
+      color: #333;
+      font-size: 1rem;
+    }
+    .banner-publicidad .btn-banner {
+      background: #cc0000;
+      padding: 14px 30px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+    .banner-publicidad .btn-banner:hover {
+      background: #b30000;
+      transform: scale(1.03);
+    }
+    .banner-publicidad .btn-banner-outline {
+      background: transparent;
+      padding: 14px 30px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #cc0000;
+      border: 2px solid #cc0000;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .banner-publicidad .btn-banner-outline:hover {
+      background: #cc0000;
+      color: white;
+      transform: scale(1.03);
+    }
+
+    /* CATEGORÍAS */
     .categorias-section {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -231,54 +329,67 @@
       margin: 30px 0;
     }
     .categoria-item {
-      background: #1a1a2e;
+      background: #ffffff;
       border-radius: 16px;
       padding: 24px 16px;
       text-align: center;
-      border: 1px solid #2d3a4e;
+      border: 1px solid #e0e0e0;
       transition: 0.3s;
       cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .categoria-item:hover {
-      border-color: #f97316;
+      border-color: #cc0000;
       transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(249,115,22,0.1);
+      box-shadow: 0 8px 30px rgba(204,0,0,0.08);
     }
     .categoria-item i {
       font-size: 2rem;
-      color: #f97316;
+      color: #cc0000;
       margin-bottom: 8px;
       display: block;
     }
-    .categoria-item h4 { font-size: 0.9rem; color: white; }
-    .categoria-item p { font-size: 0.7rem; color: #6b7280; }
+    .categoria-item h4 { font-size: 0.9rem; color: #1a1a1a; }
+    .categoria-item p { font-size: 0.7rem; color: #666; }
 
+    /* BANNER OFERTAS (estilo DepratiK) */
     .banner-ofertas {
-      background: linear-gradient(135deg, #1a1a2e, #2d1b3d);
-      border-radius: 24px;
+      background: linear-gradient(135deg, #ffffff, #f5f5f5);
+      border-radius: 16px;
       padding: 30px;
       margin: 30px 0;
-      border: 1px solid #f97316;
+      border: 2px solid #cc0000;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 20px;
+      box-shadow: 0 2px 12px rgba(204,0,0,0.06);
     }
-    .banner-ofertas .texto h3 { font-size: 1.5rem; color: #f97316; }
-    .banner-ofertas .texto p { color: #9ca3af; }
+    .banner-ofertas .texto h3 {
+      font-size: 1.5rem;
+      color: #cc0000;
+      font-weight: 900;
+    }
+    .banner-ofertas .texto p {
+      color: #333;
+    }
     .banner-ofertas .btn-oferta {
-      background: #f97316;
+      background: #cc0000;
       padding: 14px 30px;
-      border-radius: 14px;
+      border-radius: 12px;
       font-weight: 700;
       color: white;
       border: none;
       cursor: pointer;
       transition: 0.2s;
     }
-    .banner-ofertas .btn-oferta:hover { background: #ea580c; transform: scale(1.05); }
+    .banner-ofertas .btn-oferta:hover {
+      background: #b30000;
+      transform: scale(1.05);
+    }
 
+    /* PRODUCTOS GRID */
     .productos-grid-depratik {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -286,23 +397,24 @@
       margin-top: 20px;
     }
     .producto-card-depratik {
-      background: #1a1a2e;
-      border-radius: 20px;
+      background: #ffffff;
+      border-radius: 16px;
       overflow: hidden;
-      border: 1px solid #2d3a4e;
+      border: 1px solid #e0e0e0;
       transition: all 0.3s ease;
       position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .producto-card-depratik:hover {
       transform: translateY(-8px);
-      border-color: #f97316;
-      box-shadow: 0 12px 40px rgba(249,115,22,0.15);
+      border-color: #cc0000;
+      box-shadow: 0 12px 40px rgba(204,0,0,0.1);
     }
     .producto-card-depratik .imagen-container {
       position: relative;
       overflow: hidden;
       height: 260px;
-      background: #0f111a;
+      background: #f9f9f9;
     }
     .producto-card-depratik .imagen-container img {
       width: 100%;
@@ -310,12 +422,14 @@
       object-fit: cover;
       transition: transform 0.3s;
     }
-    .producto-card-depratik:hover .imagen-container img { transform: scale(1.05); }
+    .producto-card-depratik:hover .imagen-container img {
+      transform: scale(1.05);
+    }
     .producto-card-depratik .etiqueta-stock {
       position: absolute;
       top: 12px;
       right: 12px;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.7);
       backdrop-filter: blur(4px);
       padding: 4px 14px;
       border-radius: 20px;
@@ -324,36 +438,55 @@
       color: white;
       border: 1px solid rgba(255,255,255,0.1);
     }
-    .producto-card-depratik .etiqueta-stock.stock-alto { background: rgba(16, 185, 129, 0.8); }
-    .producto-card-depratik .etiqueta-stock.stock-medio { background: rgba(245, 158, 11, 0.8); }
-    .producto-card-depratik .etiqueta-stock.stock-bajo { background: rgba(239, 68, 68, 0.8); }
+    .producto-card-depratik .etiqueta-stock.stock-alto { background: rgba(40, 167, 69, 0.85); }
+    .producto-card-depratik .etiqueta-stock.stock-medio { background: rgba(255, 193, 7, 0.85); color: #333; }
+    .producto-card-depratik .etiqueta-stock.stock-bajo { background: rgba(220, 53, 69, 0.85); }
+    
     .producto-card-depratik .oferta-badge {
       position: absolute;
       top: 12px;
       left: 12px;
-      background: #ef4444;
+      background: #cc0000;
       color: white;
       padding: 4px 14px;
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: 700;
-      box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+      box-shadow: 0 4px 12px rgba(204,0,0,0.3);
     }
-    .producto-card-depratik .info { padding: 20px; }
-    .producto-card-depratik .info .nombre { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 4px; }
-    .producto-card-depratik .info .precio { font-size: 1.6rem; font-weight: 900; color: #f97316; margin: 8px 0; }
-    .producto-card-depratik .info .detalles { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .producto-card-depratik .info {
+      padding: 20px;
+      background: #ffffff;
+    }
+    .producto-card-depratik .info .nombre {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    .producto-card-depratik .info .precio {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #cc0000;
+      margin: 8px 0;
+    }
+    .producto-card-depratik .info .detalles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
     .producto-card-depratik .info .detalles span {
-      background: #1e293b;
+      background: #f0f0f0;
       padding: 2px 12px;
       border-radius: 12px;
       font-size: 0.7rem;
-      color: #9ca3af;
-      border: 1px solid #2d3a4e;
+      color: #333;
+      border: 1px solid #e0e0e0;
     }
     .producto-card-depratik .info .descripcion {
       font-size: 0.85rem;
-      color: #9ca3af;
+      color: #666;
       margin: 8px 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -364,10 +497,10 @@
     .producto-card-depratik .info .btn-comprar {
       width: 100%;
       margin-top: 12px;
-      background: #f97316;
+      background: #cc0000;
       border: none;
       padding: 12px;
-      border-radius: 14px;
+      border-radius: 12px;
       font-weight: 700;
       color: white;
       cursor: pointer;
@@ -378,16 +511,24 @@
       justify-content: center;
       gap: 8px;
     }
-    .producto-card-depratik .info .btn-comprar:hover { background: #ea580c; transform: scale(1.02); }
-    .producto-card-depratik .info .btn-comprar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .producto-card-depratik .info .btn-comprar:hover {
+      background: #b30000;
+      transform: scale(1.02);
+    }
+    .producto-card-depratik .info .btn-comprar:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-    .cart-item { background: #1e293b; border-radius: 16px; padding: 12px; margin-bottom: 8px; }
+    /* CARRITO */
+    .cart-item { background: #f9f9f9; border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 1px solid #e0e0e0; }
 
     .btn-subir-foto {
-      background: #f97316;
+      background: #cc0000;
       color: white;
       padding: 14px 28px;
-      border-radius: 14px;
+      border-radius: 12px;
       border: none;
       font-weight: 700;
       cursor: pointer;
@@ -398,16 +539,16 @@
       font-size: 1rem;
       margin: 8px 0;
     }
-    .btn-subir-foto:hover { background: #ea580c; transform: scale(1.02); }
+    .btn-subir-foto:hover { background: #b30000; transform: scale(1.02); }
 
     .imagenes-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-    .imagenes-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #2d3a4e; }
+    .imagenes-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #e0e0e0; }
 
-    /* PANEL DE DEBUG */
+    /* DEBUG */
     .debug-panel {
-      background: #1a1a2e;
-      border: 1px solid #f97316;
-      border-radius: 14px;
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
       padding: 16px;
       margin: 16px 0;
       max-height: 200px;
@@ -417,23 +558,24 @@
     }
     .debug-panel .log-entry {
       padding: 4px 8px;
-      border-bottom: 1px solid #2d3a4e;
-      color: #9ca3af;
+      border-bottom: 1px solid #e0e0e0;
+      color: #333;
     }
-    .debug-panel .log-entry.success { color: #10b981; }
-    .debug-panel .log-entry.error { color: #ef4444; }
-    .debug-panel .log-entry.info { color: #3b82f6; }
+    .debug-panel .log-entry.success { color: #28a745; }
+    .debug-panel .log-entry.error { color: #dc3545; }
+    .debug-panel .log-entry.info { color: #007bff; }
 
+    /* RESPONSIVE */
     @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; }
+      .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
       .main-content { margin-left: 0; padding: 16px; }
-      .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #f97316; border-radius: 12px; padding: 8px 12px; }
+      .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #cc0000; border-radius: 12px; padding: 8px 12px; color: white; border: none; }
       .productos-grid-depratik { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
       .tienda-header h1 { font-size: 1.8rem; }
       .tienda-header { padding: 30px 20px; }
       .categorias-section { grid-template-columns: repeat(2, 1fr); }
-      .banner-ofertas { flex-direction: column; text-align: center; }
+      .banner-ofertas, .banner-publicidad { flex-direction: column; text-align: center; }
     }
     .menu-toggle { display: none; }
   </style>
@@ -444,9 +586,9 @@
 <div id="login-container" class="app-wrapper" style="justify-content: center; align-items: center;">
   <div class="card" style="max-width: 400px; width: 100%; margin: 20px;">
     <div style="text-align: center;">
-      <i class="fas fa-gift" style="font-size: 4rem; color: #f97316;"></i>
-      <h2 style="background: linear-gradient(135deg, #f97316, #fb923c); -webkit-background-clip: text; background-clip: text; color: transparent;">LOS AMIGOS</h2>
-      <h3 style="font-size: 1rem; color: #9ca3af; margin-bottom: 20px;">ESTORE 🎁</h3>
+      <i class="fas fa-gift" style="font-size: 4rem; color: #cc0000;"></i>
+      <h2 style="color: #cc0000; font-weight: 900;">LOS AMIGOS</h2>
+      <h3 style="font-size: 1rem; color: #666; margin-bottom: 20px;">ESTORE 🎁</h3>
     </div>
     <input type="email" id="login-email" placeholder="Correo electrónico">
     <input type="password" id="login-password" placeholder="Contraseña">
@@ -457,6 +599,7 @@
 <!-- DASHBOARD -->
 <div id="dashboard-app" style="display: none;">
   <div class="app-wrapper">
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo-container">
@@ -477,9 +620,11 @@
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
 
+    <!-- MAIN CONTENT -->
     <div class="main-content">
       <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
       
+      <!-- DASHBOARD -->
       <div id="page-dashboard" class="page active-page">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-title">Productos</div><div class="stat-value" id="stat-productos">0</div></div>
@@ -497,23 +642,47 @@
           <h1>LOS AMIGOS ESTORE 🎁</h1>
           <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
         </div>
+
+        <!-- BANNER PUBLICIDAD 1 -->
+        <div class="banner-publicidad">
+          <div class="texto">
+            <h3>🔥 OFERTA ESPECIAL</h3>
+            <p>Hasta 30% de descuento en tu primera compra</p>
+          </div>
+          <button class="btn-banner" onclick="document.getElementById('filtro-productos-tienda').value=''; renderTiendaDepratik('');">Ver ofertas</button>
+        </div>
+
+        <!-- CATEGORÍAS -->
         <div class="categorias-section">
           <div class="categoria-item"><i class="fas fa-tshirt"></i><h4>Ropa</h4><p>Camisas, pantalones</p></div>
           <div class="categoria-item"><i class="fas fa-shoe-prints"></i><h4>Zapatos</h4><p>Tenis, zapatillas</p></div>
           <div class="categoria-item"><i class="fas fa-hat-cowboy"></i><h4>Accesorios</h4><p>Gorras, cinturones</p></div>
           <div class="categoria-item"><i class="fas fa-tags"></i><h4>Ofertas</h4><p>Descuentos especiales</p></div>
         </div>
+
+        <!-- BANNER PUBLICIDAD 2 -->
+        <div class="banner-publicidad">
+          <div class="texto">
+            <h3>🎁 REGALO ESPECIAL</h3>
+            <p>Lleva un accesorio gratis con tu compra</p>
+          </div>
+          <button class="btn-banner-outline" onclick="alert('¡Promoción válida por tiempo limitado!')">Ver más</button>
+        </div>
+
+        <!-- BANNER OFERTAS ESTILO DEPRATIK -->
         <div class="banner-ofertas">
           <div class="texto">
-            <h3>🔥 Ofertas Especiales</h3>
-            <p>Hasta 50% de descuento en productos seleccionados</p>
+            <h3>💳 Tu crédito en Los Amigos</h3>
+            <p>Conoce los beneficios que tenemos para ti.</p>
           </div>
-          <button class="btn-oferta" onclick="document.getElementById('filtro-productos-tienda').value=''; renderTiendaDepratik('');">Ver ofertas</button>
+          <button class="btn-oferta" onclick="alert('¡Próximamente!')">Ver más</button>
         </div>
+
+        <!-- PRODUCTOS DESTACADOS -->
         <div class="card">
           <div class="card-header">
-            <h3><i class="fas fa-store"></i> Productos destacados</h3>
-            <span style="color: #9ca3af; font-size: 0.9rem;">Lo último en moda</span>
+            <h3><i class="fas fa-store" style="color:#cc0000;"></i> Productos destacados</h3>
+            <span style="color: #666; font-size: 0.9rem;">Lo último en moda</span>
           </div>
           <input type="text" id="filtro-productos-tienda" placeholder="🔍 Buscar productos..." style="margin-bottom: 16px;" oninput="renderTiendaDepratik(this.value)">
           <div id="vitrina-productos" class="productos-grid-depratik"></div>
@@ -523,13 +692,13 @@
       <!-- PRODUCTOS -->
       <div id="page-productos" class="page">
         <div class="card">
-          <div class="card-header"><h3><i class="fas fa-plus-circle"></i> Nuevo Producto</h3></div>
+          <div class="card-header"><h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3></div>
           
           <button class="btn-subir-foto" id="btn-subir-foto">
             <i class="fas fa-camera"></i> 📸 SUBIR FOTOS DESDE MI DISPOSITIVO
           </button>
           <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
-          <p style="color: #9ca3af; font-size: 0.8rem; margin-top: 4px;">
+          <p style="color: #666; font-size: 0.8rem; margin-top: 4px;">
             <i class="fas fa-info-circle"></i> Haz clic en el botón para seleccionar fotos de tu galería
           </p>
 
@@ -548,19 +717,18 @@
             <input type="text" id="prod-medidas" placeholder="Medidas (ej: 30x40cm)" style="flex:1">
           </div>
           <textarea id="prod-desc" placeholder="Descripción completa del producto"></textarea>
-          <input type="text" id="prod-imagenes" placeholder="URLs (se llenan solas)" style="background:#1a1a2e; color:#9ca3af; font-size:0.8rem;">
+          <input type="text" id="prod-imagenes" placeholder="URLs de imágenes (separadas por coma)" style="background:#f9f9f9; color:#333; font-size:0.9rem;">
           
           <button id="btn-add-producto"><i class="fas fa-save"></i> Guardar Producto</button>
         </div>
         
         <div class="card">
           <div class="card-header">
-            <h3><i class="fas fa-edit"></i> Inventario actual</h3>
+            <h3><i class="fas fa-edit" style="color:#cc0000;"></i> Inventario actual</h3>
             <button class="btn-outline" id="btn-limpiar-filtros"><i class="fas fa-undo"></i> Mostrar todos</button>
           </div>
           <input type="text" id="filtro-productos-gestion" placeholder="🔍 Buscar producto..." style="margin-bottom: 16px;">
           
-          <!-- PANEL DE DEBUG -->
           <div class="debug-panel" id="debug-panel">
             <div class="log-entry info">🔍 Esperando acciones...</div>
           </div>
@@ -579,8 +747,8 @@
             <button id="btn-agregar-carrito"><i class="fas fa-cart-plus"></i> Agregar</button>
           </div>
           <div id="carrito-lista" style="margin-top: 20px;"></div>
-          <div style="text-align: right; font-size: 1.4rem; font-weight: bold;">Total: $<span id="carrito-total">0.00</span></div>
-          <hr style="margin: 16px 0; border-color:#2d3a4e">
+          <div style="text-align: right; font-size: 1.4rem; font-weight: bold; color: #cc0000;">Total: $<span id="carrito-total">0.00</span></div>
+          <hr style="margin: 16px 0; border-color:#e0e0e0">
           <h4>Datos del cliente</h4>
           <div class="flex">
             <input type="text" id="cliente-nombre" placeholder="Nombre completo*" style="flex:2">
@@ -692,7 +860,6 @@
   let allProducts = [];
   let uploadedImageUrls = [];
 
-  // === PANEL DE DEBUG ===
   function addDebugLog(message, type = 'info') {
     const panel = document.getElementById('debug-panel');
     if (!panel) return;
@@ -701,7 +868,6 @@
     entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
     panel.appendChild(entry);
     panel.scrollTop = panel.scrollHeight;
-    // Limitar a 50 entradas
     while (panel.children.length > 50) {
       panel.removeChild(panel.firstChild);
     }
@@ -785,13 +951,10 @@
 
   fileInput.addEventListener("change", async (e) => {
     if (e.target.files.length === 0) return;
-    
     addDebugLog(`📸 Seleccionados ${e.target.files.length} archivos`, 'info');
-    
     if (uploadedImageUrls.length === 0) {
       previewContainer.innerHTML = '';
     }
-    
     const sinImg = previewContainer.querySelector('.sin-imagenes');
     if (sinImg) sinImg.remove();
 
@@ -800,7 +963,6 @@
         addDebugLog(`⚠️ Saltando: ${file.name} (no es imagen)`, 'error');
         continue;
       }
-      
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = document.createElement("img");
@@ -826,9 +988,7 @@
     const urlsString = uploadedImageUrls.join(", ");
     document.getElementById("prod-imagenes").value = urlsString;
     addDebugLog(`📋 URLs guardadas: ${uploadedImageUrls.length} imágenes`, 'success');
-    
     fileInput.value = '';
-    
     if (uploadedImageUrls.length > 0) {
       alert(`✅ ${uploadedImageUrls.length} imagen(es) subidas exitosamente`);
     }
@@ -843,8 +1003,8 @@
     }
     if (filtered.length === 0) {
       container.innerHTML = `
-        <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:#9ca3af;">
-          <i class="fas fa-box-open" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
+        <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:#999;">
+          <i class="fas fa-box-open" style="font-size:3rem; margin-bottom:16px; display:block; color:#cc0000;"></i>
           <p>No hay productos disponibles</p>
           <p style="font-size:0.8rem;">Agrega productos desde el panel de administración</p>
         </div>
@@ -862,16 +1022,14 @@
           imagenes = p.imagenes;
         }
       }
-      
-      const primeraImagen = imagenes.length > 0 ? imagenes[0] : 'https://via.placeholder.com/300x300/1e293b/9ca3af?text=Sin+Imagen';
-      
+      const primeraImagen = imagenes.length > 0 ? imagenes[0] : 'https://via.placeholder.com/300x300/f0f0f0/999?text=Sin+Imagen';
       const stockText = p.stock > 0 ? `${p.stock} disponibles` : 'Agotado';
       const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
       
       html += `
         <div class="producto-card-depratik">
           <div class="imagen-container">
-            <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" onerror="this.src='https://via.placeholder.com/300x300/1e293b/9ca3af?text=Error+Imagen'">
+            <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" onerror="this.src='https://via.placeholder.com/300x300/f0f0f0/999?text=Error+Imagen'">
             <span class="etiqueta-stock ${stockClass}">${stockText}</span>
             ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
           </div>
@@ -886,7 +1044,7 @@
             <div class="descripcion">${p.descripcion || 'Descripción no disponible'}</div>
             ${imagenes.length > 1 ? `
               <div style="display:flex; gap:6px; margin:8px 0; flex-wrap:wrap;">
-                ${imagenes.slice(1, 4).map(img => `<img src="${img}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;border:1px solid #2d3a4e;" onerror="this.style.display='none'">`).join('')}
+                ${imagenes.slice(1, 4).map(img => `<img src="${img}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;border:1px solid #e0e0e0;" onerror="this.style.display='none'">`).join('')}
               </div>
             ` : ''}
             <button class="btn-comprar" onclick="agregarAlCarrito('${p.id}', '${p.nombre || 'Producto'}', ${p.precio || 0})" ${p.stock <= 0 ? 'disabled' : ''}>
@@ -921,15 +1079,12 @@
     
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = [];
-      let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>¿Tiene Imagen?</th><th>Acciones</th></tr></thead><tbody>`;
-      
+      let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
       snap.forEach(doc => {
         const p = doc.data();
         allProducts.push({ id: doc.id, ...p });
         const imagenes = p.imagenes ? p.imagenes.split(',').map(i => i.trim()).filter(i => i) : [];
-        const tieneImagen = imagenes.length > 0 ? '✅ Sí' : '❌ No';
-        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'">` : '📷';
-        
+        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e0e0e0;" onerror="this.style.display='none'">` : '📷';
         html += `<tr>
           <td><strong>${p.nombre || 'Sin nombre'}</strong><br><small>${p.descripcion || ''}</small></td>
           <td>$${p.precio || 0}</td>
@@ -943,18 +1098,14 @@
           </td>
         </tr>`;
       });
-      
       html += `</tbody></table>`;
       document.getElementById("lista-productos").innerHTML = html || "<p>No hay productos.</p>";
       document.getElementById("stat-productos").innerText = snap.size;
-      
       addDebugLog(`📦 ${snap.size} productos cargados`, 'success');
       
-      // Renderizar tienda
       const filtro = document.getElementById("filtro-productos-tienda")?.value || '';
       renderTiendaDepratik(filtro);
 
-      // Select carrito
       const selectCarrito = document.getElementById("select-producto-carrito");
       selectCarrito.innerHTML = '<option value="">Selecciona producto</option>';
       snap.forEach(doc => {
@@ -1102,7 +1253,6 @@
       document.getElementById("prod-imagenes").value = '';
       addDebugLog(`✏️ Editando: ${product.nombre} (sin imágenes)`, 'info');
     }
-    
     document.getElementById("btn-add-producto").dataset.editId = id;
     document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Actualizar Producto';
   };
@@ -1152,17 +1302,7 @@
       return alert("Completa nombre, precio y stock");
     }
     
-    const data = { 
-      nombre, 
-      precio, 
-      stock, 
-      talla, 
-      color, 
-      medidas, 
-      descripcion, 
-      imagenes: imagenes
-    };
-    
+    const data = { nombre, precio, stock, talla, color, medidas, descripcion, imagenes };
     addDebugLog(`📦 Guardando producto: ${nombre} (${imagenes ? imagenes.split(',').length : 0} imágenes)`, 'info');
     
     const editId = document.getElementById("btn-add-producto").dataset.editId;
@@ -1182,7 +1322,6 @@
       alert("Error: " + error.message);
     }
     
-    // Limpiar formulario
     document.getElementById("prod-nombre").value = "";
     document.getElementById("prod-precio").value = "";
     document.getElementById("prod-stock").value = "";
