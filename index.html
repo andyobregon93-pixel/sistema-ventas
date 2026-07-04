@@ -579,6 +579,10 @@
       color: #666;
     }
 
+    /* ========== OCULTAR ELEMENTOS POR ROL ========== */
+    .admin-only { display: none; }
+    .seller-only { display: none; }
+
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
@@ -622,16 +626,26 @@
           <p>ESTORE 🎁</p>
         </div>
       </div>
-      <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
-      <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
-      <div class="nav-item" data-page="productos"><i class="fas fa-boxes"></i> Productos</div>
-      <div class="nav-item" data-page="publicidad"><i class="fas fa-ad"></i> Publicidad</div>
-      <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
-      <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
-      <div class="nav-item" data-page="trabajadores"><i class="fas fa-users"></i> Trabajadores</div>
-      <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
-      <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
-      <div class="nav-item admin-only" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
+      
+      <!-- Elementos visibles para ADMIN -->
+      <div class="admin-only">
+        <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
+        <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
+        <div class="nav-item" data-page="productos"><i class="fas fa-boxes"></i> Productos</div>
+        <div class="nav-item" data-page="publicidad"><i class="fas fa-ad"></i> Publicidad</div>
+        <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
+        <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
+        <div class="nav-item" data-page="trabajadores"><i class="fas fa-users"></i> Trabajadores</div>
+        <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
+        <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
+        <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
+      </div>
+      
+      <!-- Elementos visibles para SELLER y WORKER -->
+      <div class="seller-only">
+        <div class="nav-item active" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
+      </div>
+      
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
 
@@ -639,8 +653,8 @@
     <div class="main-content">
       <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
       
-      <!-- DASHBOARD -->
-      <div id="page-dashboard" class="page active-page">
+      <!-- DASHBOARD (solo admin) -->
+      <div id="page-dashboard" class="page admin-only">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-title">Productos</div><div class="stat-value" id="stat-productos">0</div></div>
           <div class="stat-card"><div class="stat-title">Ventas (mes)</div><div class="stat-value" id="stat-ventas">0</div></div>
@@ -650,15 +664,15 @@
         <div class="card"><h3>Últimas ventas</h3><div id="ultimas-ventas-lista"></div></div>
       </div>
 
-      <!-- TIENDA -->
-      <div id="page-tienda" class="page">
+      <!-- TIENDA (visible para todos) -->
+      <div id="page-tienda" class="page active-page">
         <div class="tienda-header">
           <i class="fas fa-gift icono-header"></i>
           <h1>LOS AMIGOS ESTORE 🎁</h1>
           <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
         </div>
 
-        <!-- BANNERS DINÁMICOS DESDE FIREBASE -->
+        <!-- BANNERS DINÁMICOS -->
         <div id="banners-container"></div>
 
         <!-- CATEGORÍAS -->
@@ -680,8 +694,8 @@
         </div>
       </div>
 
-      <!-- PRODUCTOS -->
-      <div id="page-productos" class="page">
+      <!-- PRODUCTOS (solo admin) -->
+      <div id="page-productos" class="page admin-only">
         <div class="card">
           <div class="card-header"><h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3></div>
           
@@ -728,15 +742,14 @@
         </div>
       </div>
 
-      <!-- ========== PUBLICIDAD ========== -->
-      <div id="page-publicidad" class="page">
+      <!-- PUBLICIDAD (solo admin) -->
+      <div id="page-publicidad" class="page admin-only">
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-ad" style="color:#cc0000;"></i> Gestionar Publicidad</h3>
             <span style="color: #666; font-size: 0.8rem;">Crea y administra tus banners</span>
           </div>
           
-          <!-- Formulario para agregar banner -->
           <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
             <h4 style="margin-bottom: 12px; color: #cc0000;">Agregar nuevo banner</h4>
             <div class="flex">
@@ -761,14 +774,13 @@
             <button id="btn-add-banner"><i class="fas fa-save"></i> Guardar Banner</button>
           </div>
 
-          <!-- Lista de banners -->
           <h4 style="margin-bottom: 12px; color: #333;">Banners actuales</h4>
           <div id="lista-banners"></div>
         </div>
       </div>
 
-      <!-- FACTURACIÓN -->
-      <div id="page-ventas" class="page">
+      <!-- FACTURACIÓN (solo admin) -->
+      <div id="page-ventas" class="page admin-only">
         <div class="card">
           <h3>🛒 Carrito de compras</h3>
           <div class="flex">
@@ -794,8 +806,8 @@
         <div class="card"><h3>Historial de ventas</h3><div id="historial-ventas"></div></div>
       </div>
 
-      <!-- LINKS DE PAGO -->
-      <div id="page-pagos" class="page">
+      <!-- LINKS DE PAGO (solo admin) -->
+      <div id="page-pagos" class="page admin-only">
         <div class="card">
           <h3>Crear link de pago</h3>
           <input type="number" id="link-monto" placeholder="Monto USD">
@@ -805,8 +817,8 @@
         <div class="card"><h3>Links activos</h3><div id="lista-links-pago"></div></div>
       </div>
 
-      <!-- TRABAJADORES -->
-      <div id="page-trabajadores" class="page">
+      <!-- TRABAJADORES (solo admin) -->
+      <div id="page-trabajadores" class="page admin-only">
         <div class="card">
           <h3>Registrar trabajador</h3>
           <input type="email" id="worker-email" placeholder="Correo electrónico">
@@ -820,8 +832,8 @@
         <div class="card"><h3>Lista de trabajadores</h3><div id="lista-trabajadores"></div></div>
       </div>
 
-      <!-- MIEMBROS -->
-      <div id="page-miembros" class="page">
+      <!-- MIEMBROS (solo admin) -->
+      <div id="page-miembros" class="page admin-only">
         <div class="card">
           <h3>Nuevo miembro</h3>
           <div class="flex">
@@ -834,8 +846,8 @@
         <div class="card"><h3>Base de miembros</h3><div id="lista-miembros"></div></div>
       </div>
 
-      <!-- MÉTODOS DE PAGO -->
-      <div id="page-metodos-pago" class="page">
+      <!-- MÉTODOS DE PAGO (solo admin) -->
+      <div id="page-metodos-pago" class="page admin-only">
         <div class="card">
           <h3>Agregar método de pago</h3>
           <select id="tipo-metodo">
@@ -851,7 +863,7 @@
         <div class="card"><h3>Métodos disponibles</h3><div id="lista-metodos"></div></div>
       </div>
 
-      <!-- ADMIN -->
+      <!-- ADMIN / ROLES (solo admin) -->
       <div id="page-admin" class="page admin-only">
         <div class="card">
           <h3>Crear Administrador</h3>
@@ -910,11 +922,27 @@
   const logoutSidebar = document.getElementById("logout-sidebar");
 
   const isAdmin = () => currentUserRol === "admin";
+  const isSeller = () => currentUserRol === "seller" || currentUserRol === "worker";
 
-  function updateAdminVisibility() {
-    document.querySelectorAll('.admin-only').forEach(el => {
-      el.style.display = isAdmin() ? "block" : "none";
-    });
+  // ========== FUNCIÓN PARA ACTUALIZAR VISIBILIDAD SEGÚN ROL ==========
+  function updateVisibilityByRole() {
+    const adminElements = document.querySelectorAll('.admin-only');
+    const sellerElements = document.querySelectorAll('.seller-only');
+    
+    if (isAdmin()) {
+      adminElements.forEach(el => el.style.display = 'block');
+      sellerElements.forEach(el => el.style.display = 'none');
+      // Mostrar dashboard por defecto si es admin
+      showPage('dashboard');
+    } else if (isSeller()) {
+      adminElements.forEach(el => el.style.display = 'none');
+      sellerElements.forEach(el => el.style.display = 'block');
+      // Mostrar tienda por defecto si es seller
+      showPage('tienda');
+    } else {
+      adminElements.forEach(el => el.style.display = 'none');
+      sellerElements.forEach(el => el.style.display = 'none');
+    }
   }
 
   function showPage(pageId) {
@@ -962,8 +990,11 @@
       }
       loginContainer.style.display = "none";
       dashboardApp.style.display = "block";
-      updateAdminVisibility();
+      
+      // Actualizar visibilidad según rol
+      updateVisibilityByRole();
       addDebugLog(`👤 Usuario: ${user.email} (${currentUserRol})`, 'success');
+      
       loadAllData();
     } else {
       loginContainer.style.display = "flex";
@@ -1294,7 +1325,7 @@
       addDebugLog(`❌ Error cargando productos: ${error.message}`, 'error');
     });
 
-    // BANNERS (PUBLICIDAD)
+    // BANNERS
     onSnapshot(collection(db, "publicidad"), (snap) => {
       allBanners = [];
       snap.forEach(doc => {
