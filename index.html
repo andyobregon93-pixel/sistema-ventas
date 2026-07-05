@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ===== ESTILOS BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -299,14 +298,14 @@
     /* ===== CATEGORÍAS Y FILTROS ===== */
     .categorias-section {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
       margin: 25px 0;
     }
     .categoria-item {
       background: #ffffff;
       border-radius: 16px;
-      padding: 20px 12px;
+      padding: 16px 10px;
       text-align: center;
       border: 2px solid #e0e0e0;
       transition: 0.3s;
@@ -323,13 +322,13 @@
       background: #fff5f5;
     }
     .categoria-item i {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       color: #cc0000;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: block;
     }
-    .categoria-item h4 { font-size: 0.85rem; color: #1a1a1a; }
-    .categoria-item p { font-size: 0.65rem; color: #666; }
+    .categoria-item h4 { font-size: 0.75rem; color: #1a1a1a; }
+    .categoria-item p { font-size: 0.6rem; color: #666; }
 
     /* FILTROS */
     .filtros-container {
@@ -573,7 +572,7 @@
       background: #e0e0e0;
     }
 
-    /* ===== MODAL DE SELECCIÓN CON BOTONES DE TALLA ===== */
+    /* ===== MODAL ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -921,6 +920,27 @@
       color: #cc0000;
       text-align: right;
     }
+    .cart-resumen .btn-seguir-comprando {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .cart-resumen .btn-seguir-comprando:hover {
+      background: #0069d9;
+      transform: scale(1.02);
+    }
     .cart-resumen .btn-finalizar {
       width: 100%;
       padding: 16px;
@@ -1248,15 +1268,25 @@
           </button>
         </div>
 
+        <!-- CATEGORÍAS ESPECÍFICAS -->
         <div class="categorias-section" id="categorias-container">
           <div class="categoria-item active-categoria" data-categoria="todos">
             <i class="fas fa-th-large"></i><h4>Todos</h4><p>Todos los productos</p>
           </div>
           <div class="categoria-item" data-categoria="ropa">
-            <i class="fas fa-tshirt"></i><h4>Ropa</h4><p>Camisas, pantalones</p>
+            <i class="fas fa-tshirt"></i><h4>Ropa</h4><p>Camisas, blusas</p>
           </div>
           <div class="categoria-item" data-categoria="zapatos">
             <i class="fas fa-shoe-prints"></i><h4>Zapatos</h4><p>Tenis, zapatillas</p>
+          </div>
+          <div class="categoria-item" data-categoria="relojes">
+            <i class="fas fa-clock"></i><h4>Relojes</h4><p>Deportivos, elegantes</p>
+          </div>
+          <div class="categoria-item" data-categoria="medias">
+            <i class="fas fa-socks"></i><h4>Medias</h4><p>Deportivas, casuales</p>
+          </div>
+          <div class="categoria-item" data-categoria="boxer">
+            <i class="fas fa-tshirt"></i><h4>Boxer</h4><p>Ropa interior</p>
           </div>
           <div class="categoria-item" data-categoria="accesorios">
             <i class="fas fa-hat-cowboy"></i><h4>Accesorios</h4><p>Gorras, cinturones</p>
@@ -1296,11 +1326,17 @@
             <input type="number" id="prod-precio" placeholder="Precio USD*" style="flex:1">
             <input type="number" id="prod-stock" placeholder="Stock*" style="flex:1">
           </div>
-          <div class="flex">
-            <input type="text" id="prod-talla" placeholder="Tallas (ej: S,M,L o 36 al 39)" style="flex:1">
-            <input type="text" id="prod-color" placeholder="Colores (Rojo,Azul...)" style="flex:1">
-            <input type="text" id="prod-medidas" placeholder="Medidas (ej: 30x40cm)" style="flex:1">
+          
+          <!-- CAMPOS OPCIONALES -->
+          <div style="background: #f0f8ff; padding: 16px; border-radius: 12px; border: 1px solid #d0e8ff; margin: 8px 0;">
+            <p style="color: #666; font-size: 0.8rem; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> Los siguientes campos son <strong>opcionales</strong>. Solo llénalos si tu producto lo necesita (ej: talla para ropa o zapatos).</p>
+            <div class="flex">
+              <input type="text" id="prod-talla" placeholder="Tallas (S,M,L o 36 al 39) *Opcional" style="flex:1; background:#fff;">
+              <input type="text" id="prod-color" placeholder="Colores (Rojo,Azul...) *Opcional" style="flex:1; background:#fff;">
+              <input type="text" id="prod-medidas" placeholder="Medidas (ej: 30x40cm) *Opcional" style="flex:1; background:#fff;">
+            </div>
           </div>
+          
           <div class="flex">
             <select id="prod-genero" style="flex:1;">
               <option value="todos">Todos los géneros</option>
@@ -1312,6 +1348,9 @@
             <select id="prod-categoria" style="flex:1;">
               <option value="ropa">👕 Ropa</option>
               <option value="zapatos">👟 Zapatos</option>
+              <option value="relojes">⌚ Relojes</option>
+              <option value="medias">🧦 Medias</option>
+              <option value="boxer">🩲 Boxer</option>
               <option value="accesorios">🧢 Accesorios</option>
               <option value="ofertas">🏷️ Ofertas</option>
             </select>
@@ -1424,6 +1463,9 @@
               <p style="color: #666; font-size: 0.85rem;">Todos los pagos se realizan en efectivo al momento de la entrega.</p>
             </div>
             
+            <button class="btn-seguir-comprando" id="btn-seguir-comprando">
+              <i class="fas fa-store"></i> Seguir comprando
+            </button>
             <button class="btn-finalizar" id="btn-finalizar-pedido">
               <i class="fab fa-whatsapp"></i> FINALIZAR PEDIDO POR WHATSAPP
             </button>
@@ -1525,7 +1567,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PRODUCTO CON BOTONES DE TALLA ===== -->
+<!-- ===== MODAL DE PRODUCTO ===== -->
 <div class="modal-overlay" id="modal-producto">
   <div class="modal-contenido">
     <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
@@ -1542,20 +1584,16 @@
         <div class="descripcion" id="modal-descripcion">Descripción</div>
         <div class="stock-info" id="modal-stock">Stock disponible</div>
         
-        <!-- TALLAS COMO BOTONES -->
-        <div class="modal-tallas-container">
+        <!-- TALLAS (opcional) -->
+        <div class="modal-tallas-container" id="modal-tallas-container" style="display:none;">
           <label><i class="fas fa-ruler"></i> Selecciona tu talla:</label>
-          <div class="tallas-grid" id="modal-tallas-grid">
-            <!-- Las tallas se generan automáticamente desde JavaScript -->
-          </div>
+          <div class="tallas-grid" id="modal-tallas-grid"></div>
         </div>
         
-        <!-- COLORES COMO BOTONES -->
+        <!-- COLORES (opcional) -->
         <div class="modal-colores-container" id="modal-colores-container" style="display:none;">
           <label><i class="fas fa-palette"></i> Selecciona un color:</label>
-          <div class="colores-grid" id="modal-colores-grid">
-            <!-- Los colores se generan automáticamente desde JavaScript -->
-          </div>
+          <div class="colores-grid" id="modal-colores-grid"></div>
         </div>
         
         <button class="btn-agregar-modal" id="modal-btn-agregar" onclick="agregarDelModal()">
@@ -1611,16 +1649,10 @@
   // ===== FUNCIÓN PARA GENERAR TALLAS DESDE UN RANGO =====
   function generarTallasDesdeRango(textoTallas) {
     if (!textoTallas) return [];
-    
-    // Limpiar espacios
     textoTallas = textoTallas.trim();
-    
-    // Si ya es una lista separada por comas
     if (textoTallas.includes(',')) {
       return textoTallas.split(',').map(t => t.trim()).filter(t => t);
     }
-    
-    // Si es un rango tipo "36 al 39" o "36-39"
     const rangoMatch = textoTallas.match(/(\d+)\s*(?:al|a|-)\s*(\d+)/i);
     if (rangoMatch) {
       const inicio = parseInt(rangoMatch[1]);
@@ -1633,8 +1665,6 @@
         return tallas;
       }
     }
-    
-    // Si es un rango de letras tipo "S al XL"
     const letras = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     const rangoLetras = textoTallas.match(/([A-Z]+)\s*(?:al|a|-)\s*([A-Z]+)/i);
     if (rangoLetras) {
@@ -1644,8 +1674,6 @@
         return letras.slice(inicio, fin + 1);
       }
     }
-    
-    // Si es una sola talla
     return [textoTallas];
   }
 
@@ -2046,6 +2074,7 @@
       const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
       
       const generoIcono = p.genero === 'hombre' ? '👨' : p.genero === 'mujer' ? '👩' : p.genero === 'ninos' ? '🧒' : p.genero === 'ninas' ? '👧' : '';
+      const categoriaIcono = p.categoria === 'ropa' ? '👕' : p.categoria === 'zapatos' ? '👟' : p.categoria === 'relojes' ? '⌚' : p.categoria === 'medias' ? '🧦' : p.categoria === 'boxer' ? '🩲' : p.categoria === 'accesorios' ? '🧢' : '🏷️';
       
       html += `
         <div class="producto-card-depratik" onclick="abrirModal('${p.id}')">
@@ -2055,7 +2084,7 @@
             ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
           </div>
           <div class="info">
-            <div class="nombre">${generoIcono} ${p.nombre || 'Sin nombre'}</div>
+            <div class="nombre">${generoIcono} ${categoriaIcono} ${p.nombre || 'Sin nombre'}</div>
             <div class="precio">$${p.precio || 0}</div>
             <div class="detalles">
               ${p.talla ? `<span>📏 ${p.talla}</span>` : ''}
@@ -2077,7 +2106,7 @@
     renderTiendaDepratik();
   };
 
-  // ===== MODAL CON BOTONES DE TALLA =====
+  // ===== MODAL =====
   window.abrirModal = function(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
@@ -2108,6 +2137,10 @@
       const generoLabel = product.genero === 'hombre' ? '👨 Hombre' : product.genero === 'mujer' ? '👩 Mujer' : product.genero === 'ninos' ? '🧒 Niños' : '👧 Niñas';
       detallesHtml += `<span>${generoLabel}</span>`;
     }
+    if (product.categoria) {
+      const categoriaLabel = product.categoria === 'ropa' ? '👕 Ropa' : product.categoria === 'zapatos' ? '👟 Zapatos' : product.categoria === 'relojes' ? '⌚ Relojes' : product.categoria === 'medias' ? '🧦 Medias' : product.categoria === 'boxer' ? '🩲 Boxer' : product.categoria === 'accesorios' ? '🧢 Accesorios' : '🏷️ Ofertas';
+      detallesHtml += `<span>${categoriaLabel}</span>`;
+    }
     document.getElementById('modal-detalles').innerHTML = detallesHtml || '<span>Sin especificaciones</span>';
     
     document.getElementById('modal-descripcion').textContent = product.descripcion || 'Descripción no disponible';
@@ -2116,10 +2149,12 @@
     document.getElementById('modal-stock').textContent = stockText;
     document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
     
-    // ===== GENERAR BOTONES DE TALLAS =====
+    // TALLAS (solo si hay tallas)
+    const tallasContainer = document.getElementById('modal-tallas-container');
     const tallasGrid = document.getElementById('modal-tallas-grid');
     tallasGrid.innerHTML = '';
     if (product.talla) {
+      tallasContainer.style.display = 'block';
       const tallas = generarTallasDesdeRango(product.talla);
       tallas.forEach(t => {
         const btn = document.createElement('button');
@@ -2133,9 +2168,11 @@
         });
         tallasGrid.appendChild(btn);
       });
+    } else {
+      tallasContainer.style.display = 'none';
     }
     
-    // ===== GENERAR BOTONES DE COLORES =====
+    // COLORES (solo si hay colores)
     const coloresContainer = document.getElementById('modal-colores-container');
     const coloresGrid = document.getElementById('modal-colores-grid');
     coloresGrid.innerHTML = '';
@@ -2209,7 +2246,7 @@
     if (e.target === this) cerrarModal();
   });
 
-  // ===== AGREGAR AL CARRITO DESDE MODAL =====
+  // ===== AGREGAR AL CARRITO =====
   window.agregarDelModal = function() {
     if (!productoModal) return;
     if (productoModal.stock <= 0) {
@@ -2217,12 +2254,13 @@
       return;
     }
     
-    if (!tallaSeleccionada) {
+    // Verificar si el producto tiene tallas y si se seleccionó una
+    if (productoModal.talla && !tallaSeleccionada) {
       alert('⚠️ Por favor selecciona una talla.');
       return;
     }
     
-    const nombreConDetalles = `${productoModal.nombre || 'Producto'} (Talla: ${tallaSeleccionada}${colorSeleccionado ? ', Color: ' + colorSeleccionado : ''})`;
+    const nombreConDetalles = `${productoModal.nombre || 'Producto'}${tallaSeleccionada ? ' (Talla: ' + tallaSeleccionada : ''}${colorSeleccionado ? ', Color: ' + colorSeleccionado : ''})`;
     
     const existing = cart.find(item => 
       item.productoId === productoModal.id && 
@@ -2236,8 +2274,8 @@
       cart.push({ 
         productoId: productoModal.id, 
         nombre: productoModal.nombre || 'Producto',
-        talla: tallaSeleccionada,
-        color: colorSeleccionado,
+        talla: tallaSeleccionada || null,
+        color: colorSeleccionado || null,
         precio: productoModal.precio || 0, 
         cantidad: 1 
       });
@@ -2249,7 +2287,7 @@
     showPage('ventas');
   };
 
-  // ===== ENVIAR A WHATSAPP DIRECTAMENTE DESDE MODAL =====
+  // ===== ENVIAR A WHATSAPP DIRECTAMENTE =====
   window.enviarWhatsAppDirecto = function() {
     if (!productoModal) return;
     if (productoModal.stock <= 0) {
@@ -2257,7 +2295,7 @@
       return;
     }
     
-    if (!tallaSeleccionada) {
+    if (productoModal.talla && !tallaSeleccionada) {
       alert('⚠️ Por favor selecciona una talla.');
       return;
     }
@@ -2270,11 +2308,11 @@
       `📱 *WhatsApp:* ${telefono || 'No proporcionado'}\n\n` +
       `📦 *Producto:* ${productoModal.nombre}\n` +
       `💰 *Precio:* $${productoModal.precio}\n` +
-      `📏 *Talla:* ${tallaSeleccionada}\n` +
-      `🎨 *Color:* ${colorSeleccionado || 'No especificado'}\n` +
-      `📐 *Medidas:* ${productoModal.medidas || 'No especificadas'}\n` +
-      `📝 *Descripción:* ${productoModal.descripcion || 'Sin descripción'}\n\n` +
-      `🔗 *Código:* ${productoModal.id?.slice(0, 8) || '---'}\n\n` +
+      `${tallaSeleccionada ? `📏 *Talla:* ${tallaSeleccionada}\n` : ''}` +
+      `${colorSeleccionado ? `🎨 *Color:* ${colorSeleccionado}\n` : ''}` +
+      `${productoModal.medidas ? `📐 *Medidas:* ${productoModal.medidas}\n` : ''}` +
+      `${productoModal.descripcion ? `📝 *Descripción:* ${productoModal.descripcion}\n` : ''}` +
+      `\n🔗 *Código:* ${productoModal.id?.slice(0, 8) || '---'}\n\n` +
       `✅ *Pedido listo para confirmar.*`;
     
     const numero = WHATSAPP_NUMBER;
@@ -2354,6 +2392,11 @@
       renderCarrito();
     }
   };
+
+  // ===== SEGUIR COMPRANDO =====
+  document.getElementById("btn-seguir-comprando")?.addEventListener("click", function() {
+    showPage('tienda');
+  });
 
   // ===== FINALIZAR PEDIDO POR WHATSAPP =====
   document.getElementById("btn-finalizar-pedido")?.addEventListener("click", function() {
