@@ -272,65 +272,25 @@
       opacity: 0.9;
     }
 
-    /* ===== BANNER PUBLICITARIO ===== */
-    .banner-publicidad-dinamico {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 20px 25px;
+    /* ===== BANNER PUBLICITARIO - IMAGEN COMPLETA ===== */
+    .banner-publicidad-full {
       margin: 15px 0 25px 0;
-      border: 2px solid #cc0000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-      box-shadow: 0 2px 12px rgba(204,0,0,0.08);
-      transition: 0.3s;
-      min-height: 120px;
-    }
-    .banner-publicidad-dinamico:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(204,0,0,0.15);
-    }
-    .banner-publicidad-dinamico .banner-contenido {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      flex-wrap: wrap;
-      flex: 1;
-    }
-    .banner-publicidad-dinamico .banner-contenido img {
-      height: 100px;
-      width: auto;
-      max-width: 250px;
-      object-fit: cover;
-      border-radius: 12px;
-      border: 1px solid #e0e0e0;
-    }
-    .banner-publicidad-dinamico .banner-contenido .texto h3 {
-      font-size: 1.5rem;
-      color: #cc0000;
-      font-weight: 900;
-    }
-    .banner-publicidad-dinamico .banner-contenido .texto p {
-      color: #333;
-      font-size: 1rem;
-    }
-    .banner-publicidad-dinamico .btn-banner {
-      background: #cc0000;
-      padding: 12px 30px;
-      border-radius: 12px;
-      font-weight: 700;
-      color: white;
-      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       cursor: pointer;
-      transition: 0.2s;
-      white-space: nowrap;
-      font-size: 1rem;
+      transition: 0.3s;
     }
-    .banner-publicidad-dinamico .btn-banner:hover {
-      background: #b30000;
-      transform: scale(1.03);
+    .banner-publicidad-full:hover {
+      transform: scale(1.01);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .banner-publicidad-full img {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      object-fit: cover;
+      display: block;
     }
 
     /* ===== CATEGORÍAS Y FILTROS ===== */
@@ -368,7 +328,7 @@
     .categoria-item h4 { font-size: 0.85rem; color: #1a1a1a; }
     .categoria-item p { font-size: 0.65rem; color: #666; }
 
-    /* FILTROS DE TALLA Y GÉNERO */
+    /* FILTROS */
     .filtros-container {
       display: flex;
       flex-wrap: wrap;
@@ -405,27 +365,6 @@
       outline: none;
       border-color: #cc0000;
       box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
-    }
-    .filtro-talla-badge {
-      display: inline-block;
-      background: #f0f0f0;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #333;
-      border: 1px solid #e0e0e0;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .filtro-talla-badge:hover {
-      border-color: #cc0000;
-      background: #fff5f5;
-    }
-    .filtro-talla-badge.active-talla {
-      border-color: #cc0000;
-      background: #cc0000;
-      color: white;
     }
 
     /* ===== PRODUCTOS GRID ===== */
@@ -631,6 +570,7 @@
       background: #e0e0e0;
     }
 
+    /* ===== MODAL DE SELECCIÓN ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -763,6 +703,35 @@
       color: #28a745;
       font-weight: 600;
     }
+    /* Selectores de talla y color en el modal */
+    .modal-opciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 12px 0;
+    }
+    .modal-opciones label {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.85rem;
+      min-width: 60px;
+    }
+    .modal-opciones select {
+      background: #f9f9f9;
+      border: 1px solid #d0d0d0;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      color: #333;
+      cursor: pointer;
+      flex: 1;
+      min-width: 120px;
+    }
+    .modal-opciones select:focus {
+      outline: none;
+      border-color: #cc0000;
+      box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
+    }
     .modal-info .btn-agregar-modal {
       width: 100%;
       padding: 16px;
@@ -781,6 +750,33 @@
       transform: scale(1.02);
     }
     .modal-info .btn-agregar-modal:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    /* Botón de enviar a WhatsApp en el modal */
+    .modal-info .btn-whatsapp-modal {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .modal-info .btn-whatsapp-modal:hover {
+      background: #1da851;
+      transform: scale(1.02);
+    }
+    .modal-info .btn-whatsapp-modal:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
@@ -912,9 +908,7 @@
       .productos-grid-depratik { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
       .tienda-header img { max-height: 150px; }
       .categorias-section { grid-template-columns: repeat(2, 1fr); }
-      .banner-publicidad-dinamico { flex-direction: column; text-align: center; }
-      .banner-publicidad-dinamico .banner-contenido { flex-direction: column; text-align: center; }
-      .banner-publicidad-dinamico .banner-contenido img { height: 80px; }
+      .banner-publicidad-full img { max-height: 200px; }
       .modal-grid { grid-template-columns: 1fr; }
       .modal-imagen-principal { height: 220px; }
       .modal-contenido { padding: 20px; }
@@ -937,13 +931,11 @@
         <h3 style="font-size: 1rem; color: #666;">ESTORE 🎁</h3>
       </div>
 
-      <!-- Tabs -->
       <div class="auth-tabs">
         <button class="active-tab" data-tab="login" onclick="cambiarTabAuth('login')"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
         <button data-tab="register" onclick="cambiarTabAuth('register')"><i class="fas fa-user-plus"></i> Registrarse</button>
       </div>
 
-      <!-- Login Form -->
       <div class="auth-form active-form" id="form-login">
         <div class="form-group">
           <label>Correo electrónico</label>
@@ -961,7 +953,6 @@
         <button class="btn-guest" id="guest-btn"><i class="fas fa-user"></i> Entrar como Invitado</button>
       </div>
 
-      <!-- Register Form -->
       <div class="auth-form" id="form-register">
         <div class="form-group">
           <label>Nombre completo</label>
@@ -978,7 +969,6 @@
         <button class="btn-auth" id="register-btn"><i class="fas fa-user-plus"></i> Crear Cuenta</button>
       </div>
 
-      <!-- Recuperar contraseña (oculto) -->
       <div class="auth-form" id="form-recuperar" style="display:none;">
         <div class="form-group">
           <label>Correo electrónico</label>
@@ -996,7 +986,6 @@
 <!-- ===== DASHBOARD ===== -->
 <div id="dashboard-app" style="display: none;">
   <div class="app-wrapper">
-    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo-container">
@@ -1027,11 +1016,10 @@
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content">
       <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
       
-      <!-- ===== DASHBOARD ===== -->
+      <!-- DASHBOARD -->
       <div id="page-dashboard" class="page admin-only active-page">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-title">Productos</div><div class="stat-value" id="stat-productos">0</div></div>
@@ -1042,7 +1030,7 @@
         <div class="card"><h3>Últimas ventas</h3><div id="ultimas-ventas-lista"></div></div>
       </div>
 
-      <!-- ===== TIENDA ===== -->
+      <!-- TIENDA -->
       <div id="page-tienda" class="page">
         <div class="tienda-header" id="tienda-header">
           <img id="header-imagen-tienda" src="" alt="Header" style="display:none;">
@@ -1053,9 +1041,10 @@
           </div>
         </div>
 
+        <!-- BANNERS - IMAGEN COMPLETA -->
         <div id="banners-container"></div>
 
-        <!-- ===== FILTROS AVANZADOS ===== -->
+        <!-- FILTROS -->
         <div class="filtros-container">
           <div class="grupo-filtro">
             <label><i class="fas fa-tshirt"></i> Género:</label>
@@ -1117,7 +1106,7 @@
         </div>
       </div>
 
-      <!-- ===== PRODUCTOS ===== -->
+      <!-- PRODUCTOS (admin) -->
       <div id="page-productos" class="page admin-only">
         <div class="card">
           <div class="card-header"><h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3></div>
@@ -1177,7 +1166,7 @@
         </div>
       </div>
 
-      <!-- ===== CONFIGURACIÓN ===== -->
+      <!-- CONFIGURACIÓN -->
       <div id="page-configuracion" class="page admin-only">
         <div class="card">
           <div class="card-header">
@@ -1206,7 +1195,7 @@
         </div>
       </div>
 
-      <!-- ===== PUBLICIDAD ===== -->
+      <!-- PUBLICIDAD -->
       <div id="page-publicidad" class="page admin-only">
         <div class="card">
           <div class="card-header">
@@ -1216,20 +1205,11 @@
           <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
             <h4 style="margin-bottom: 12px; color: #cc0000;">Agregar nuevo banner</h4>
             <div class="flex">
-              <input type="text" id="banner-titulo" placeholder="Título del banner*" style="flex:2">
-              <input type="text" id="banner-descripcion" placeholder="Descripción corta" style="flex:2">
-            </div>
-            <div class="flex">
+              <input type="text" id="banner-titulo" placeholder="Título (solo para admin)*" style="flex:2">
               <input type="text" id="banner-imagen" placeholder="URL de la imagen*" style="flex:3">
-              <input type="text" id="banner-enlace" placeholder="Enlace del botón" style="flex:2">
             </div>
             <div class="flex">
-              <select id="banner-tipo" style="flex:1;">
-                <option value="oferta">🔥 Oferta</option>
-                <option value="promocion">🎁 Promoción</option>
-                <option value="evento">📅 Evento</option>
-                <option value="info">ℹ️ Informativo</option>
-              </select>
+              <input type="text" id="banner-enlace" placeholder="Enlace del banner (opcional)" style="flex:2">
               <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #333;">
                 <input type="checkbox" id="banner-activo" checked> Activo
               </label>
@@ -1241,7 +1221,7 @@
         </div>
       </div>
 
-      <!-- ===== FACTURACIÓN ===== -->
+      <!-- FACTURACIÓN -->
       <div id="page-ventas" class="page admin-only">
         <div class="card">
           <h3>🛒 Carrito de compras</h3>
@@ -1271,7 +1251,7 @@
         <div class="card"><h3>Historial de ventas</h3><div id="historial-ventas"></div></div>
       </div>
 
-      <!-- ===== LINKS DE PAGO ===== -->
+      <!-- LINKS DE PAGO -->
       <div id="page-pagos" class="page admin-only">
         <div class="card">
           <h3>Crear link de pago</h3>
@@ -1282,7 +1262,7 @@
         <div class="card"><h3>Links activos</h3><div id="lista-links-pago"></div></div>
       </div>
 
-      <!-- ===== USUARIOS ===== -->
+      <!-- USUARIOS -->
       <div id="page-usuarios" class="page admin-only">
         <div class="card">
           <div class="card-header">
@@ -1312,7 +1292,7 @@
         </div>
       </div>
 
-      <!-- ===== MIEMBROS ===== -->
+      <!-- MIEMBROS -->
       <div id="page-miembros" class="page admin-only">
         <div class="card">
           <h3>Nuevo miembro</h3>
@@ -1326,7 +1306,7 @@
         <div class="card"><h3>Base de miembros</h3><div id="lista-miembros"></div></div>
       </div>
 
-      <!-- ===== MÉTODOS DE PAGO ===== -->
+      <!-- MÉTODOS DE PAGO -->
       <div id="page-metodos-pago" class="page admin-only">
         <div class="card">
           <h3>Agregar método de pago</h3>
@@ -1343,7 +1323,7 @@
         <div class="card"><h3>Métodos disponibles</h3><div id="lista-metodos"></div></div>
       </div>
 
-      <!-- ===== ADMIN ===== -->
+      <!-- ADMIN -->
       <div id="page-admin" class="page admin-only">
         <div class="card">
           <h3>Crear Administrador</h3>
@@ -1357,7 +1337,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL ===== -->
+<!-- ===== MODAL DE PRODUCTO CON SELECCIÓN ===== -->
 <div class="modal-overlay" id="modal-producto">
   <div class="modal-contenido">
     <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
@@ -1373,8 +1353,28 @@
         <div class="detalles" id="modal-detalles"></div>
         <div class="descripcion" id="modal-descripcion">Descripción</div>
         <div class="stock-info" id="modal-stock">Stock disponible</div>
+        
+        <!-- Opciones de talla y color -->
+        <div class="modal-opciones">
+          <div style="flex:1; min-width:120px;">
+            <label>Talla:</label>
+            <select id="modal-talla-select">
+              <option value="">Seleccionar talla</option>
+            </select>
+          </div>
+          <div style="flex:1; min-width:120px;">
+            <label>Color:</label>
+            <select id="modal-color-select">
+              <option value="">Seleccionar color</option>
+            </select>
+          </div>
+        </div>
+        
         <button class="btn-agregar-modal" id="modal-btn-agregar" onclick="agregarDelModal()">
           <i class="fas fa-cart-plus"></i> Agregar al carrito
+        </button>
+        <button class="btn-whatsapp-modal" id="modal-btn-whatsapp" onclick="enviarWhatsAppDirecto()">
+          <i class="fab fa-whatsapp"></i> Comprar por WhatsApp
         </button>
       </div>
     </div>
@@ -1407,6 +1407,11 @@
   const storage = getStorage(app);
 
   const MASTER_EMAIL = "andyobregon799@gmail.com";
+  // ====================================================
+  // 🔥 TU NÚMERO DE WHATSAPP PARA PEDIDOS DIRECTOS
+  // ====================================================
+  const WHATSAPP_NUMBER = "593990434546"; // <-- YA ESTÁ TU NÚMERO
+  // ====================================================
   let currentUser = null;
   let currentUserRol = "visitor";
   let cart = [];
@@ -1426,7 +1431,6 @@
   const guestBtn = document.getElementById("guest-btn");
   const logoutSidebar = document.getElementById("logout-sidebar");
 
-  // Tabs
   window.cambiarTabAuth = function(tab) {
     document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
     document.querySelector(`.auth-tabs button[data-tab="${tab}"]`).classList.add('active-tab');
@@ -1448,7 +1452,6 @@
     document.querySelector('.auth-tabs button[data-tab="login"]').classList.add('active-tab');
   };
 
-  // Login
   loginBtn.addEventListener('click', async () => {
     const email = document.getElementById("login-email").value.trim();
     const pass = document.getElementById("login-password").value.trim();
@@ -1462,7 +1465,6 @@
     }
   });
 
-  // Register
   registerBtn.addEventListener('click', async () => {
     const nombre = document.getElementById("register-nombre").value.trim();
     const email = document.getElementById("register-email").value.trim();
@@ -1487,7 +1489,6 @@
     }
   });
 
-  // Recuperar contraseña
   recuperarBtn.addEventListener('click', async () => {
     const email = document.getElementById("recuperar-email").value.trim();
     if (!email) { alert("Ingresa tu correo electrónico."); return; }
@@ -1502,39 +1503,32 @@
     }
   });
 
-  // Guest (Invitado)
   guestBtn.addEventListener('click', () => {
     currentUser = null;
     currentUserRol = "guest";
     loginContainer.style.display = "none";
     dashboardApp.style.display = "block";
-    // Mostrar solo la tienda para invitados
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
-    // Mostrar solo el nav de tienda
     document.querySelectorAll('.nav-item').forEach(el => {
       if (el.dataset.page !== 'tienda' && el.id !== 'logout-sidebar') {
         el.style.display = 'none';
       }
     });
-    // Activar tienda
     showPage('tienda');
     addDebugLog(`👤 Acceso como invitado`, 'info');
     loadAllData();
     cargarHeader();
   });
 
-  // Logout
   logoutSidebar.addEventListener('click', () => {
     if (currentUser) {
       signOut(auth);
     } else {
-      // Guest logout
       location.reload();
     }
   });
 
-  // Auth State
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
@@ -1554,7 +1548,6 @@
       loadAllData();
       cargarHeader();
     } else {
-      // Si no hay usuario y no es guest, mostrar login
       if (currentUserRol !== 'guest') {
         loginContainer.style.display = "flex";
         dashboardApp.style.display = "none";
@@ -1564,7 +1557,6 @@
     }
   });
 
-  // ===== FUNCIONES DE ROL =====
   const isAdmin = () => currentUserRol === "admin";
   const isSeller = () => currentUserRol === "seller" || currentUserRol === "worker";
 
@@ -1579,7 +1571,6 @@
     } else if (isSeller()) {
       adminElements.forEach(el => el.style.display = 'none');
       sellerElements.forEach(el => el.style.display = 'block');
-      // Ocultar navs de admin
       document.querySelectorAll('.nav-item').forEach(el => {
         if (el.dataset.page !== 'tienda' && el.id !== 'logout-sidebar') {
           el.style.display = 'none';
@@ -1591,7 +1582,6 @@
     } else {
       adminElements.forEach(el => el.style.display = 'none');
       sellerElements.forEach(el => el.style.display = 'none');
-      // Mostrar solo tienda para invitados
       document.querySelectorAll('.nav-item').forEach(el => {
         if (el.dataset.page !== 'tienda' && el.id !== 'logout-sidebar') {
           el.style.display = 'none';
@@ -1783,17 +1773,14 @@
     
     let filtered = allProducts;
     
-    // Filtrar por categoría
     if (categoriaSeleccionada !== "todos") {
       filtered = filtered.filter(p => p.categoria === categoriaSeleccionada);
     }
     
-    // Filtrar por género
     if (filtroGenero !== "todos") {
       filtered = filtered.filter(p => p.genero === filtroGenero || p.genero === 'todos' || !p.genero);
     }
     
-    // Filtrar por talla
     if (filtroTalla !== "todos") {
       filtered = filtered.filter(p => {
         if (!p.talla) return false;
@@ -1802,7 +1789,6 @@
       });
     }
     
-    // Filtrar por texto
     if (filtroTexto) {
       filtered = filtered.filter(p => p.nombre && p.nombre.toLowerCase().includes(filtroTexto));
     }
@@ -1864,7 +1850,7 @@
     renderTiendaDepratik();
   };
 
-  // ===== MODAL =====
+  // ===== MODAL CON SELECCIÓN DE TALLA Y COLOR =====
   window.abrirModal = function(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
@@ -1901,15 +1887,47 @@
     document.getElementById('modal-stock').textContent = stockText;
     document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
     
+    // Llenar opciones de talla
+    const tallaSelect = document.getElementById('modal-talla-select');
+    tallaSelect.innerHTML = '<option value="">Seleccionar talla</option>';
+    if (product.talla) {
+      const tallas = product.talla.split(',').map(t => t.trim());
+      tallas.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        tallaSelect.appendChild(opt);
+      });
+    }
+    
+    // Llenar opciones de color
+    const colorSelect = document.getElementById('modal-color-select');
+    colorSelect.innerHTML = '<option value="">Seleccionar color</option>';
+    if (product.color) {
+      const colores = product.color.split(',').map(c => c.trim());
+      colores.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        colorSelect.appendChild(opt);
+      });
+    }
+    
     const btnAgregar = document.getElementById('modal-btn-agregar');
+    const btnWhatsApp = document.getElementById('modal-btn-whatsapp');
     if (product.stock <= 0) {
       btnAgregar.disabled = true;
       btnAgregar.innerHTML = '<i class="fas fa-times"></i> Agotado';
+      btnWhatsApp.disabled = true;
+      btnWhatsApp.innerHTML = '<i class="fas fa-times"></i> Agotado';
     } else {
       btnAgregar.disabled = false;
       btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al carrito';
+      btnWhatsApp.disabled = false;
+      btnWhatsApp.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar por WhatsApp';
     }
     
+    // Miniaturas
     const miniContainer = document.getElementById('modal-miniaturas');
     miniContainer.innerHTML = '';
     if (imagenes.length > 0) {
@@ -1947,21 +1965,72 @@
   window.agregarDelModal = function() {
     if (!productoModal) return;
     if (productoModal.stock <= 0) return;
-    const existing = cart.find(item => item.productoId === productoModal.id);
+    
+    const talla = document.getElementById('modal-talla-select').value;
+    const color = document.getElementById('modal-color-select').value;
+    
+    if (!talla) {
+      alert('Por favor selecciona una talla.');
+      return;
+    }
+    
+    const nombreConDetalles = `${productoModal.nombre}${talla ? ' (Talla: ' + talla : ''}${color ? ', Color: ' + color : ''})`;
+    
+    const existing = cart.find(item => item.productoId === productoModal.id && item.talla === talla && item.color === color);
     if (existing) {
       existing.cantidad += 1;
     } else {
       cart.push({ 
         productoId: productoModal.id, 
-        nombre: productoModal.nombre || 'Producto', 
+        nombre: productoModal.nombre || 'Producto',
+        nombreCompleto: nombreConDetalles,
+        talla: talla,
+        color: color,
         precio: productoModal.precio || 0, 
         cantidad: 1 
       });
     }
     renderCarrito();
-    alert(`✅ ${productoModal.nombre} agregado al carrito`);
+    alert(`✅ ${nombreConDetalles} agregado al carrito`);
     cerrarModal();
     showPage('ventas');
+  };
+
+  // ===== ENVIAR A WHATSAPP DIRECTAMENTE =====
+  window.enviarWhatsAppDirecto = function() {
+    if (!productoModal) return;
+    if (productoModal.stock <= 0) {
+      alert('Este producto está agotado.');
+      return;
+    }
+    
+    const talla = document.getElementById('modal-talla-select').value;
+    const color = document.getElementById('modal-color-select').value;
+    
+    if (!talla) {
+      alert('Por favor selecciona una talla.');
+      return;
+    }
+    
+    const clienteNombre = document.getElementById('cliente-nombre')?.value || 'Cliente';
+    const telefono = document.getElementById('cliente-telefono')?.value || '';
+    
+    const mensaje = `🎁 *NUEVO PEDIDO - LOS AMIGOS ESTORE* 🎁\n\n` +
+      `👤 *Cliente:* ${clienteNombre}\n` +
+      `📱 *WhatsApp:* ${telefono || 'No proporcionado'}\n\n` +
+      `📦 *Producto:* ${productoModal.nombre}\n` +
+      `💰 *Precio:* $${productoModal.precio}\n` +
+      `📏 *Talla:* ${talla}\n` +
+      `🎨 *Color:* ${color || 'No especificado'}\n` +
+      `📐 *Medidas:* ${productoModal.medidas || 'No especificadas'}\n` +
+      `📝 *Descripción:* ${productoModal.descripcion || 'Sin descripción'}\n\n` +
+      `🔗 *Código:* ${productoModal.id?.slice(0, 8) || '---'}\n\n` +
+      `✅ *Pedido listo para confirmar.*`;
+    
+    const numero = WHATSAPP_NUMBER;
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+    cerrarModal();
   };
 
   // ===== CATEGORÍAS =====
@@ -1974,7 +2043,7 @@
     });
   });
 
-  // ===== BANNERS =====
+  // ===== BANNERS - IMAGEN COMPLETA =====
   function renderBannersEnTienda() {
     const container = document.getElementById("banners-container");
     const activos = allBanners.filter(b => b.activo === true);
@@ -1984,17 +2053,9 @@
     }
     let html = '';
     activos.forEach(b => {
-      const tipoIcono = b.tipo === 'oferta' ? '🔥' : b.tipo === 'promocion' ? '🎁' : b.tipo === 'evento' ? '📅' : 'ℹ️';
       html += `
-        <div class="banner-publicidad-dinamico">
-          <div class="banner-contenido">
-            ${b.imagen ? `<img src="${b.imagen}" alt="${b.titulo}" onerror="this.style.display='none'">` : ''}
-            <div class="texto">
-              <h3>${tipoIcono} ${b.titulo || 'Sin título'}</h3>
-              <p>${b.descripcion || ''}</p>
-            </div>
-          </div>
-          ${b.enlace ? `<button class="btn-banner" onclick="window.open('${b.enlace}', '_blank')">Ver más</button>` : ''}
+        <div class="banner-publicidad-full" ${b.enlace ? `onclick="window.open('${b.enlace}', '_blank')"` : ''}>
+          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" onerror="this.style.display='none'">
         </div>
       `;
     });
@@ -2011,13 +2072,11 @@
     allBanners.forEach((b) => {
       const estadoClass = b.activo ? 'badge-activo' : 'badge-inactivo';
       const estadoText = b.activo ? 'Activo' : 'Inactivo';
-      const tipoIcono = b.tipo === 'oferta' ? '🔥' : b.tipo === 'promocion' ? '🎁' : b.tipo === 'evento' ? '📅' : 'ℹ️';
       html += `
         <div class="banner-preview-mini" style="display:flex; align-items:center; gap:16px; padding:12px; background:#f9f9f9; border-radius:12px; border:1px solid #e0e0e0; margin:8px 0; flex-wrap:wrap;">
           ${b.imagen ? `<img src="${b.imagen}" style="height:50px;width:auto;border-radius:8px;border:1px solid #e0e0e0;" onerror="this.style.display='none'">` : ''}
           <div class="info" style="flex:1; min-width:150px;">
-            <h4 style="font-size:0.95rem; color:#1a1a1a;">${tipoIcono} ${b.titulo || 'Sin título'}</h4>
-            <p style="font-size:0.8rem; color:#666;">${b.descripcion || ''}</p>
+            <h4 style="font-size:0.95rem; color:#1a1a1a;">${b.titulo || 'Sin título'}</h4>
             <p style="font-size:0.7rem; color:#999;">${b.enlace || 'Sin enlace'}</p>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
@@ -2061,10 +2120,8 @@
     const banner = allBanners.find(b => b.id === id);
     if (!banner) return;
     document.getElementById("banner-titulo").value = banner.titulo || '';
-    document.getElementById("banner-descripcion").value = banner.descripcion || '';
     document.getElementById("banner-imagen").value = banner.imagen || '';
     document.getElementById("banner-enlace").value = banner.enlace || '';
-    document.getElementById("banner-tipo").value = banner.tipo || 'oferta';
     document.getElementById("banner-activo").checked = banner.activo !== false;
     document.getElementById("btn-add-banner").dataset.editId = id;
     document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Actualizar Banner';
@@ -2073,16 +2130,14 @@
 
   document.getElementById("btn-add-banner")?.addEventListener("click", async () => {
     const titulo = document.getElementById("banner-titulo").value.trim();
-    const descripcion = document.getElementById("banner-descripcion").value.trim();
     const imagen = document.getElementById("banner-imagen").value.trim();
     const enlace = document.getElementById("banner-enlace").value.trim();
-    const tipo = document.getElementById("banner-tipo").value;
     const activo = document.getElementById("banner-activo").checked;
-    if (!titulo || !imagen) {
-      alert("Completa al menos el título y la URL de la imagen.");
+    if (!imagen) {
+      alert("La URL de la imagen es obligatoria.");
       return;
     }
-    const data = { titulo, descripcion, imagen, enlace, tipo, activo };
+    const data = { titulo, imagen, enlace, activo };
     const editId = document.getElementById("btn-add-banner").dataset.editId;
     try {
       if (editId) {
@@ -2096,10 +2151,8 @@
       }
       alert("✅ Banner guardado correctamente");
       document.getElementById("banner-titulo").value = "";
-      document.getElementById("banner-descripcion").value = "";
       document.getElementById("banner-imagen").value = "";
       document.getElementById("banner-enlace").value = "";
-      document.getElementById("banner-tipo").value = "oferta";
       document.getElementById("banner-activo").checked = true;
     } catch (error) {
       addDebugLog(`❌ Error al guardar banner: ${error.message}`, 'error');
@@ -2474,7 +2527,8 @@
     cart.forEach((item, idx) => {
       const subtotal = (item.precio || 0) * item.cantidad;
       total += subtotal;
-      html += `<div class="cart-item">${item.nombre || 'Producto'} x${item.cantidad} = $${subtotal.toFixed(2)} 
+      const detalle = item.talla ? ` (Talla: ${item.talla}${item.color ? ', Color: ' + item.color : ''})` : '';
+      html += `<div class="cart-item">${item.nombre || 'Producto'}${detalle} x${item.cantidad} = $${subtotal.toFixed(2)} 
       <button class="btn-small btn-danger" onclick="eliminarDelCarrito(${idx})">❌</button></div>`;
     });
     document.getElementById("carrito-lista").innerHTML = html || "Carrito vacío";
@@ -2497,7 +2551,14 @@
     if (!cliente || !telefono) return alert("Nombre y WhatsApp del cliente obligatorios");
     
     const total = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
-    const items = cart.map(i => ({ productoId: i.productoId, nombre: i.nombre || 'Producto', cantidad: i.cantidad, precio: i.precio || 0 }));
+    const items = cart.map(i => ({ 
+      productoId: i.productoId, 
+      nombre: i.nombre || 'Producto',
+      talla: i.talla || '',
+      color: i.color || '',
+      cantidad: i.cantidad, 
+      precio: i.precio || 0 
+    }));
     
     await addDoc(collection(db, "ventas"), {
       cliente, telefono, items, total, metodoPago: "Efectivo", fecha: new Date()
@@ -2512,7 +2573,16 @@
       }
     }
     
-    const facturaTexto = `🎁 *LOS AMIGOS ESTORE* 🎁\n\n🧾 *FACTURA DE COMPRA*\nCliente: ${cliente}\nTel: ${telefono}\n\n*Productos:*\n${cart.map(i => `- ${i.nombre || 'Producto'} x${i.cantidad} = $${((i.precio || 0) * i.cantidad).toFixed(2)}`).join('\n')}\n\n💰 *TOTAL: $${total.toFixed(2)}*\n💳 Método: EFECTIVO\n\n¡Gracias por tu compra! 🎉`;
+    let detalleProductos = cart.map(i => {
+      let det = `- ${i.nombre}`;
+      if (i.talla) det += ` (Talla: ${i.talla}`;
+      if (i.color) det += `, Color: ${i.color}`;
+      if (i.talla || i.color) det += `)`;
+      det += ` x${i.cantidad} = $${((i.precio || 0) * i.cantidad).toFixed(2)}`;
+      return det;
+    }).join('\n');
+    
+    const facturaTexto = `🎁 *LOS AMIGOS ESTORE* 🎁\n\n🧾 *FACTURA DE COMPRA*\nCliente: ${cliente}\nTel: ${telefono}\n\n*Productos:*\n${detalleProductos}\n\n💰 *TOTAL: $${total.toFixed(2)}*\n💳 Método: EFECTIVO\n\n¡Gracias por tu compra! 🎉`;
     
     if (enviarWhatsApp) {
       const whatsappUrl = `https://wa.me/${telefono.replace(/\s+/g, '')}?text=${encodeURIComponent(facturaTexto)}`;
