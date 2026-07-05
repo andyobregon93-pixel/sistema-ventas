@@ -162,6 +162,8 @@
     .btn-small { padding: 4px 12px; font-size: 0.8rem; border-radius: 8px; }
     .btn-guest { background: #6c757d; }
     .btn-guest:hover { background: #5a6268; }
+    .btn-whatsapp { background: #25D366; }
+    .btn-whatsapp:hover { background: #1da851; }
     
     .badge { 
       background: #f0f0f0; 
@@ -709,23 +711,31 @@
       flex-wrap: wrap;
       gap: 12px;
       margin: 12px 0;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+    }
+    .modal-opciones .campo {
+      flex: 1;
+      min-width: 120px;
     }
     .modal-opciones label {
+      display: block;
       font-weight: 600;
       color: #333;
-      font-size: 0.85rem;
-      min-width: 60px;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
     }
     .modal-opciones select {
-      background: #f9f9f9;
+      background: #ffffff;
       border: 1px solid #d0d0d0;
       border-radius: 10px;
-      padding: 8px 14px;
+      padding: 8px 12px;
       font-size: 0.9rem;
       color: #333;
       cursor: pointer;
-      flex: 1;
-      min-width: 120px;
+      width: 100%;
     }
     .modal-opciones select:focus {
       outline: none;
@@ -754,7 +764,6 @@
       cursor: not-allowed;
       transform: none;
     }
-    /* Botón de enviar a WhatsApp en el modal */
     .modal-info .btn-whatsapp-modal {
       width: 100%;
       padding: 16px;
@@ -782,7 +791,117 @@
       transform: none;
     }
 
-    .cart-item { background: #f9f9f9; border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 1px solid #e0e0e0; }
+    /* ===== CARRITO MEJORADO ===== */
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+    }
+    .cart-item .item-info {
+      flex: 1;
+      min-width: 150px;
+    }
+    .cart-item .item-info .nombre {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .cart-item .item-info .detalle {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .cart-item .item-info .precio {
+      font-weight: 700;
+      color: #cc0000;
+    }
+    .cart-item .item-cantidad {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cart-item .item-cantidad button {
+      background: #e0e0e0;
+      color: #333;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      padding: 0;
+    }
+    .cart-item .item-cantidad button:hover {
+      background: #cc0000;
+      color: white;
+    }
+    .cart-item .item-cantidad span {
+      min-width: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .cart-item .btn-eliminar-item {
+      background: transparent;
+      color: #dc3545;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .cart-item .btn-eliminar-item:hover {
+      background: #dc3545;
+      color: white;
+    }
+
+    .cart-resumen {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      margin-top: 16px;
+    }
+    .cart-resumen .total {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #cc0000;
+      text-align: right;
+    }
+    .cart-resumen .btn-finalizar {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.2rem;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .cart-resumen .btn-finalizar:hover {
+      background: #1da851;
+      transform: scale(1.02);
+    }
+    .cart-resumen .btn-finalizar:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
 
     .btn-subir-foto {
       background: #cc0000;
@@ -915,6 +1034,8 @@
       .filtros-container { flex-direction: column; }
       .filtros-container .grupo-filtro { width: 100%; }
       .filtros-container .grupo-filtro select { width: 100%; }
+      .cart-item { flex-direction: column; align-items: stretch; text-align: center; }
+      .cart-item .item-cantidad { justify-content: center; }
     }
     .menu-toggle { display: none; }
   </style>
@@ -1041,10 +1162,8 @@
           </div>
         </div>
 
-        <!-- BANNERS - IMAGEN COMPLETA -->
         <div id="banners-container"></div>
 
-        <!-- FILTROS -->
         <div class="filtros-container">
           <div class="grupo-filtro">
             <label><i class="fas fa-tshirt"></i> Género:</label>
@@ -1077,7 +1196,6 @@
           </button>
         </div>
 
-        <!-- CATEGORÍAS -->
         <div class="categorias-section" id="categorias-container">
           <div class="categoria-item active-categoria" data-categoria="todos">
             <i class="fas fa-th-large"></i><h4>Todos</h4><p>Todos los productos</p>
@@ -1096,7 +1214,6 @@
           </div>
         </div>
 
-        <!-- PRODUCTOS -->
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-store" style="color:#cc0000;"></i> Productos destacados</h3>
@@ -1205,7 +1322,7 @@
           <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
             <h4 style="margin-bottom: 12px; color: #cc0000;">Agregar nuevo banner</h4>
             <div class="flex">
-              <input type="text" id="banner-titulo" placeholder="Título (solo para admin)*" style="flex:2">
+              <input type="text" id="banner-titulo" placeholder="Título (solo para admin)" style="flex:2">
               <input type="text" id="banner-imagen" placeholder="URL de la imagen*" style="flex:3">
             </div>
             <div class="flex">
@@ -1221,34 +1338,53 @@
         </div>
       </div>
 
-      <!-- FACTURACIÓN -->
-      <div id="page-ventas" class="page admin-only">
+      <!-- FACTURACIÓN (CARRITO) -->
+      <div id="page-ventas" class="page">
         <div class="card">
-          <h3>🛒 Carrito de compras</h3>
-          <div class="flex">
-            <select id="select-producto-carrito" style="flex:2"></select>
-            <input type="number" id="cantidad-carrito" placeholder="Cantidad" style="flex:1">
-            <button id="btn-agregar-carrito"><i class="fas fa-cart-plus"></i> Agregar</button>
+          <div class="card-header">
+            <h3><i class="fas fa-shopping-cart" style="color:#cc0000;"></i> Mi Carrito</h3>
+            <span style="color: #666; font-size: 0.8rem;">Revisa y edita tu pedido</span>
           </div>
-          <div id="carrito-lista" style="margin-top: 20px;"></div>
-          <div style="text-align: right; font-size: 1.4rem; font-weight: bold; color: #cc0000;">Total: $<span id="carrito-total">0.00</span></div>
-          <hr style="margin: 16px 0; border-color:#e0e0e0">
-          <h4>Datos del cliente</h4>
-          <div class="flex">
-            <input type="text" id="cliente-nombre" placeholder="Nombre completo*" style="flex:2">
-            <input type="text" id="cliente-telefono" placeholder="WhatsApp*" style="flex:2">
-            <input type="email" id="cliente-email" placeholder="Email (opcional)" style="flex:2">
+          
+          <div id="carrito-lista">
+            <p style="color: #999; text-align: center; padding: 30px 0;">
+              <i class="fas fa-cart-plus" style="font-size: 2rem; display: block; margin-bottom: 10px; color: #cc0000;"></i>
+              Tu carrito está vacío. Agrega productos desde la tienda.
+            </p>
           </div>
-          <div style="background: #f0f8ff; padding: 12px; border-radius: 12px; border: 1px solid #cc0000; margin: 8px 0;">
-            <p style="color: #333; font-weight: 600;"><i class="fas fa-money-bill-wave" style="color: #cc0000;"></i> Método de pago: <strong>EFECTIVO</strong></p>
-            <p style="color: #666; font-size: 0.85rem;">Todos los pagos se realizan en efectivo al momento de la entrega.</p>
-          </div>
-          <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
-            <button id="btn-generar-factura" class="btn-success"><i class="fas fa-file-invoice"></i> GENERAR FACTURA</button>
-            <button id="btn-enviar-whatsapp" class="btn-info"><i class="fab fa-whatsapp"></i> ENVIAR POR WHATSAPP</button>
+          
+          <div class="cart-resumen" style="display: none;" id="cart-resumen">
+            <div class="total">
+              Total: $<span id="carrito-total">0.00</span>
+            </div>
+            
+            <div style="margin-top: 16px;">
+              <h4 style="margin-bottom: 8px; color: #333;">Datos del cliente</h4>
+              <div class="flex">
+                <input type="text" id="cliente-nombre" placeholder="Nombre completo*" style="flex:2">
+                <input type="text" id="cliente-telefono" placeholder="WhatsApp*" style="flex:2">
+                <input type="email" id="cliente-email" placeholder="Email (opcional)" style="flex:2">
+              </div>
+            </div>
+            
+            <div style="background: #f0f8ff; padding: 12px; border-radius: 12px; border: 1px solid #cc0000; margin: 12px 0;">
+              <p style="color: #333; font-weight: 600;"><i class="fas fa-money-bill-wave" style="color: #cc0000;"></i> Método de pago: <strong>EFECTIVO</strong></p>
+              <p style="color: #666; font-size: 0.85rem;">Todos los pagos se realizan en efectivo al momento de la entrega.</p>
+            </div>
+            
+            <button class="btn-finalizar" id="btn-finalizar-pedido">
+              <i class="fab fa-whatsapp"></i> FINALIZAR PEDIDO POR WHATSAPP
+            </button>
+            <p style="color: #666; font-size: 0.75rem; text-align: center; margin-top: 8px;">
+              <i class="fas fa-info-circle"></i> Al finalizar, se abrirá WhatsApp con todos los detalles de tu pedido.
+            </p>
           </div>
         </div>
-        <div class="card"><h3>Historial de ventas</h3><div id="historial-ventas"></div></div>
+        
+        <div class="card" id="historial-card">
+          <h3>Historial de ventas</h3>
+          <div id="historial-ventas"></div>
+        </div>
       </div>
 
       <!-- LINKS DE PAGO -->
@@ -1337,7 +1473,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PRODUCTO CON SELECCIÓN ===== -->
+<!-- ===== MODAL DE PRODUCTO ===== -->
 <div class="modal-overlay" id="modal-producto">
   <div class="modal-contenido">
     <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
@@ -1354,16 +1490,16 @@
         <div class="descripcion" id="modal-descripcion">Descripción</div>
         <div class="stock-info" id="modal-stock">Stock disponible</div>
         
-        <!-- Opciones de talla y color -->
+        <!-- SELECCIÓN DE TALLA Y COLOR -->
         <div class="modal-opciones">
-          <div style="flex:1; min-width:120px;">
-            <label>Talla:</label>
+          <div class="campo">
+            <label><i class="fas fa-ruler"></i> Talla / Medida:</label>
             <select id="modal-talla-select">
               <option value="">Seleccionar talla</option>
             </select>
           </div>
-          <div style="flex:1; min-width:120px;">
-            <label>Color:</label>
+          <div class="campo">
+            <label><i class="fas fa-palette"></i> Color:</label>
             <select id="modal-color-select">
               <option value="">Seleccionar color</option>
             </select>
@@ -1374,7 +1510,7 @@
           <i class="fas fa-cart-plus"></i> Agregar al carrito
         </button>
         <button class="btn-whatsapp-modal" id="modal-btn-whatsapp" onclick="enviarWhatsAppDirecto()">
-          <i class="fab fa-whatsapp"></i> Comprar por WhatsApp
+          <i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp
         </button>
       </div>
     </div>
@@ -1407,11 +1543,7 @@
   const storage = getStorage(app);
 
   const MASTER_EMAIL = "andyobregon799@gmail.com";
-  // ====================================================
-  // 🔥 TU NÚMERO DE WHATSAPP PARA PEDIDOS DIRECTOS
-  // ====================================================
-  const WHATSAPP_NUMBER = "593990434546"; // <-- YA ESTÁ TU NÚMERO
-  // ====================================================
+  const WHATSAPP_NUMBER = "593990434546"; // Ecuador: 0990434546
   let currentUser = null;
   let currentUserRol = "visitor";
   let cart = [];
@@ -1764,7 +1896,7 @@
     }
   }
 
-  // ===== RENDER TIENDA CON FILTROS =====
+  // ===== RENDER TIENDA =====
   window.renderTiendaDepratik = function() {
     const container = document.getElementById("vitrina-productos");
     const filtroTexto = document.getElementById("filtro-productos-tienda")?.value?.toLowerCase() || '';
@@ -1887,7 +2019,7 @@
     document.getElementById('modal-stock').textContent = stockText;
     document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
     
-    // Llenar opciones de talla
+    // LLENAR OPCIONES DE TALLA
     const tallaSelect = document.getElementById('modal-talla-select');
     tallaSelect.innerHTML = '<option value="">Seleccionar talla</option>';
     if (product.talla) {
@@ -1900,7 +2032,7 @@
       });
     }
     
-    // Llenar opciones de color
+    // LLENAR OPCIONES DE COLOR
     const colorSelect = document.getElementById('modal-color-select');
     colorSelect.innerHTML = '<option value="">Seleccionar color</option>';
     if (product.color) {
@@ -1924,7 +2056,7 @@
       btnAgregar.disabled = false;
       btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al carrito';
       btnWhatsApp.disabled = false;
-      btnWhatsApp.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar por WhatsApp';
+      btnWhatsApp.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp';
     }
     
     // Miniaturas
@@ -1962,41 +2094,52 @@
     if (e.target === this) cerrarModal();
   });
 
+  // ===== AGREGAR AL CARRITO DESDE MODAL =====
   window.agregarDelModal = function() {
     if (!productoModal) return;
-    if (productoModal.stock <= 0) return;
+    if (productoModal.stock <= 0) {
+      alert('Este producto está agotado.');
+      return;
+    }
     
     const talla = document.getElementById('modal-talla-select').value;
     const color = document.getElementById('modal-color-select').value;
     
     if (!talla) {
-      alert('Por favor selecciona una talla.');
+      alert('⚠️ Por favor selecciona una talla/medida disponible.');
+      tallaSelect.focus();
       return;
     }
     
-    const nombreConDetalles = `${productoModal.nombre}${talla ? ' (Talla: ' + talla : ''}${color ? ', Color: ' + color : ''})`;
+    const nombreConDetalles = `${productoModal.nombre || 'Producto'}${talla ? ' (Talla: ' + talla : ''}${color ? ', Color: ' + color : ''})`;
     
-    const existing = cart.find(item => item.productoId === productoModal.id && item.talla === talla && item.color === color);
+    // Buscar si ya existe en el carrito con la misma talla y color
+    const existing = cart.find(item => 
+      item.productoId === productoModal.id && 
+      item.talla === talla && 
+      item.color === color
+    );
+    
     if (existing) {
       existing.cantidad += 1;
     } else {
       cart.push({ 
         productoId: productoModal.id, 
         nombre: productoModal.nombre || 'Producto',
-        nombreCompleto: nombreConDetalles,
         talla: talla,
         color: color,
         precio: productoModal.precio || 0, 
         cantidad: 1 
       });
     }
+    
     renderCarrito();
     alert(`✅ ${nombreConDetalles} agregado al carrito`);
     cerrarModal();
     showPage('ventas');
   };
 
-  // ===== ENVIAR A WHATSAPP DIRECTAMENTE =====
+  // ===== ENVIAR A WHATSAPP DIRECTAMENTE DESDE MODAL =====
   window.enviarWhatsAppDirecto = function() {
     if (!productoModal) return;
     if (productoModal.stock <= 0) {
@@ -2008,7 +2151,7 @@
     const color = document.getElementById('modal-color-select').value;
     
     if (!talla) {
-      alert('Por favor selecciona una talla.');
+      alert('⚠️ Por favor selecciona una talla/medida disponible.');
       return;
     }
     
@@ -2033,6 +2176,120 @@
     cerrarModal();
   };
 
+  // ===== RENDER CARRITO =====
+  function renderCarrito() {
+    const container = document.getElementById('carrito-lista');
+    const resumen = document.getElementById('cart-resumen');
+    const totalSpan = document.getElementById('carrito-total');
+    
+    if (cart.length === 0) {
+      container.innerHTML = `
+        <p style="color: #999; text-align: center; padding: 30px 0;">
+          <i class="fas fa-cart-plus" style="font-size: 2rem; display: block; margin-bottom: 10px; color: #cc0000;"></i>
+          Tu carrito está vacío. Agrega productos desde la tienda.
+        </p>
+      `;
+      resumen.style.display = 'none';
+      return;
+    }
+    
+    let html = '';
+    let total = 0;
+    
+    cart.forEach((item, idx) => {
+      const subtotal = (item.precio || 0) * item.cantidad;
+      total += subtotal;
+      
+      const detalleTalla = item.talla ? `Talla: ${item.talla}` : '';
+      const detalleColor = item.color ? `Color: ${item.color}` : '';
+      const detalles = [detalleTalla, detalleColor].filter(d => d).join(' | ');
+      
+      html += `
+        <div class="cart-item">
+          <div class="item-info">
+            <div class="nombre">${item.nombre || 'Producto'}</div>
+            <div class="detalle">${detalles || 'Sin especificaciones'}</div>
+            <div class="precio">$${(item.precio || 0).toFixed(2)} c/u</div>
+          </div>
+          <div class="item-cantidad">
+            <button onclick="cambiarCantidad(${idx}, -1)">−</button>
+            <span>${item.cantidad}</span>
+            <button onclick="cambiarCantidad(${idx}, 1)">+</button>
+          </div>
+          <div style="font-weight: 700; color: #cc0000; min-width: 80px; text-align: right;">
+            $${subtotal.toFixed(2)}
+          </div>
+          <button class="btn-eliminar-item" onclick="eliminarItemCarrito(${idx})" title="Eliminar producto">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    totalSpan.textContent = total.toFixed(2);
+    resumen.style.display = 'block';
+  }
+
+  // ===== CAMBIAR CANTIDAD EN CARRITO =====
+  window.cambiarCantidad = function(idx, cambio) {
+    if (cart[idx]) {
+      cart[idx].cantidad += cambio;
+      if (cart[idx].cantidad <= 0) {
+        cart.splice(idx, 1);
+      }
+      renderCarrito();
+    }
+  };
+
+  // ===== ELIMINAR ITEM DEL CARRITO =====
+  window.eliminarItemCarrito = function(idx) {
+    if (confirm(`¿Eliminar "${cart[idx].nombre || 'Producto'}" del carrito?`)) {
+      cart.splice(idx, 1);
+      renderCarrito();
+    }
+  };
+
+  // ===== FINALIZAR PEDIDO POR WHATSAPP =====
+  document.getElementById("btn-finalizar-pedido")?.addEventListener("click", function() {
+    if (cart.length === 0) {
+      alert("El carrito está vacío.");
+      return;
+    }
+    
+    const cliente = document.getElementById("cliente-nombre").value.trim();
+    const telefono = document.getElementById("cliente-telefono").value.trim();
+    
+    if (!cliente || !telefono) {
+      alert("⚠️ Por favor completa tu nombre y número de WhatsApp para finalizar el pedido.");
+      document.getElementById("cliente-nombre").focus();
+      return;
+    }
+    
+    let detalleProductos = cart.map((item, i) => {
+      let det = ` ${i+1}. ${item.nombre}`;
+      if (item.talla) det += ` (Talla: ${item.talla}`;
+      if (item.color) det += `, Color: ${item.color}`;
+      if (item.talla || item.color) det += `)`;
+      det += ` x${item.cantidad} = $${((item.precio || 0) * item.cantidad).toFixed(2)}`;
+      return det;
+    }).join('\n');
+    
+    const total = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    
+    const mensaje = `🎁 *NUEVO PEDIDO - LOS AMIGOS ESTORE* 🎁\n\n` +
+      `👤 *Cliente:* ${cliente}\n` +
+      `📱 *WhatsApp:* ${telefono}\n\n` +
+      `📦 *Productos solicitados:*\n${detalleProductos}\n\n` +
+      `💰 *TOTAL A PAGAR: $${total.toFixed(2)}*\n` +
+      `💳 *Método de pago:* EFECTIVO\n\n` +
+      `✅ *Por favor confirmar disponibilidad y coordinar entrega.*`;
+    
+    const numero = WHATSAPP_NUMBER;
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+  });
+
   // ===== CATEGORÍAS =====
   document.querySelectorAll('.categoria-item').forEach(el => {
     el.addEventListener('click', function() {
@@ -2043,7 +2300,7 @@
     });
   });
 
-  // ===== BANNERS - IMAGEN COMPLETA =====
+  // ===== BANNERS =====
   function renderBannersEnTienda() {
     const container = document.getElementById("banners-container");
     const activos = allBanners.filter(b => b.activo === true);
@@ -2159,22 +2416,6 @@
       alert("Error: " + error.message);
     }
   });
-
-  window.agregarAlCarrito = (id, nombre, precio) => {
-    if (precio <= 0) {
-      alert('Este producto no tiene precio válido');
-      return;
-    }
-    const existing = cart.find(item => item.productoId === id);
-    if (existing) {
-      existing.cantidad += 1;
-    } else {
-      cart.push({ productoId: id, nombre, precio, cantidad: 1 });
-    }
-    renderCarrito();
-    alert(`✅ ${nombre} agregado al carrito`);
-    showPage('ventas');
-  };
 
   // ===== CARGA DE DATOS =====
   function loadAllData() {
@@ -2445,11 +2686,6 @@
       alert("Error: " + error.message);
     }
   };
-  
-  window.eliminarDelCarrito = (idx) => {
-    cart.splice(idx, 1);
-    renderCarrito();
-  };
 
   // ===== AGREGAR/ACTUALIZAR PRODUCTO =====
   document.getElementById("btn-add-producto")?.addEventListener("click", async () => {
@@ -2500,103 +2736,6 @@
     previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
     uploadedImageUrls = [];
   });
-
-  // ===== CARRITO =====
-  document.getElementById("btn-agregar-carrito")?.addEventListener("click", () => {
-    const select = document.getElementById("select-producto-carrito");
-    const option = select.options[select.selectedIndex];
-    if (!option.value) return alert("Selecciona un producto");
-    const productoId = option.value;
-    const nombre = option.getAttribute("data-nombre") || 'Producto';
-    const precio = parseFloat(option.getAttribute("data-precio")) || 0;
-    const cantidad = parseInt(document.getElementById("cantidad-carrito").value);
-    if (isNaN(cantidad) || cantidad < 1) return alert("Cantidad válida");
-    
-    const existing = cart.find(item => item.productoId === productoId);
-    if (existing) {
-      existing.cantidad += cantidad;
-    } else {
-      cart.push({ productoId, nombre, precio, cantidad });
-    }
-    renderCarrito();
-    document.getElementById("cantidad-carrito").value = "";
-  });
-
-  function renderCarrito() {
-    let html = "", total = 0;
-    cart.forEach((item, idx) => {
-      const subtotal = (item.precio || 0) * item.cantidad;
-      total += subtotal;
-      const detalle = item.talla ? ` (Talla: ${item.talla}${item.color ? ', Color: ' + item.color : ''})` : '';
-      html += `<div class="cart-item">${item.nombre || 'Producto'}${detalle} x${item.cantidad} = $${subtotal.toFixed(2)} 
-      <button class="btn-small btn-danger" onclick="eliminarDelCarrito(${idx})">❌</button></div>`;
-    });
-    document.getElementById("carrito-lista").innerHTML = html || "Carrito vacío";
-    document.getElementById("carrito-total").innerText = total.toFixed(2);
-  }
-
-  // ===== FACTURA =====
-  document.getElementById("btn-generar-factura")?.addEventListener("click", async () => {
-    await generarFactura(false);
-  });
-
-  document.getElementById("btn-enviar-whatsapp")?.addEventListener("click", async () => {
-    await generarFactura(true);
-  });
-
-  async function generarFactura(enviarWhatsApp) {
-    if (cart.length === 0) return alert("Carrito vacío");
-    const cliente = document.getElementById("cliente-nombre").value.trim();
-    const telefono = document.getElementById("cliente-telefono").value.trim();
-    if (!cliente || !telefono) return alert("Nombre y WhatsApp del cliente obligatorios");
-    
-    const total = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
-    const items = cart.map(i => ({ 
-      productoId: i.productoId, 
-      nombre: i.nombre || 'Producto',
-      talla: i.talla || '',
-      color: i.color || '',
-      cantidad: i.cantidad, 
-      precio: i.precio || 0 
-    }));
-    
-    await addDoc(collection(db, "ventas"), {
-      cliente, telefono, items, total, metodoPago: "Efectivo", fecha: new Date()
-    });
-    
-    for (const item of cart) {
-      const prodRef = doc(db, "productos", item.productoId);
-      const prodSnap = await getDoc(prodRef);
-      if (prodSnap.exists()) {
-        const newStock = (prodSnap.data().stock || 0) - item.cantidad;
-        await updateDoc(prodRef, { stock: newStock });
-      }
-    }
-    
-    let detalleProductos = cart.map(i => {
-      let det = `- ${i.nombre}`;
-      if (i.talla) det += ` (Talla: ${i.talla}`;
-      if (i.color) det += `, Color: ${i.color}`;
-      if (i.talla || i.color) det += `)`;
-      det += ` x${i.cantidad} = $${((i.precio || 0) * i.cantidad).toFixed(2)}`;
-      return det;
-    }).join('\n');
-    
-    const facturaTexto = `🎁 *LOS AMIGOS ESTORE* 🎁\n\n🧾 *FACTURA DE COMPRA*\nCliente: ${cliente}\nTel: ${telefono}\n\n*Productos:*\n${detalleProductos}\n\n💰 *TOTAL: $${total.toFixed(2)}*\n💳 Método: EFECTIVO\n\n¡Gracias por tu compra! 🎉`;
-    
-    if (enviarWhatsApp) {
-      const whatsappUrl = `https://wa.me/${telefono.replace(/\s+/g, '')}?text=${encodeURIComponent(facturaTexto)}`;
-      window.open(whatsappUrl, '_blank');
-    } else {
-      alert(facturaTexto);
-    }
-    
-    cart = [];
-    renderCarrito();
-    document.getElementById("cliente-nombre").value = "";
-    document.getElementById("cliente-telefono").value = "";
-    alert("✅ Factura generada");
-  }
 
   // ===== LINKS DE PAGO =====
   document.getElementById("btn-generar-link")?.addEventListener("click", async () => {
