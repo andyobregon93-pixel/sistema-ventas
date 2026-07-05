@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ===== ESTILOS BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -572,7 +573,7 @@
       background: #e0e0e0;
     }
 
-    /* ===== MODAL DE SELECCIÓN ===== */
+    /* ===== MODAL DE SELECCIÓN CON BOTONES DE TALLA ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -705,43 +706,87 @@
       color: #28a745;
       font-weight: 600;
     }
-    /* Selectores de talla y color en el modal */
-    .modal-opciones {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+
+    /* ===== BOTONES DE TALLA ===== */
+    .modal-tallas-container {
       margin: 12px 0;
-      padding: 12px;
-      background: #f9f9f9;
-      border-radius: 12px;
-      border: 1px solid #e0e0e0;
     }
-    .modal-opciones .campo {
-      flex: 1;
-      min-width: 120px;
-    }
-    .modal-opciones label {
+    .modal-tallas-container label {
       display: block;
       font-weight: 600;
       color: #333;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
     }
-    .modal-opciones select {
+    .modal-tallas-container .tallas-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .modal-tallas-container .talla-btn {
+      padding: 10px 18px;
+      border: 2px solid #d0d0d0;
+      border-radius: 12px;
       background: #ffffff;
-      border: 1px solid #d0d0d0;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 0.9rem;
       color: #333;
+      font-weight: 600;
+      font-size: 0.9rem;
       cursor: pointer;
-      width: 100%;
+      transition: 0.2s;
+      min-width: 50px;
+      text-align: center;
     }
-    .modal-opciones select:focus {
-      outline: none;
+    .modal-tallas-container .talla-btn:hover {
       border-color: #cc0000;
-      box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
+      background: #fff5f5;
+      transform: scale(1.05);
     }
+    .modal-tallas-container .talla-btn.active-talla {
+      border-color: #cc0000;
+      background: #cc0000;
+      color: white;
+      box-shadow: 0 4px 12px rgba(204,0,0,0.3);
+    }
+
+    /* ===== COLORES ===== */
+    .modal-colores-container {
+      margin: 12px 0;
+    }
+    .modal-colores-container label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    .modal-colores-container .colores-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .modal-colores-container .color-btn {
+      padding: 8px 16px;
+      border: 2px solid #d0d0d0;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #333;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .modal-colores-container .color-btn:hover {
+      border-color: #cc0000;
+      background: #fff5f5;
+      transform: scale(1.05);
+    }
+    .modal-colores-container .color-btn.active-color {
+      border-color: #cc0000;
+      background: #cc0000;
+      color: white;
+      box-shadow: 0 4px 12px rgba(204,0,0,0.3);
+    }
+
     .modal-info .btn-agregar-modal {
       width: 100%;
       padding: 16px;
@@ -791,7 +836,7 @@
       transform: none;
     }
 
-    /* ===== CARRITO MEJORADO ===== */
+    /* ===== CARRITO ===== */
     .cart-item {
       display: flex;
       align-items: center;
@@ -1185,6 +1230,13 @@
               <option value="L">L</option>
               <option value="XL">XL</option>
               <option value="XXL">XXL</option>
+              <option value="36">36</option>
+              <option value="37">37</option>
+              <option value="38">38</option>
+              <option value="39">39</option>
+              <option value="40">40</option>
+              <option value="41">41</option>
+              <option value="42">42</option>
             </select>
           </div>
           <div class="grupo-filtro" style="flex:1; min-width:150px;">
@@ -1245,7 +1297,7 @@
             <input type="number" id="prod-stock" placeholder="Stock*" style="flex:1">
           </div>
           <div class="flex">
-            <input type="text" id="prod-talla" placeholder="Tallas (S,M,L,XL...)" style="flex:1">
+            <input type="text" id="prod-talla" placeholder="Tallas (ej: S,M,L o 36 al 39)" style="flex:1">
             <input type="text" id="prod-color" placeholder="Colores (Rojo,Azul...)" style="flex:1">
             <input type="text" id="prod-medidas" placeholder="Medidas (ej: 30x40cm)" style="flex:1">
           </div>
@@ -1473,7 +1525,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PRODUCTO ===== -->
+<!-- ===== MODAL DE PRODUCTO CON BOTONES DE TALLA ===== -->
 <div class="modal-overlay" id="modal-producto">
   <div class="modal-contenido">
     <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
@@ -1490,19 +1542,19 @@
         <div class="descripcion" id="modal-descripcion">Descripción</div>
         <div class="stock-info" id="modal-stock">Stock disponible</div>
         
-        <!-- SELECCIÓN DE TALLA Y COLOR -->
-        <div class="modal-opciones">
-          <div class="campo">
-            <label><i class="fas fa-ruler"></i> Talla / Medida:</label>
-            <select id="modal-talla-select">
-              <option value="">Seleccionar talla</option>
-            </select>
+        <!-- TALLAS COMO BOTONES -->
+        <div class="modal-tallas-container">
+          <label><i class="fas fa-ruler"></i> Selecciona tu talla:</label>
+          <div class="tallas-grid" id="modal-tallas-grid">
+            <!-- Las tallas se generan automáticamente desde JavaScript -->
           </div>
-          <div class="campo">
-            <label><i class="fas fa-palette"></i> Color:</label>
-            <select id="modal-color-select">
-              <option value="">Seleccionar color</option>
-            </select>
+        </div>
+        
+        <!-- COLORES COMO BOTONES -->
+        <div class="modal-colores-container" id="modal-colores-container" style="display:none;">
+          <label><i class="fas fa-palette"></i> Selecciona un color:</label>
+          <div class="colores-grid" id="modal-colores-grid">
+            <!-- Los colores se generan automáticamente desde JavaScript -->
           </div>
         </div>
         
@@ -1543,7 +1595,7 @@
   const storage = getStorage(app);
 
   const MASTER_EMAIL = "andyobregon799@gmail.com";
-  const WHATSAPP_NUMBER = "593990434546"; // Ecuador: 0990434546
+  const WHATSAPP_NUMBER = "593990434546";
   let currentUser = null;
   let currentUserRol = "visitor";
   let cart = [];
@@ -1552,7 +1604,50 @@
   let uploadedImageUrls = [];
   let categoriaSeleccionada = "todos";
   let productoModal = null;
+  let tallaSeleccionada = null;
+  let colorSeleccionado = null;
   let headerImageUrl = "";
+
+  // ===== FUNCIÓN PARA GENERAR TALLAS DESDE UN RANGO =====
+  function generarTallasDesdeRango(textoTallas) {
+    if (!textoTallas) return [];
+    
+    // Limpiar espacios
+    textoTallas = textoTallas.trim();
+    
+    // Si ya es una lista separada por comas
+    if (textoTallas.includes(',')) {
+      return textoTallas.split(',').map(t => t.trim()).filter(t => t);
+    }
+    
+    // Si es un rango tipo "36 al 39" o "36-39"
+    const rangoMatch = textoTallas.match(/(\d+)\s*(?:al|a|-)\s*(\d+)/i);
+    if (rangoMatch) {
+      const inicio = parseInt(rangoMatch[1]);
+      const fin = parseInt(rangoMatch[2]);
+      if (inicio && fin && inicio < fin) {
+        const tallas = [];
+        for (let i = inicio; i <= fin; i++) {
+          tallas.push(i.toString());
+        }
+        return tallas;
+      }
+    }
+    
+    // Si es un rango de letras tipo "S al XL"
+    const letras = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const rangoLetras = textoTallas.match(/([A-Z]+)\s*(?:al|a|-)\s*([A-Z]+)/i);
+    if (rangoLetras) {
+      const inicio = letras.indexOf(rangoLetras[1].toUpperCase());
+      const fin = letras.indexOf(rangoLetras[2].toUpperCase());
+      if (inicio !== -1 && fin !== -1 && inicio < fin) {
+        return letras.slice(inicio, fin + 1);
+      }
+    }
+    
+    // Si es una sola talla
+    return [textoTallas];
+  }
 
   // ===== AUTH =====
   const loginContainer = document.getElementById("login-container");
@@ -1916,8 +2011,8 @@
     if (filtroTalla !== "todos") {
       filtered = filtered.filter(p => {
         if (!p.talla) return false;
-        const tallas = p.talla.split(',').map(t => t.trim().toUpperCase());
-        return tallas.includes(filtroTalla);
+        const tallasDisponibles = generarTallasDesdeRango(p.talla);
+        return tallasDisponibles.includes(filtroTalla);
       });
     }
     
@@ -1982,11 +2077,13 @@
     renderTiendaDepratik();
   };
 
-  // ===== MODAL CON SELECCIÓN DE TALLA Y COLOR =====
+  // ===== MODAL CON BOTONES DE TALLA =====
   window.abrirModal = function(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
     productoModal = product;
+    tallaSeleccionada = null;
+    colorSeleccionado = null;
     
     let imagenes = [];
     if (product.imagenes) {
@@ -2019,30 +2116,46 @@
     document.getElementById('modal-stock').textContent = stockText;
     document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
     
-    // LLENAR OPCIONES DE TALLA
-    const tallaSelect = document.getElementById('modal-talla-select');
-    tallaSelect.innerHTML = '<option value="">Seleccionar talla</option>';
+    // ===== GENERAR BOTONES DE TALLAS =====
+    const tallasGrid = document.getElementById('modal-tallas-grid');
+    tallasGrid.innerHTML = '';
     if (product.talla) {
-      const tallas = product.talla.split(',').map(t => t.trim());
+      const tallas = generarTallasDesdeRango(product.talla);
       tallas.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t;
-        opt.textContent = t;
-        tallaSelect.appendChild(opt);
+        const btn = document.createElement('button');
+        btn.className = 'talla-btn';
+        btn.textContent = t;
+        btn.dataset.talla = t;
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('active-talla'));
+          this.classList.add('active-talla');
+          tallaSeleccionada = t;
+        });
+        tallasGrid.appendChild(btn);
       });
     }
     
-    // LLENAR OPCIONES DE COLOR
-    const colorSelect = document.getElementById('modal-color-select');
-    colorSelect.innerHTML = '<option value="">Seleccionar color</option>';
+    // ===== GENERAR BOTONES DE COLORES =====
+    const coloresContainer = document.getElementById('modal-colores-container');
+    const coloresGrid = document.getElementById('modal-colores-grid');
+    coloresGrid.innerHTML = '';
     if (product.color) {
-      const colores = product.color.split(',').map(c => c.trim());
+      coloresContainer.style.display = 'block';
+      const colores = product.color.split(',').map(c => c.trim()).filter(c => c);
       colores.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        colorSelect.appendChild(opt);
+        const btn = document.createElement('button');
+        btn.className = 'color-btn';
+        btn.textContent = c;
+        btn.dataset.color = c;
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active-color'));
+          this.classList.add('active-color');
+          colorSeleccionado = c;
+        });
+        coloresGrid.appendChild(btn);
       });
+    } else {
+      coloresContainer.style.display = 'none';
     }
     
     const btnAgregar = document.getElementById('modal-btn-agregar');
@@ -2088,6 +2201,8 @@
     document.getElementById('modal-producto').classList.remove('active');
     document.body.style.overflow = '';
     productoModal = null;
+    tallaSeleccionada = null;
+    colorSeleccionado = null;
   };
 
   document.getElementById('modal-producto').addEventListener('click', function(e) {
@@ -2102,22 +2217,17 @@
       return;
     }
     
-    const talla = document.getElementById('modal-talla-select').value;
-    const color = document.getElementById('modal-color-select').value;
-    
-    if (!talla) {
-      alert('⚠️ Por favor selecciona una talla/medida disponible.');
-      tallaSelect.focus();
+    if (!tallaSeleccionada) {
+      alert('⚠️ Por favor selecciona una talla.');
       return;
     }
     
-    const nombreConDetalles = `${productoModal.nombre || 'Producto'}${talla ? ' (Talla: ' + talla : ''}${color ? ', Color: ' + color : ''})`;
+    const nombreConDetalles = `${productoModal.nombre || 'Producto'} (Talla: ${tallaSeleccionada}${colorSeleccionado ? ', Color: ' + colorSeleccionado : ''})`;
     
-    // Buscar si ya existe en el carrito con la misma talla y color
     const existing = cart.find(item => 
       item.productoId === productoModal.id && 
-      item.talla === talla && 
-      item.color === color
+      item.talla === tallaSeleccionada && 
+      item.color === colorSeleccionado
     );
     
     if (existing) {
@@ -2126,8 +2236,8 @@
       cart.push({ 
         productoId: productoModal.id, 
         nombre: productoModal.nombre || 'Producto',
-        talla: talla,
-        color: color,
+        talla: tallaSeleccionada,
+        color: colorSeleccionado,
         precio: productoModal.precio || 0, 
         cantidad: 1 
       });
@@ -2147,11 +2257,8 @@
       return;
     }
     
-    const talla = document.getElementById('modal-talla-select').value;
-    const color = document.getElementById('modal-color-select').value;
-    
-    if (!talla) {
-      alert('⚠️ Por favor selecciona una talla/medida disponible.');
+    if (!tallaSeleccionada) {
+      alert('⚠️ Por favor selecciona una talla.');
       return;
     }
     
@@ -2163,8 +2270,8 @@
       `📱 *WhatsApp:* ${telefono || 'No proporcionado'}\n\n` +
       `📦 *Producto:* ${productoModal.nombre}\n` +
       `💰 *Precio:* $${productoModal.precio}\n` +
-      `📏 *Talla:* ${talla}\n` +
-      `🎨 *Color:* ${color || 'No especificado'}\n` +
+      `📏 *Talla:* ${tallaSeleccionada}\n` +
+      `🎨 *Color:* ${colorSeleccionado || 'No especificado'}\n` +
       `📐 *Medidas:* ${productoModal.medidas || 'No especificadas'}\n` +
       `📝 *Descripción:* ${productoModal.descripcion || 'Sin descripción'}\n\n` +
       `🔗 *Código:* ${productoModal.id?.slice(0, 8) || '---'}\n\n` +
@@ -2231,7 +2338,6 @@
     resumen.style.display = 'block';
   }
 
-  // ===== CAMBIAR CANTIDAD EN CARRITO =====
   window.cambiarCantidad = function(idx, cambio) {
     if (cart[idx]) {
       cart[idx].cantidad += cambio;
@@ -2242,7 +2348,6 @@
     }
   };
 
-  // ===== ELIMINAR ITEM DEL CARRITO =====
   window.eliminarItemCarrito = function(idx) {
     if (confirm(`¿Eliminar "${cart[idx].nombre || 'Producto'}" del carrito?`)) {
       cart.splice(idx, 1);
@@ -2421,7 +2526,6 @@
   function loadAllData() {
     addDebugLog('🔄 Cargando datos de Firebase...', 'info');
     
-    // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = [];
       let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Género</th><th>Categoría</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
@@ -2466,7 +2570,6 @@
       addDebugLog(`❌ Error cargando productos: ${error.message}`, 'error');
     });
 
-    // BANNERS
     onSnapshot(collection(db, "publicidad"), (snap) => {
       allBanners = [];
       snap.forEach(doc => {
