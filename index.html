@@ -255,7 +255,7 @@
       width: 100%;
       height: auto;
       max-height: 250px;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
     .tienda-header .sin-imagen-header {
@@ -291,7 +291,7 @@
       width: 100%;
       height: auto;
       max-height: 400px;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
 
@@ -369,7 +369,7 @@
       box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
     }
 
-    /* ===== PRODUCTOS GRID ===== */
+    /* ===== PRODUCTOS GRID - IMAGEN SIN RECORTES ===== */
     .productos-grid-depratik {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -396,15 +396,19 @@
       overflow: hidden;
       height: 260px;
       background: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .producto-card-depratik .imagen-container img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: transform 0.3s;
+      background: #f9f9f9;
     }
     .producto-card-depratik:hover .imagen-container img {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
     .producto-card-depratik .etiqueta-stock {
       position: absolute;
@@ -639,7 +643,7 @@
     .modal-imagen-principal {
       width: 100%;
       height: 350px;
-      object-fit: cover;
+      object-fit: contain;
       border-radius: 16px;
       border: 1px solid #e0e0e0;
       background: #f9f9f9;
@@ -652,11 +656,12 @@
     .modal-miniaturas img {
       width: 70px;
       height: 70px;
-      object-fit: cover;
+      object-fit: contain;
       border-radius: 12px;
       border: 2px solid #e0e0e0;
       cursor: pointer;
       transition: 0.2s;
+      background: #f9f9f9;
     }
     .modal-miniaturas img:hover {
       border-color: #cc0000;
@@ -1268,7 +1273,6 @@
           </button>
         </div>
 
-        <!-- CATEGORÍAS ESPECÍFICAS -->
         <div class="categorias-section" id="categorias-container">
           <div class="categoria-item active-categoria" data-categoria="todos">
             <i class="fas fa-th-large"></i><h4>Todos</h4><p>Todos los productos</p>
@@ -1327,7 +1331,6 @@
             <input type="number" id="prod-stock" placeholder="Stock*" style="flex:1">
           </div>
           
-          <!-- CAMPOS OPCIONALES -->
           <div style="background: #f0f8ff; padding: 16px; border-radius: 12px; border: 1px solid #d0e8ff; margin: 8px 0;">
             <p style="color: #666; font-size: 0.8rem; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> Los siguientes campos son <strong>opcionales</strong>. Solo llénalos si tu producto lo necesita (ej: talla para ropa o zapatos).</p>
             <div class="flex">
@@ -2254,7 +2257,6 @@
       return;
     }
     
-    // Verificar si el producto tiene tallas y si se seleccionó una
     if (productoModal.talla && !tallaSeleccionada) {
       alert('⚠️ Por favor selecciona una talla.');
       return;
