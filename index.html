@@ -239,39 +239,28 @@
       padding: 20px 0;
     }
 
-    /* ===== HEADER CON IMAGEN ===== */
+    /* ===== HEADER - IMAGEN COMPLETA SIN BORDES ===== */
     .tienda-header {
-      border-radius: 16px;
+      border-radius: 0px;
       margin-bottom: 0px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(204,0,0,0.15);
-      background: #cc0000;
-      min-height: 150px;
+      box-shadow: none;
+      background: transparent;
+      min-height: auto;
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
     }
     .tienda-header img {
       width: 100%;
       height: auto;
-      max-height: 250px;
-      object-fit: contain;
+      max-height: 400px;
+      object-fit: cover;
       display: block;
     }
     .tienda-header .sin-imagen-header {
-      padding: 40px 30px;
-      text-align: center;
-      color: white;
-      width: 100%;
-    }
-    .tienda-header .sin-imagen-header h1 {
-      font-size: 2.5rem;
-      font-weight: 900;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.2);
-    }
-    .tienda-header .sin-imagen-header p {
-      font-size: 1.1rem;
-      opacity: 0.9;
+      display: none;
     }
 
     /* ===== BANNER PUBLICITARIO - SIN ESPACIOS ===== */
@@ -331,7 +320,7 @@
     .categoria-item h4 { font-size: 0.75rem; color: #1a1a1a; }
     .categoria-item p { font-size: 0.6rem; color: #666; }
 
-    /* ===== FILTROS ===== */
+    /* FILTROS */
     .filtros-container {
       display: flex;
       flex-wrap: wrap;
@@ -370,7 +359,7 @@
       box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
     }
 
-    /* ===== PRODUCTOS GRID ===== */
+    /* ===== PRODUCTOS GRID - IMAGEN SIN RECORTES ===== */
     .productos-grid-depratik {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -1096,7 +1085,7 @@
       .main-content { margin-left: 0; padding: 16px; }
       .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #cc0000; border-radius: 12px; padding: 8px 12px; color: white; border: none; }
       .productos-grid-depratik { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-      .tienda-header img { max-height: 150px; }
+      .tienda-header img { max-height: 200px; }
       .categorias-section { grid-template-columns: repeat(2, 1fr); }
       .banner-publicidad-full img { max-height: 200px; }
       .modal-grid { grid-template-columns: 1fr; }
@@ -1224,17 +1213,12 @@
 
       <!-- TIENDA -->
       <div id="page-tienda" class="page">
-        <!-- HEADER -->
+        <!-- HEADER - IMAGEN COMPLETA SIN BORDES -->
         <div class="tienda-header" id="tienda-header">
-          <img id="header-imagen-tienda" src="" alt="Header" style="display:none;">
-          <div class="sin-imagen-header" id="header-placeholder">
-            <i class="fas fa-gift" style="font-size:3rem; display:block; margin-bottom:10px;"></i>
-            <h1>LOS AMIGOS ESTORE 🎁</h1>
-            <p>👕 Encuentra la mejor ropa y accesorios al mejor precio</p>
-          </div>
+          <img id="header-imagen-tienda" src="" alt="Header" style="width:100%; height:auto; max-height:400px; object-fit:cover; display:block;">
         </div>
 
-        <!-- BANNERS - SIN ESPACIOS -->
+        <!-- BANNERS -->
         <div id="banners-container" style="margin:0; padding:0;"></div>
 
         <!-- FILTROS -->
@@ -1576,7 +1560,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PRODUCTO ===== -->
+<!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="modal-producto">
   <div class="modal-contenido">
     <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
@@ -1614,6 +1598,7 @@
   </div>
 </div>
 
+<!-- ===== JAVASCRIPT ===== -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { 
@@ -1896,18 +1881,14 @@
 
   function actualizarHeader() {
     const img = document.getElementById('header-imagen-tienda');
-    const placeholder = document.getElementById('header-placeholder');
     if (headerImageUrl && headerImageUrl.trim() !== "") {
       img.src = headerImageUrl;
       img.style.display = 'block';
-      placeholder.style.display = 'none';
       img.onerror = function() {
-        img.style.display = 'none';
-        placeholder.style.display = 'block';
+        this.style.display = 'none';
       };
     } else {
       img.style.display = 'none';
-      placeholder.style.display = 'block';
     }
   }
 
