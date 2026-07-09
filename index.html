@@ -212,6 +212,7 @@
     .upload-area-fotos .sub-texto { font-size: 0.8rem; color: #999; }
     .upload-area-fotos input[type="file"] { display: none; }
     
+    /* ===== PREVIEW DE IMÁGENES MEJORADO ===== */
     .preview-imagenes { 
       display: flex; 
       gap: 12px; 
@@ -226,9 +227,10 @@
     .preview-imagenes img { 
       width: 80px; 
       height: 80px; 
-      object-fit: cover; 
+      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
       border-radius: 10px; 
       border: 2px solid #cc0000;
+      background: #ffffff;
     }
     .preview-imagenes img:hover { transform: scale(1.05); }
     .preview-imagenes .sin-imagenes {
@@ -256,8 +258,9 @@
       width: 100%;
       height: auto;
       max-height: 400px;
-      object-fit: cover;
+      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
       display: block;
+      background: #f5f5f5;
     }
     .tienda-header .sin-imagen-header {
       display: none;
@@ -280,7 +283,7 @@
       width: 100%;
       height: auto;
       max-height: 400px;
-      object-fit: contain;
+      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
       display: block;
       background: #f5f5f5;
     }
@@ -393,7 +396,7 @@
     .producto-card-depratik .imagen-container img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
       transition: transform 0.3s;
       background: #f9f9f9;
     }
@@ -633,7 +636,7 @@
     .modal-imagen-principal {
       width: 100%;
       height: 350px;
-      object-fit: contain;
+      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
       border-radius: 16px;
       border: 1px solid #e0e0e0;
       background: #f9f9f9;
@@ -646,7 +649,7 @@
     .modal-miniaturas img {
       width: 70px;
       height: 70px;
-      object-fit: contain;
+      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
       border-radius: 12px;
       border: 2px solid #e0e0e0;
       cursor: pointer;
@@ -981,7 +984,7 @@
     .btn-subir-foto:hover { background: #b30000; transform: scale(1.02); }
 
     .imagenes-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-    .imagenes-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #e0e0e0; }
+    .imagenes-preview img { width: 50px; height: 50px; object-fit: contain; border-radius: 8px; border: 1px solid #e0e0e0; background: #f9f9f9; }
 
     .debug-panel {
       background: #f9f9f9;
@@ -1018,6 +1021,8 @@
       width: auto;
       border-radius: 8px;
       border: 1px solid #e0e0e0;
+      object-fit: contain;
+      background: #f9f9f9;
     }
     .banner-preview-mini .info {
       flex: 1;
@@ -1056,6 +1061,8 @@
       width: auto;
       border-radius: 8px;
       border: 1px solid #e0e0e0;
+      object-fit: contain;
+      background: #f9f9f9;
     }
     .config-header-panel .preview-header-actual .sin-img {
       color: #999;
@@ -1078,6 +1085,16 @@
       margin: 8px 0;
     }
     .btn-crear-seller:hover { background: #218838; transform: scale(1.02); }
+
+    /* ===== PREVIEW IMAGEN EN TABLA ===== */
+    .preview-img-tabla {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      background: #f9f9f9;
+    }
 
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
@@ -1215,7 +1232,7 @@
       <div id="page-tienda" class="page">
         <!-- HEADER - IMAGEN COMPLETA SIN BORDES -->
         <div class="tienda-header" id="tienda-header">
-          <img id="header-imagen-tienda" src="" alt="Header" style="width:100%; height:auto; max-height:400px; object-fit:cover; display:block;">
+          <img id="header-imagen-tienda" src="" alt="Header" style="width:100%; height:auto; max-height:400px; object-fit:contain; display:block;">
         </div>
 
         <!-- BANNERS -->
@@ -1638,6 +1655,7 @@
   let colorSeleccionado = null;
   let headerImageUrl = "";
 
+  // ===== FUNCIÓN PARA GENERAR TALLAS =====
   function generarTallasDesdeRango(textoTallas) {
     if (!textoTallas) return [];
     textoTallas = textoTallas.trim();
@@ -1668,6 +1686,31 @@
     return [textoTallas];
   }
 
+  // ===== FUNCIÓN PARA OBTENER IMAGEN POR DEFECTO =====
+  function getDefaultImage() {
+    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
+  }
+
+  // ===== FUNCIÓN PARA OBTENER IMÁGENES DEL PRODUCTO =====
+  function getProductImages(product) {
+    let imagenes = [];
+    if (product.imagenes) {
+      if (typeof product.imagenes === 'string') {
+        imagenes = product.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
+      } else if (Array.isArray(product.imagenes)) {
+        imagenes = product.imagenes;
+      }
+    }
+    return imagenes;
+  }
+
+  // ===== FUNCIÓN PARA OBTENER PRIMERA IMAGEN =====
+  function getFirstImage(product) {
+    const imagenes = getProductImages(product);
+    return imagenes.length > 0 ? imagenes[0] : getDefaultImage();
+  }
+
+  // ===== VARIABLES GLOBALES =====
   const loginContainer = document.getElementById("login-container");
   const dashboardApp = document.getElementById("dashboard-app");
   const loginBtn = document.getElementById("login-btn");
@@ -1676,6 +1719,7 @@
   const guestBtn = document.getElementById("guest-btn");
   const logoutSidebar = document.getElementById("logout-sidebar");
 
+  // ===== FUNCIONES DE AUTENTICACIÓN =====
   window.cambiarTabAuth = function(tab) {
     document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
     document.querySelector(`.auth-tabs button[data-tab="${tab}"]`).classList.add('active-tab');
@@ -1855,6 +1899,7 @@
     });
   });
 
+  // ===== FUNCIONES DE DEBUG =====
   function addDebugLog(message, type = 'info') {
     const panel = document.getElementById('debug-panel');
     if (!panel) return;
@@ -1868,6 +1913,7 @@
     }
   }
 
+  // ===== FUNCIONES DE HEADER =====
   function cargarHeader() {
     const headerDocRef = doc(db, "configuracion", "header");
     getDoc(headerDocRef).then((docSnap) => {
@@ -1895,7 +1941,7 @@
   function actualizarPreviewHeader() {
     const container = document.getElementById('preview-header-actual-container');
     if (headerImageUrl && headerImageUrl.trim() !== "") {
-      container.innerHTML = `<img src="${headerImageUrl}" style="height:60px; width:auto; border-radius:8px; border:1px solid #e0e0e0;" onerror="this.outerHTML='<span class=\\'sin-img\\'>❌ Error al cargar imagen</span>'">`;
+      container.innerHTML = `<img src="${headerImageUrl}" style="height:60px; width:auto; border-radius:8px; border:1px solid #e0e0e0; object-fit:contain; background:#f9f9f9;" onerror="this.outerHTML='<span class=\\'sin-img\\'>❌ Error al cargar imagen</span>'">`;
     } else {
       container.innerHTML = `<span class="sin-img">📝 Texto original: "LOS AMIGOS ESTORE 🎁"</span>`;
     }
@@ -1933,6 +1979,7 @@
     }
   });
 
+  // ===== FUNCIONES DE SUBIDA DE IMÁGENES =====
   const uploadArea = document.getElementById("upload-area");
   const fileInput = document.getElementById("file-input");
   const previewContainer = document.getElementById("preview-container");
@@ -1976,6 +2023,8 @@
       reader.onload = (e) => {
         const img = document.createElement("img");
         img.src = e.target.result;
+        img.alt = "Vista previa";
+        img.title = "Vista previa de la imagen";
         previewContainer.appendChild(img);
       };
       reader.readAsDataURL(file);
@@ -1988,21 +2037,25 @@
         const url = await getDownloadURL(snapshot.ref);
         uploadedImageUrls.push(url);
         addDebugLog(`✅ Subida exitosa: ${fileName}`, 'success');
+        
+        // Actualizar el campo de URLs automáticamente
+        const urlsString = uploadedImageUrls.join(", ");
+        document.getElementById("prod-imagenes").value = urlsString;
+        
       } catch (error) {
         addDebugLog(`❌ Error subiendo ${file.name}: ${error.message}`, 'error');
         alert("Error al subir imagen: " + error.message);
       }
     }
     
-    const urlsString = uploadedImageUrls.join(", ");
-    document.getElementById("prod-imagenes").value = urlsString;
-    addDebugLog(`📋 URLs guardadas: ${uploadedImageUrls.length} imágenes`, 'success');
     fileInput.value = '';
     if (uploadedImageUrls.length > 0) {
+      addDebugLog(`📋 Total: ${uploadedImageUrls.length} imágenes subidas`, 'success');
       alert(`✅ ${uploadedImageUrls.length} imagen(es) subidas exitosamente`);
     }
   }
 
+  // ===== RENDER TIENDA =====
   window.renderTiendaDepratik = function() {
     const container = document.getElementById("vitrina-productos");
     const filtroTexto = document.getElementById("filtro-productos-tienda")?.value?.toLowerCase() || '';
@@ -2044,15 +2097,7 @@
     
     let html = '';
     filtered.forEach(p => {
-      let imagenes = [];
-      if (p.imagenes) {
-        if (typeof p.imagenes === 'string') {
-          imagenes = p.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
-        } else if (Array.isArray(p.imagenes)) {
-          imagenes = p.imagenes;
-        }
-      }
-      const primeraImagen = imagenes.length > 0 ? imagenes[0] : 'https://via.placeholder.com/300x300/f0f0f0/999?text=Sin+Imagen';
+      const primeraImagen = getFirstImage(p);
       const stockText = p.stock > 0 ? `${p.stock} disponibles` : 'Agotado';
       const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
       
@@ -2062,7 +2107,8 @@
       html += `
         <div class="producto-card-depratik" onclick="abrirModal('${p.id}')">
           <div class="imagen-container">
-            <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" onerror="this.src='https://via.placeholder.com/300x300/f0f0f0/999?text=Error+Imagen'">
+            <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" loading="lazy" 
+                 onerror="this.src='${getDefaultImage()}'">
             <span class="etiqueta-stock ${stockClass}">${stockText}</span>
             ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
           </div>
@@ -2089,6 +2135,7 @@
     renderTiendaDepratik();
   };
 
+  // ===== MODAL =====
   window.abrirModal = function(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
@@ -2096,17 +2143,15 @@
     tallaSeleccionada = null;
     colorSeleccionado = null;
     
-    let imagenes = [];
-    if (product.imagenes) {
-      if (typeof product.imagenes === 'string') {
-        imagenes = product.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
-      } else if (Array.isArray(product.imagenes)) {
-        imagenes = product.imagenes;
-      }
-    }
-    const primeraImagen = imagenes.length > 0 ? imagenes[0] : 'https://via.placeholder.com/300x300/f0f0f0/999?text=Sin+Imagen';
+    const imagenes = getProductImages(product);
+    const primeraImagen = imagenes.length > 0 ? imagenes[0] : getDefaultImage();
     
-    document.getElementById('modal-img-principal').src = primeraImagen;
+    const modalImg = document.getElementById('modal-img-principal');
+    modalImg.src = primeraImagen;
+    modalImg.onerror = function() {
+      this.src = getDefaultImage();
+    };
+    
     document.getElementById('modal-nombre').textContent = product.nombre || 'Sin nombre';
     document.getElementById('modal-precio').textContent = `$${product.precio || 0}`;
     document.getElementById('modal-codigo').textContent = `Código: ${product.id?.slice(0, 8) || '---'}`;
@@ -2131,6 +2176,7 @@
     document.getElementById('modal-stock').textContent = stockText;
     document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
     
+    // Tallas
     const tallasContainer = document.getElementById('modal-tallas-container');
     const tallasGrid = document.getElementById('modal-tallas-grid');
     tallasGrid.innerHTML = '';
@@ -2153,6 +2199,7 @@
       tallasContainer.style.display = 'none';
     }
     
+    // Colores
     const coloresContainer = document.getElementById('modal-colores-container');
     const coloresGrid = document.getElementById('modal-colores-grid');
     coloresGrid.innerHTML = '';
@@ -2175,6 +2222,7 @@
       coloresContainer.style.display = 'none';
     }
     
+    // Botones
     const btnAgregar = document.getElementById('modal-btn-agregar');
     const btnWhatsApp = document.getElementById('modal-btn-whatsapp');
     if (product.stock <= 0) {
@@ -2189,6 +2237,7 @@
       btnWhatsApp.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp';
     }
     
+    // Miniaturas
     const miniContainer = document.getElementById('modal-miniaturas');
     miniContainer.innerHTML = '';
     if (imagenes.length > 0) {
@@ -2297,6 +2346,7 @@
     cerrarModal();
   };
 
+  // ===== CARRITO =====
   function renderCarrito() {
     const container = document.getElementById('carrito-lista');
     const resumen = document.getElementById('cart-resumen');
@@ -2411,6 +2461,7 @@
     window.open(url, '_blank');
   });
 
+  // ===== CATEGORÍAS =====
   document.querySelectorAll('.categoria-item').forEach(el => {
     el.addEventListener('click', function() {
       document.querySelectorAll('.categoria-item').forEach(c => c.classList.remove('active-categoria'));
@@ -2420,6 +2471,7 @@
     });
   });
 
+  // ===== BANNERS =====
   function renderBannersEnTienda() {
     const container = document.getElementById("banners-container");
     const activos = allBanners.filter(b => b.activo === true);
@@ -2431,7 +2483,7 @@
     activos.forEach(b => {
       html += `
         <div class="banner-publicidad-full" ${b.enlace ? `onclick="window.open('${b.enlace}', '_blank')"` : ''}>
-          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" onerror="this.style.display='none'">
+          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" loading="lazy" onerror="this.style.display='none'">
         </div>
       `;
     });
@@ -2450,7 +2502,7 @@
       const estadoText = b.activo ? 'Activo' : 'Inactivo';
       html += `
         <div class="banner-preview-mini" style="display:flex; align-items:center; gap:16px; padding:12px; background:#f9f9f9; border-radius:12px; border:1px solid #e0e0e0; margin:8px 0; flex-wrap:wrap;">
-          ${b.imagen ? `<img src="${b.imagen}" style="height:50px;width:auto;border-radius:8px;border:1px solid #e0e0e0;" onerror="this.style.display='none'">` : ''}
+          ${b.imagen ? `<img src="${b.imagen}" style="height:50px;width:auto;border-radius:8px;border:1px solid #e0e0e0;object-fit:contain;background:#f9f9f9;" onerror="this.style.display='none'">` : ''}
           <div class="info" style="flex:1; min-width:150px;">
             <h4 style="font-size:0.95rem; color:#1a1a1a;">${b.titulo || 'Sin título'}</h4>
             <p style="font-size:0.7rem; color:#999;">${b.enlace || 'Sin enlace'}</p>
@@ -2536,6 +2588,7 @@
     }
   });
 
+  // ===== LOAD ALL DATA =====
   function loadAllData() {
     addDebugLog('🔄 Cargando datos de Firebase...', 'info');
     
@@ -2545,8 +2598,8 @@
       snap.forEach(doc => {
         const p = doc.data();
         allProducts.push({ id: doc.id, ...p });
-        const imagenes = p.imagenes ? p.imagenes.split(',').map(i => i.trim()).filter(i => i) : [];
-        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e0e0e0;" onerror="this.style.display='none'">` : '📷';
+        const imagenes = getProductImages(p);
+        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" class="preview-img-tabla" onerror="this.outerHTML='📷'">` : '📷';
         const generoLabel = p.genero && p.genero !== 'todos' ? p.genero : 'Todos';
         const categoriaLabel = p.categoria || 'Sin categoría';
         html += `<tr>
@@ -2570,15 +2623,6 @@
       addDebugLog(`📦 ${snap.size} productos cargados`, 'success');
       
       renderTiendaDepratik();
-
-      const selectCarrito = document.getElementById("select-producto-carrito");
-      selectCarrito.innerHTML = '<option value="">Selecciona producto</option>';
-      snap.forEach(doc => {
-        const p = doc.data();
-        if (p.stock > 0) {
-          selectCarrito.innerHTML += `<option value="${doc.id}" data-precio="${p.precio || 0}" data-nombre="${p.nombre || 'Producto'}">${p.nombre || 'Producto'} - $${p.precio || 0} (${p.stock} disponibles)</option>`;
-        }
-      });
     }, (error) => {
       addDebugLog(`❌ Error cargando productos: ${error.message}`, 'error');
     });
@@ -2726,6 +2770,7 @@
     });
   }
 
+  // ===== FUNCIONES GLOBALES =====
   window.eliminarProducto = async (id) => {
     if (confirm("¿Eliminar este producto?")) {
       await deleteDoc(doc(db, "productos", id));
@@ -2748,16 +2793,17 @@
     
     previewContainer.innerHTML = '';
     uploadedImageUrls = [];
-    if (product.imagenes) {
-      const urls = product.imagenes.split(',').map(i => i.trim()).filter(i => i);
-      urls.forEach(url => {
+    const imagenes = getProductImages(product);
+    if (imagenes.length > 0) {
+      imagenes.forEach(url => {
         const img = document.createElement("img");
         img.src = url;
+        img.alt = "Vista previa";
         previewContainer.appendChild(img);
       });
-      uploadedImageUrls = urls;
-      document.getElementById("prod-imagenes").value = product.imagenes;
-      addDebugLog(`✏️ Editando: ${product.nombre} (${urls.length} imágenes)`, 'info');
+      uploadedImageUrls = imagenes;
+      document.getElementById("prod-imagenes").value = imagenes.join(", ");
+      addDebugLog(`✏️ Editando: ${product.nombre} (${imagenes.length} imágenes)`, 'info');
     } else {
       previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
       document.getElementById("prod-imagenes").value = '';
@@ -2797,6 +2843,7 @@
     }
   };
 
+  // ===== GUARDAR PRODUCTO =====
   document.getElementById("btn-add-producto")?.addEventListener("click", async () => {
     const nombre = document.getElementById("prod-nombre").value.trim();
     const precio = parseFloat(document.getElementById("prod-precio").value);
@@ -2846,6 +2893,7 @@
     uploadedImageUrls = [];
   });
 
+  // ===== OTROS EVENTOS =====
   document.getElementById("btn-generar-link")?.addEventListener("click", async () => {
     const monto = parseFloat(document.getElementById("link-monto").value);
     const concepto = document.getElementById("link-concepto").value.trim();
@@ -2934,6 +2982,24 @@
   const menuToggle = document.getElementById("menu-toggle");
   const sidebar = document.getElementById("sidebar");
   menuToggle?.addEventListener("click", () => sidebar.classList.toggle("open"));
+
+  // ===== FILTRO EN GESTIÓN DE PRODUCTOS =====
+  document.getElementById("filtro-productos-gestion")?.addEventListener("input", function() {
+    const filtro = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#lista-productos table tbody tr");
+    rows.forEach(row => {
+      const texto = row.textContent.toLowerCase();
+      row.style.display = texto.includes(filtro) ? '' : 'none';
+    });
+  });
+
+  document.getElementById("btn-limpiar-filtros")?.addEventListener("click", function() {
+    document.getElementById("filtro-productos-gestion").value = '';
+    const rows = document.querySelectorAll("#lista-productos table tbody tr");
+    rows.forEach(row => row.style.display = '');
+  });
+
+  console.log("🚀 LOS AMIGOS ESTORE 🎁 - Tienda online con Firebase");
 </script>
 </body>
 </html>
