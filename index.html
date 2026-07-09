@@ -2993,7 +2993,7 @@
     });
   });
 
-  document.getElementById("btn-limpiar-filtros")?.addEventListener("click", function() {
+ document.getElementById("btn-limpiar-filtros")?.addEventListener("click", function() {
     document.getElementById("filtro-productos-gestion").value = '';
     const rows = document.querySelectorAll("#lista-productos table tbody tr");
     rows.forEach(row => row.style.display = '');
