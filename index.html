@@ -789,7 +789,7 @@
       cursor: not-allowed;
       transform: none;
     }
-    .modal-info .btn-whatsapp-modal {
+    .modal-info .btn-comprar-ahora {
       width: 100%;
       padding: 16px;
       font-size: 1.1rem;
@@ -806,11 +806,11 @@
       justify-content: center;
       gap: 10px;
     }
-    .modal-info .btn-whatsapp-modal:hover {
+    .modal-info .btn-comprar-ahora:hover {
       background: #1da851;
       transform: scale(1.02);
     }
-    .modal-info .btn-whatsapp-modal:disabled {
+    .modal-info .btn-comprar-ahora:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
@@ -949,7 +949,7 @@
       transform: none;
     }
 
-    /* ===== MODAL DE MÉTODO DE PAGO (NUEVO) ===== */
+    /* ===== MODAL DE MÉTODO DE PAGO ===== */
     .modal-pago-overlay {
       display: none;
       position: fixed;
@@ -1017,17 +1017,31 @@
       margin-bottom: 20px;
       border: 1px solid #e0e0e0;
     }
-    .modal-pago-contenido .resumen-pedido .total-pago {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: #cc0000;
-      text-align: center;
-    }
     .modal-pago-contenido .resumen-pedido .productos-resumen {
       font-size: 0.85rem;
       color: #555;
       max-height: 100px;
       overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .modal-pago-contenido .resumen-pedido .total-pago {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #cc0000;
+      text-align: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .modal-pago-contenido .resumen-pedido .detalle-credito-pagos {
+      font-size: 0.85rem;
+      color: #856404;
+      text-align: center;
+      margin-top: 6px;
+      display: none;
+    }
+    .modal-pago-contenido .resumen-pedido .detalle-credito-pagos.show {
+      display: block;
     }
     
     .opcion-pago {
@@ -1278,6 +1292,45 @@
       border-radius: 6px;
       border: 1px solid #e0e0e0;
       background: #f9f9f9;
+    }
+
+    /* ===== ESTILOS PARA DETALLE DE CRÉDITO EN MODAL ===== */
+    .detalle-cuotas {
+      font-size: 0.85rem;
+      color: #856404;
+      background: #fff8e1;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 8px;
+      border: 1px solid #ffc107;
+      display: none;
+    }
+    .detalle-cuotas.show {
+      display: block;
+    }
+    .detalle-cuotas .cuota-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0e0c0;
+    }
+    .detalle-cuotas .cuota-item:last-child {
+      border-bottom: none;
+    }
+    .detalle-cuotas .cuota-item .label {
+      color: #666;
+    }
+    .detalle-cuotas .cuota-item .value {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .detalle-cuotas .total-interes {
+      text-align: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 2px solid #ffc107;
+      font-weight: 700;
+      color: #cc0000;
     }
 
     @media (max-width: 768px) {
@@ -1621,7 +1674,7 @@
         </div>
       </div>
 
-      <!-- ===== FACTURACIÓN (CARRITO) - SIMPLIFICADO ===== -->
+      <!-- ===== FACTURACIÓN (CARRITO) ===== -->
       <div id="page-ventas" class="page">
         <div class="card">
           <div class="card-header">
@@ -1653,7 +1706,7 @@
             <button class="btn-seguir-comprando" id="btn-seguir-comprando">
               <i class="fas fa-store"></i> Seguir comprando
             </button>
-            <button class="btn-finalizar" id="btn-abrir-modal-pago">
+            <button class="btn-finalizar" id="btn-abrir-modal-pago-carrito">
               <i class="fab fa-whatsapp"></i> FINALIZAR PEDIDO POR WHATSAPP
             </button>
             <p style="color: #666; font-size: 0.75rem; text-align: center; margin-top: 8px;">
@@ -1679,6 +1732,7 @@
           <div class="resumen-pedido" id="resumen-pedido-modal">
             <div class="productos-resumen" id="productos-resumen-modal"></div>
             <div class="total-pago" id="total-pago-modal">Total: $0.00</div>
+            <div class="detalle-credito-pagos" id="detalle-credito-modal"></div>
           </div>
           
           <!-- Opciones de pago -->
@@ -1854,7 +1908,7 @@
         <button class="btn-agregar-modal" id="modal-btn-agregar" onclick="agregarDelModal()">
           <i class="fas fa-cart-plus"></i> Agregar al carrito
         </button>
-        <button class="btn-whatsapp-modal" id="modal-btn-whatsapp" onclick="enviarWhatsAppDirecto()">
+        <button class="btn-comprar-ahora" id="modal-btn-comprar-ahora" onclick="comprarAhoraDirecto()">
           <i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp
         </button>
       </div>
@@ -1905,6 +1959,8 @@
   // ===== VARIABLES PARA MÉTODOS DE PAGO (MODAL) =====
   let metodoPagoSeleccionado = 'efectivo';
   let planCreditoSeleccionado = 2;
+  let modoCompraDirecta = false;
+  let productoDirecto = null;
 
   // ===== FUNCIÓN PARA GENERAR TALLAS =====
   function generarTallasDesdeRango(textoTallas) {
@@ -2471,17 +2527,17 @@
     }
     
     const btnAgregar = document.getElementById('modal-btn-agregar');
-    const btnWhatsApp = document.getElementById('modal-btn-whatsapp');
+    const btnComprarAhora = document.getElementById('modal-btn-comprar-ahora');
     if (product.stock <= 0) {
       btnAgregar.disabled = true;
       btnAgregar.innerHTML = '<i class="fas fa-times"></i> Agotado';
-      btnWhatsApp.disabled = true;
-      btnWhatsApp.innerHTML = '<i class="fas fa-times"></i> Agotado';
+      btnComprarAhora.disabled = true;
+      btnComprarAhora.innerHTML = '<i class="fas fa-times"></i> Agotado';
     } else {
       btnAgregar.disabled = false;
       btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al carrito';
-      btnWhatsApp.disabled = false;
-      btnWhatsApp.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp';
+      btnComprarAhora.disabled = false;
+      btnComprarAhora.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp';
     }
     
     const miniContainer = document.getElementById('modal-miniaturas');
@@ -2559,7 +2615,8 @@
     showPage('ventas');
   };
 
-  window.enviarWhatsAppDirecto = function() {
+  // ===== COMPRA DIRECTA DESDE EL MODAL =====
+  window.comprarAhoraDirecto = function() {
     if (!productoModal) return;
     if (productoModal.stock <= 0) {
       alert('Este producto está agotado.');
@@ -2571,25 +2628,30 @@
       return;
     }
     
-    const clienteNombre = document.getElementById('cliente-nombre')?.value || 'Cliente';
-    const telefono = document.getElementById('cliente-telefono')?.value || '';
+    // Crear un carrito temporal con solo este producto
+    const nombreConDetalles = `${productoModal.nombre || 'Producto'}${tallaSeleccionada ? ' (Talla: ' + tallaSeleccionada : ''}${colorSeleccionado ? ', Color: ' + colorSeleccionado : ''})`;
     
-    const mensaje = `🎁 *NUEVO PEDIDO - LOS AMIGOS ESTORE* 🎁\n\n` +
-      `👤 *Cliente:* ${clienteNombre}\n` +
-      `📱 *WhatsApp:* ${telefono || 'No proporcionado'}\n\n` +
-      `📦 *Producto:* ${productoModal.nombre}\n` +
-      `💰 *Precio:* $${productoModal.precio}\n` +
-      `${tallaSeleccionada ? `📏 *Talla:* ${tallaSeleccionada}\n` : ''}` +
-      `${colorSeleccionado ? `🎨 *Color:* ${colorSeleccionado}\n` : ''}` +
-      `${productoModal.medidas ? `📐 *Medidas:* ${productoModal.medidas}\n` : ''}` +
-      `${productoModal.descripcion ? `📝 *Descripción:* ${productoModal.descripcion}\n` : ''}` +
-      `\n🔗 *Código:* ${productoModal.id?.slice(0, 8) || '---'}\n\n` +
-      `✅ *Pedido listo para confirmar.*`;
+    const items = [{
+      productoId: productoModal.id,
+      nombre: nombreConDetalles,
+      talla: tallaSeleccionada || null,
+      color: colorSeleccionado || null,
+      precio: productoModal.precio || 0,
+      cantidad: 1
+    }];
     
-    const numero = WHATSAPP_NUMBER;
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-    window.open(url, '_blank');
-    cerrarModal();
+    // Guardar el estado actual del carrito
+    const carritoGuardado = [...cart];
+    
+    // Establecer el carrito temporal
+    cart = items;
+    
+    // Abrir el modal de pago
+    abrirModalPago('directo');
+    
+    // Restaurar el carrito original después de cerrar el modal
+    // pero mantener los items para el envío
+    // En la función de envío se usará el carrito actual
   };
 
   // ===== CARRITO =====
@@ -2646,7 +2708,6 @@
     container.innerHTML = html;
     resumen.style.display = 'block';
     
-    // Calcular total correctamente
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     totalSpan.textContent = totalOriginal.toFixed(2);
     totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalOriginal.toFixed(2)}</span>`;
@@ -2674,7 +2735,7 @@
   });
 
   // ===== MODAL DE MÉTODO DE PAGO =====
-  document.getElementById("btn-abrir-modal-pago")?.addEventListener("click", function() {
+  function abrirModalPago(modo = 'carrito') {
     if (cart.length === 0) {
       alert("El carrito está vacío.");
       return;
@@ -2689,6 +2750,8 @@
       return;
     }
     
+    modoCompraDirecta = (modo === 'directo');
+    
     // Mostrar resumen del pedido en el modal
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     let productosText = cart.map((item, i) => {
@@ -2701,6 +2764,8 @@
     
     document.getElementById('productos-resumen-modal').textContent = productosText;
     document.getElementById('total-pago-modal').textContent = `Total: $${totalOriginal.toFixed(2)}`;
+    document.getElementById('detalle-credito-modal').classList.remove('show');
+    document.getElementById('detalle-credito-modal').textContent = '';
     
     // Resetear selecciones
     document.querySelectorAll('.opcion-pago').forEach(el => {
@@ -2725,11 +2790,21 @@
     
     document.getElementById('modal-pago').classList.add('active');
     document.body.style.overflow = 'hidden';
+  }
+
+  document.getElementById("btn-abrir-modal-pago-carrito")?.addEventListener("click", function() {
+    abrirModalPago('carrito');
   });
 
   window.cerrarModalPago = function() {
     document.getElementById('modal-pago').classList.remove('active');
     document.body.style.overflow = '';
+    
+    // Si era compra directa, restaurar el carrito original
+    if (modoCompraDirecta) {
+      // El carrito ya se restauró o se mantiene igual
+      modoCompraDirecta = false;
+    }
   };
 
   // Cerrar modal al hacer clic fuera
@@ -2759,7 +2834,6 @@
       opcionesCredito.classList.remove('show');
     }
     
-    // Actualizar total con intereses si es crédito
     actualizarTotalPagoModal();
   };
 
@@ -2790,9 +2864,25 @@
     }
     
     const totalPagoElement = document.getElementById('total-pago-modal');
-    if (interes > 0) {
-      totalPagoElement.innerHTML = `Total: $${totalFinal.toFixed(2)} <span style="font-size:0.8rem; color:#856404; display:block; font-weight:400;">(Incluye $${interes.toFixed(2)} de interés)</span>`;
+    const detalleCreditoElement = document.getElementById('detalle-credito-modal');
+    
+    if (metodoPagoSeleccionado === 'credito') {
+      const cuota = (totalFinal / planCreditoSeleccionado).toFixed(2);
+      let detalleHtml = '';
+      for (let i = 1; i <= planCreditoSeleccionado; i++) {
+        detalleHtml += `<div class="cuota-item"><span class="label">Cuota ${i}</span><span class="value">$${cuota}</span></div>`;
+      }
+      detalleHtml += `<div class="total-interes">Total a pagar: $${totalFinal.toFixed(2)}${interes > 0 ? ` (Interés: $${interes.toFixed(2)})` : ''}</div>`;
+      detalleCreditoElement.innerHTML = detalleHtml;
+      detalleCreditoElement.classList.add('show');
+      
+      if (interes > 0) {
+        totalPagoElement.innerHTML = `Total: $${totalFinal.toFixed(2)} <span style="font-size:0.8rem; color:#856404; display:block; font-weight:400;">(Incluye $${interes.toFixed(2)} de interés)</span>`;
+      } else {
+        totalPagoElement.textContent = `Total: $${totalFinal.toFixed(2)} (2 cuotas de $${cuota})`;
+      }
     } else {
+      detalleCreditoElement.classList.remove('show');
       totalPagoElement.textContent = `Total: $${totalFinal.toFixed(2)}`;
     }
   }
@@ -2821,11 +2911,16 @@
       totalFinal = totalOriginal + interes;
       const cuota = (totalFinal / planCreditoSeleccionado).toFixed(2);
       metodoTexto = `📋 CRÉDITO (${planCreditoSeleccionado} pagos)`;
+      let detalleCuotas = '';
+      for (let i = 1; i <= planCreditoSeleccionado; i++) {
+        detalleCuotas += `Cuota ${i}: $${cuota}\n`;
+      }
       metodoDetalle = `${planCreditoSeleccionado} pagos de $${cuota} (Total: $${totalFinal.toFixed(2)})`;
       if (interes > 0) {
         metodoDetalle += ` (Interés: $${interes.toFixed(2)})`;
+        metodoDetalle += `\n${detalleCuotas}`;
       } else {
-        metodoDetalle += ` (Sin interés)`;
+        metodoDetalle += ` (Sin interés)\n${detalleCuotas}`;
       }
     }
     
@@ -2852,12 +2947,18 @@
     const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
     
-    // Cerrar modal y limpiar carrito
+    // Cerrar modal
     cerrarModalPago();
     
-    // Opcional: limpiar carrito después de enviar
-    // cart = [];
-    // renderCarrito();
+    // Si fue compra directa, limpiar el carrito temporal
+    if (modoCompraDirecta) {
+      // Si el carrito solo tiene 1 item y es el de compra directa, limpiarlo
+      if (cart.length === 1) {
+        cart = [];
+        renderCarrito();
+      }
+      modoCompraDirecta = false;
+    }
   });
 
   // ===== CATEGORÍAS =====
