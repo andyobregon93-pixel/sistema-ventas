@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ===== TODOS LOS ESTILOS ANTERIORES ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -553,6 +554,7 @@
       background: #e0e0e0;
     }
 
+    /* ===== MODAL PRODUCTO ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -814,6 +816,7 @@
       transform: none;
     }
 
+    /* ===== CARRITO ===== */
     .cart-item {
       display: flex;
       align-items: center;
@@ -941,6 +944,208 @@
       transform: scale(1.02);
     }
     .cart-resumen .btn-finalizar:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ===== MODAL DE MÉTODO DE PAGO (NUEVO) ===== */
+    .modal-pago-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-pago-overlay.active { display: flex; }
+    
+    .modal-pago-contenido {
+      background: #ffffff;
+      border-radius: 24px;
+      max-width: 550px;
+      width: 95%;
+      max-height: 95vh;
+      overflow-y: auto;
+      padding: 35px 30px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .modal-pago-contenido .btn-cerrar-pago {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: #f0f0f0;
+      color: #333;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-pago-contenido .btn-cerrar-pago:hover {
+      background: #dc3545;
+      color: white;
+    }
+    .modal-pago-contenido h2 {
+      text-align: center;
+      color: #cc0000;
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+    }
+    .modal-pago-contenido .sub-titulo {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    .modal-pago-contenido .resumen-pedido {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+    }
+    .modal-pago-contenido .resumen-pedido .total-pago {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #cc0000;
+      text-align: center;
+    }
+    .modal-pago-contenido .resumen-pedido .productos-resumen {
+      font-size: 0.85rem;
+      color: #555;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    
+    .opcion-pago {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: #ffffff;
+      border: 2px solid #e0e0e0;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-bottom: 10px;
+    }
+    .opcion-pago:hover {
+      border-color: #cc0000;
+      background: #fff5f5;
+      transform: scale(1.01);
+    }
+    .opcion-pago.active {
+      border-color: #cc0000;
+      background: #fff5f5;
+      box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
+    }
+    .opcion-pago input[type="radio"] {
+      margin: 0;
+      width: 20px;
+      height: 20px;
+      accent-color: #cc0000;
+      cursor: pointer;
+    }
+    .opcion-pago .icono {
+      font-size: 1.8rem;
+      width: 45px;
+      text-align: center;
+    }
+    .opcion-pago .info {
+      flex: 1;
+    }
+    .opcion-pago .info h4 {
+      font-weight: 700;
+      color: #1a1a1a;
+      font-size: 1rem;
+    }
+    .opcion-pago .info p {
+      color: #666;
+      font-size: 0.8rem;
+    }
+    
+    .opciones-credito-pago {
+      display: none;
+      background: #fff8e1;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 10px 0 16px 0;
+      border: 1px solid #ffc107;
+    }
+    .opciones-credito-pago.show { display: block; }
+    .opciones-credito-pago .plan-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: 0.2s;
+    }
+    .opciones-credito-pago .plan-item:hover {
+      border-color: #cc0000;
+      background: #fff5f5;
+    }
+    .opciones-credito-pago .plan-item.active {
+      border-color: #cc0000;
+      background: #fff5f5;
+    }
+    .opciones-credito-pago .plan-item input[type="radio"] {
+      margin: 0;
+      width: 18px;
+      height: 18px;
+      accent-color: #cc0000;
+      cursor: pointer;
+    }
+    .opciones-credito-pago .plan-item .detalle-plan {
+      flex: 1;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .opciones-credito-pago .plan-item .interes {
+      font-weight: 700;
+      color: #cc0000;
+      font-size: 0.85rem;
+    }
+
+    .btn-enviar-pago {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.2rem;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .btn-enviar-pago:hover {
+      background: #1da851;
+      transform: scale(1.02);
+    }
+    .btn-enviar-pago:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
@@ -1075,60 +1280,6 @@
       background: #f9f9f9;
     }
 
-    /* ===== ESTILOS PARA MÉTODOS DE PAGO ===== */
-    .metodo-pago-option {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      padding: 10px 16px;
-      background: #fff;
-      border-radius: 10px;
-      border: 2px solid #e0e0e0;
-      flex: 1;
-      min-width: 120px;
-      transition: 0.2s;
-    }
-    .metodo-pago-option:hover {
-      border-color: #cc0000;
-      background: #fff5f5;
-    }
-    .metodo-pago-option.active {
-      border-color: #cc0000;
-      background: #fff5f5;
-    }
-    .metodo-pago-option input[type="radio"] {
-      margin: 0;
-      width: auto;
-      accent-color: #cc0000;
-    }
-
-    .plan-credito-option {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      padding: 8px 14px;
-      background: #fff;
-      border-radius: 8px;
-      border: 2px solid #e0e0e0;
-      transition: 0.2s;
-      font-size: 0.85rem;
-    }
-    .plan-credito-option:hover {
-      border-color: #cc0000;
-      background: #fff5f5;
-    }
-    .plan-credito-option.active {
-      border-color: #cc0000;
-      background: #fff5f5;
-    }
-    .plan-credito-option input[type="radio"] {
-      margin: 0;
-      width: auto;
-      accent-color: #cc0000;
-    }
-
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
@@ -1146,8 +1297,9 @@
       .filtros-container .grupo-filtro select { width: 100%; }
       .cart-item { flex-direction: column; align-items: stretch; text-align: center; }
       .cart-item .item-cantidad { justify-content: center; }
-      .metodo-pago-option { min-width: 80px; padding: 8px 12px; }
-      .plan-credito-option { font-size: 0.75rem; padding: 6px 10px; }
+      .modal-pago-contenido { padding: 25px 20px; }
+      .opcion-pago { padding: 12px 14px; }
+      .opcion-pago .icono { font-size: 1.4rem; width: 35px; }
     }
     .menu-toggle { display: none; }
   </style>
@@ -1469,7 +1621,7 @@
         </div>
       </div>
 
-      <!-- ===== FACTURACIÓN (CARRITO) - MODIFICADO CON MÉTODOS DE PAGO ===== -->
+      <!-- ===== FACTURACIÓN (CARRITO) - SIMPLIFICADO ===== -->
       <div id="page-ventas" class="page">
         <div class="card">
           <div class="card-header">
@@ -1498,56 +1650,14 @@
               </div>
             </div>
             
-            <!-- ===== MÉTODOS DE PAGO MEJORADOS ===== -->
-            <div style="background: #f0f8ff; padding: 16px; border-radius: 12px; border: 1px solid #cc0000; margin: 12px 0;">
-              <p style="color: #333; font-weight: 600; margin-bottom: 12px;">
-                <i class="fas fa-credit-card" style="color: #cc0000;"></i> Selecciona el método de pago:
-              </p>
-              
-              <div class="flex" style="gap: 12px;">
-                <label class="metodo-pago-option active" style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; background:#fff; border-radius:10px; border:2px solid #cc0000; flex:1; min-width:120px;">
-                  <input type="radio" name="metodo-pago" value="efectivo" checked onchange="actualizarMetodoPago()">
-                  <i class="fas fa-money-bill-wave" style="color: #28a745;"></i> Efectivo
-                </label>
-                <label class="metodo-pago-option" style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; background:#fff; border-radius:10px; border:2px solid #e0e0e0; flex:1; min-width:120px;">
-                  <input type="radio" name="metodo-pago" value="transferencia" onchange="actualizarMetodoPago()">
-                  <i class="fas fa-university" style="color: #007bff;"></i> Transferencia
-                </label>
-                <label class="metodo-pago-option" style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; background:#fff; border-radius:10px; border:2px solid #e0e0e0; flex:1; min-width:120px;">
-                  <input type="radio" name="metodo-pago" value="credito" onchange="actualizarMetodoPago()">
-                  <i class="fas fa-hand-holding-usd" style="color: #ffc107;"></i> Crédito
-                </label>
-              </div>
-              
-              <!-- ===== OPCIONES DE CRÉDITO ===== -->
-              <div id="opciones-credito" style="display: none; margin-top: 12px; padding: 12px; background: #fff8e1; border-radius: 10px; border: 1px solid #ffc107;">
-                <p style="font-weight: 600; color: #856404; margin-bottom: 8px;">📋 Plan de pagos a crédito:</p>
-                <div class="flex" style="gap: 10px;">
-                  <label class="plan-credito-option active" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 14px; background:#fff; border-radius:8px; border:2px solid #cc0000;">
-                    <input type="radio" name="plan-credito" value="2" checked onchange="actualizarMetodoPago()">
-                    2 pagos (sin interés)
-                  </label>
-                  <label class="plan-credito-option" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 14px; background:#fff; border-radius:8px; border:2px solid #e0e0e0;">
-                    <input type="radio" name="plan-credito" value="3" onchange="actualizarMetodoPago()">
-                    3 pagos (+$5)
-                  </label>
-                  <label class="plan-credito-option" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 14px; background:#fff; border-radius:8px; border:2px solid #e0e0e0;">
-                    <input type="radio" name="plan-credito" value="4" onchange="actualizarMetodoPago()">
-                    4 pagos (+$10)
-                  </label>
-                </div>
-                <p id="detalle-credito" style="font-size: 0.85rem; color: #856404; margin-top: 8px;"></p>
-              </div>
-            </div>
-            
             <button class="btn-seguir-comprando" id="btn-seguir-comprando">
               <i class="fas fa-store"></i> Seguir comprando
             </button>
-            <button class="btn-finalizar" id="btn-finalizar-pedido">
+            <button class="btn-finalizar" id="btn-abrir-modal-pago">
               <i class="fab fa-whatsapp"></i> FINALIZAR PEDIDO POR WHATSAPP
             </button>
             <p style="color: #666; font-size: 0.75rem; text-align: center; margin-top: 8px;">
-              <i class="fas fa-info-circle"></i> Al finalizar, se abrirá WhatsApp con todos los detalles de tu pedido.
+              <i class="fas fa-info-circle"></i> Al finalizar, elige tu método de pago y se enviará el pedido a WhatsApp.
             </p>
           </div>
         </div>
@@ -1555,6 +1665,76 @@
         <div class="card" id="historial-card">
           <h3>Historial de ventas</h3>
           <div id="historial-ventas"></div>
+        </div>
+      </div>
+
+      <!-- ===== MODAL DE MÉTODO DE PAGO ===== -->
+      <div class="modal-pago-overlay" id="modal-pago">
+        <div class="modal-pago-contenido">
+          <button class="btn-cerrar-pago" onclick="cerrarModalPago()"><i class="fas fa-times"></i></button>
+          
+          <h2><i class="fas fa-credit-card" style="color:#cc0000;"></i> Selecciona tu método de pago</h2>
+          <p class="sub-titulo">Elige cómo deseas realizar el pago de tu pedido</p>
+          
+          <div class="resumen-pedido" id="resumen-pedido-modal">
+            <div class="productos-resumen" id="productos-resumen-modal"></div>
+            <div class="total-pago" id="total-pago-modal">Total: $0.00</div>
+          </div>
+          
+          <!-- Opciones de pago -->
+          <div class="opcion-pago active" onclick="seleccionarPago('efectivo')">
+            <input type="radio" name="metodo-pago-modal" value="efectivo" checked>
+            <div class="icono">💰</div>
+            <div class="info">
+              <h4>Efectivo</h4>
+              <p>Pago al momento de la entrega</p>
+            </div>
+          </div>
+          
+          <div class="opcion-pago" onclick="seleccionarPago('transferencia')">
+            <input type="radio" name="metodo-pago-modal" value="transferencia">
+            <div class="icono">🏦</div>
+            <div class="info">
+              <h4>Transferencia Bancaria</h4>
+              <p>Pago por transferencia a nuestra cuenta</p>
+            </div>
+          </div>
+          
+          <div class="opcion-pago" onclick="seleccionarPago('credito')">
+            <input type="radio" name="metodo-pago-modal" value="credito">
+            <div class="icono">📋</div>
+            <div class="info">
+              <h4>Crédito (Pagos a plazos)</h4>
+              <p>Elige el número de cuotas</p>
+            </div>
+          </div>
+          
+          <!-- Opciones de crédito -->
+          <div class="opciones-credito-pago" id="opciones-credito-modal">
+            <p style="font-weight: 600; color: #856404; margin-bottom: 10px;">📋 Selecciona el número de pagos:</p>
+            
+            <div class="plan-item active" onclick="seleccionarPlan(2)">
+              <input type="radio" name="plan-credito-modal" value="2" checked>
+              <span class="detalle-plan">2 pagos</span>
+              <span class="interes">Sin interés</span>
+            </div>
+            
+            <div class="plan-item" onclick="seleccionarPlan(3)">
+              <input type="radio" name="plan-credito-modal" value="3">
+              <span class="detalle-plan">3 pagos</span>
+              <span class="interes">+$5 de interés</span>
+            </div>
+            
+            <div class="plan-item" onclick="seleccionarPlan(4)">
+              <input type="radio" name="plan-credito-modal" value="4">
+              <span class="detalle-plan">4 pagos</span>
+              <span class="interes">+$10 de interés</span>
+            </div>
+          </div>
+          
+          <button class="btn-enviar-pago" id="btn-enviar-pago-whatsapp">
+            <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
+          </button>
         </div>
       </div>
 
@@ -1644,7 +1824,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL ===== -->
+<!-- ===== MODAL PRODUCTO ===== -->
 <div class="modal-overlay" id="modal-producto">
   <div class="modal-contenido">
     <button class="btn-cerrar-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
@@ -1722,10 +1902,9 @@
   let colorSeleccionado = null;
   let headerImageUrl = "";
   
-  // ===== VARIABLES PARA MÉTODOS DE PAGO =====
+  // ===== VARIABLES PARA MÉTODOS DE PAGO (MODAL) =====
   let metodoPagoSeleccionado = 'efectivo';
   let planCreditoSeleccionado = 2;
-  let interesAplicado = 0;
 
   // ===== FUNCIÓN PARA GENERAR TALLAS =====
   function generarTallasDesdeRango(textoTallas) {
@@ -2206,7 +2385,7 @@
     renderTiendaDepratik();
   };
 
-  // ===== MODAL =====
+  // ===== MODAL PRODUCTO =====
   window.abrirModal = function(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
@@ -2413,128 +2592,12 @@
     cerrarModal();
   };
 
-  // ===== FUNCIONES PARA MÉTODOS DE PAGO =====
-  window.actualizarMetodoPago = function() {
-    const metodoSeleccionado = document.querySelector('input[name="metodo-pago"]:checked');
-    if (metodoSeleccionado) {
-      metodoPagoSeleccionado = metodoSeleccionado.value;
-    }
-    
-    // Actualizar estilos de los métodos de pago
-    document.querySelectorAll('.metodo-pago-option').forEach(el => {
-      el.classList.remove('active');
-      el.style.borderColor = '#e0e0e0';
-    });
-    const selectedParent = metodoSeleccionado?.closest('.metodo-pago-option');
-    if (selectedParent) {
-      selectedParent.classList.add('active');
-      selectedParent.style.borderColor = '#cc0000';
-    }
-    
-    const opcionesCredito = document.getElementById('opciones-credito');
-    const detalleCredito = document.getElementById('detalle-credito');
-    
-    if (metodoPagoSeleccionado === 'credito') {
-      opcionesCredito.style.display = 'block';
-      
-      // Seleccionar plan por defecto si no hay ninguno seleccionado
-      const planSeleccionado = document.querySelector('input[name="plan-credito"]:checked');
-      if (planSeleccionado) {
-        planCreditoSeleccionado = parseInt(planSeleccionado.value);
-      } else {
-        const radio2 = document.querySelector('input[name="plan-credito"][value="2"]');
-        if (radio2) {
-          radio2.checked = true;
-          planCreditoSeleccionado = 2;
-        }
-      }
-      
-      // Actualizar estilos de los planes
-      document.querySelectorAll('.plan-credito-option').forEach(el => {
-        el.classList.remove('active');
-        el.style.borderColor = '#e0e0e0';
-      });
-      const planSelected = document.querySelector('input[name="plan-credito"]:checked');
-      const planParent = planSelected?.closest('.plan-credito-option');
-      if (planParent) {
-        planParent.classList.add('active');
-        planParent.style.borderColor = '#cc0000';
-      }
-      
-      calcularInteres();
-    } else {
-      opcionesCredito.style.display = 'none';
-      planCreditoSeleccionado = 2;
-      interesAplicado = 0;
-      actualizarTotalCarrito();
-    }
-  };
-
-  // ===== FUNCIÓN PARA CALCULAR INTERÉS =====
-  function calcularInteres() {
-    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
-    
-    if (planCreditoSeleccionado === 2) {
-      interesAplicado = 0;
-    } else if (planCreditoSeleccionado === 3) {
-      interesAplicado = 5;
-    } else if (planCreditoSeleccionado === 4) {
-      interesAplicado = 10;
-    } else {
-      interesAplicado = 0;
-    }
-    
-    const totalConInteres = totalOriginal + interesAplicado;
-    
-    const detalleCredito = document.getElementById('detalle-credito');
-    if (planCreditoSeleccionado === 2) {
-      detalleCredito.textContent = `✅ 2 pagos sin interés: $${totalOriginal.toFixed(2)} (2 cuotas de $${(totalOriginal/2).toFixed(2)})`;
-    } else if (planCreditoSeleccionado === 3) {
-      detalleCredito.textContent = `✅ 3 pagos con +$5 de interés: $${totalConInteres.toFixed(2)} (3 cuotas de $${(totalConInteres/3).toFixed(2)})`;
-    } else if (planCreditoSeleccionado === 4) {
-      detalleCredito.textContent = `✅ 4 pagos con +$10 de interés: $${totalConInteres.toFixed(2)} (4 cuotas de $${(totalConInteres/4).toFixed(2)})`;
-    }
-    
-    actualizarTotalCarrito();
-  }
-
-  // ===== FUNCIÓN PARA ACTUALIZAR TOTAL DEL CARRITO =====
-  function actualizarTotalCarrito() {
-    const totalSpan = document.getElementById('carrito-total');
-    const totalContainer = document.getElementById('total-container');
-    
-    if (cart.length === 0) {
-      totalSpan.textContent = '0.00';
-      return;
-    }
-    
-    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
-    
-    if (metodoPagoSeleccionado === 'credito' && planCreditoSeleccionado) {
-      const totalFinal = totalOriginal + interesAplicado;
-      totalSpan.textContent = totalFinal.toFixed(2);
-      
-      if (interesAplicado > 0) {
-        totalContainer.innerHTML = `
-          Total: $<span id="carrito-total">${totalFinal.toFixed(2)}</span>
-          <span style="font-size: 0.8rem; color: #856404; display: block; font-weight: 400;">
-            (Incluye $${interesAplicado.toFixed(2)} de interés por ${planCreditoSeleccionado} pagos)
-          </span>
-        `;
-      } else {
-        totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalFinal.toFixed(2)}</span>`;
-      }
-    } else {
-      totalSpan.textContent = totalOriginal.toFixed(2);
-      totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalOriginal.toFixed(2)}</span>`;
-    }
-  }
-
   // ===== CARRITO =====
   function renderCarrito() {
     const container = document.getElementById('carrito-lista');
     const resumen = document.getElementById('cart-resumen');
     const totalSpan = document.getElementById('carrito-total');
+    const totalContainer = document.getElementById('total-container');
     
     if (cart.length === 0) {
       container.innerHTML = `
@@ -2583,8 +2646,10 @@
     container.innerHTML = html;
     resumen.style.display = 'block';
     
-    // Actualizar métodos de pago y total
-    window.actualizarMetodoPago();
+    // Calcular total correctamente
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    totalSpan.textContent = totalOriginal.toFixed(2);
+    totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalOriginal.toFixed(2)}</span>`;
   }
 
   window.cambiarCantidad = function(idx, cambio) {
@@ -2608,8 +2673,8 @@
     showPage('tienda');
   });
 
-  // ===== FINALIZAR PEDIDO CON MÉTODOS DE PAGO =====
-  document.getElementById("btn-finalizar-pedido")?.addEventListener("click", function() {
+  // ===== MODAL DE MÉTODO DE PAGO =====
+  document.getElementById("btn-abrir-modal-pago")?.addEventListener("click", function() {
     if (cart.length === 0) {
       alert("El carrito está vacío.");
       return;
@@ -2624,33 +2689,139 @@
       return;
     }
     
-    // Obtener método de pago seleccionado
-    const metodoRadio = document.querySelector('input[name="metodo-pago"]:checked');
-    const metodo = metodoRadio ? metodoRadio.value : 'efectivo';
+    // Mostrar resumen del pedido en el modal
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    let productosText = cart.map((item, i) => {
+      let det = `${i+1}. ${item.nombre}`;
+      if (item.talla) det += ` (Talla: ${item.talla})`;
+      if (item.color) det += ` (Color: ${item.color})`;
+      det += ` x${item.cantidad} = $${((item.precio || 0) * item.cantidad).toFixed(2)}`;
+      return det;
+    }).join('\n');
     
-    let metodoTexto = '';
-    let metodoDetalle = '';
-    let totalFinal = 0;
+    document.getElementById('productos-resumen-modal').textContent = productosText;
+    document.getElementById('total-pago-modal').textContent = `Total: $${totalOriginal.toFixed(2)}`;
+    
+    // Resetear selecciones
+    document.querySelectorAll('.opcion-pago').forEach(el => {
+      el.classList.remove('active');
+      el.style.borderColor = '#e0e0e0';
+    });
+    document.querySelector('.opcion-pago input[value="efectivo"]').closest('.opcion-pago').classList.add('active');
+    document.querySelector('.opcion-pago input[value="efectivo"]').closest('.opcion-pago').style.borderColor = '#cc0000';
+    document.querySelector('input[name="metodo-pago-modal"][value="efectivo"]').checked = true;
+    metodoPagoSeleccionado = 'efectivo';
+    planCreditoSeleccionado = 2;
+    document.getElementById('opciones-credito-modal').classList.remove('show');
+    
+    // Resetear planes de crédito
+    document.querySelectorAll('.plan-item').forEach(el => {
+      el.classList.remove('active');
+      el.style.borderColor = '#e0e0e0';
+    });
+    document.querySelector('.plan-item input[value="2"]').closest('.plan-item').classList.add('active');
+    document.querySelector('.plan-item input[value="2"]').closest('.plan-item').style.borderColor = '#cc0000';
+    document.querySelector('input[name="plan-credito-modal"][value="2"]').checked = true;
+    
+    document.getElementById('modal-pago').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+
+  window.cerrarModalPago = function() {
+    document.getElementById('modal-pago').classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  // Cerrar modal al hacer clic fuera
+  document.getElementById('modal-pago').addEventListener('click', function(e) {
+    if (e.target === this) {
+      cerrarModalPago();
+    }
+  });
+
+  // ===== FUNCIONES PARA SELECCIONAR PAGO =====
+  window.seleccionarPago = function(metodo) {
+    metodoPagoSeleccionado = metodo;
+    
+    document.querySelectorAll('.opcion-pago').forEach(el => {
+      el.classList.remove('active');
+      el.style.borderColor = '#e0e0e0';
+    });
+    const selected = document.querySelector(`.opcion-pago input[value="${metodo}"]`).closest('.opcion-pago');
+    selected.classList.add('active');
+    selected.style.borderColor = '#cc0000';
+    document.querySelector(`input[name="metodo-pago-modal"][value="${metodo}"]`).checked = true;
+    
+    const opcionesCredito = document.getElementById('opciones-credito-modal');
+    if (metodo === 'credito') {
+      opcionesCredito.classList.add('show');
+    } else {
+      opcionesCredito.classList.remove('show');
+    }
+    
+    // Actualizar total con intereses si es crédito
+    actualizarTotalPagoModal();
+  };
+
+  window.seleccionarPlan = function(plan) {
+    planCreditoSeleccionado = plan;
+    
+    document.querySelectorAll('.plan-item').forEach(el => {
+      el.classList.remove('active');
+      el.style.borderColor = '#e0e0e0';
+    });
+    const selected = document.querySelector(`.plan-item input[value="${plan}"]`).closest('.plan-item');
+    selected.classList.add('active');
+    selected.style.borderColor = '#cc0000';
+    document.querySelector(`input[name="plan-credito-modal"][value="${plan}"]`).checked = true;
+    
+    actualizarTotalPagoModal();
+  };
+
+  function actualizarTotalPagoModal() {
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    let totalFinal = totalOriginal;
+    let interes = 0;
+    
+    if (metodoPagoSeleccionado === 'credito') {
+      if (planCreditoSeleccionado === 3) interes = 5;
+      else if (planCreditoSeleccionado === 4) interes = 10;
+      totalFinal = totalOriginal + interes;
+    }
+    
+    const totalPagoElement = document.getElementById('total-pago-modal');
+    if (interes > 0) {
+      totalPagoElement.innerHTML = `Total: $${totalFinal.toFixed(2)} <span style="font-size:0.8rem; color:#856404; display:block; font-weight:400;">(Incluye $${interes.toFixed(2)} de interés)</span>`;
+    } else {
+      totalPagoElement.textContent = `Total: $${totalFinal.toFixed(2)}`;
+    }
+  }
+
+  // ===== ENVIAR PEDIDO POR WHATSAPP DESDE EL MODAL =====
+  document.getElementById("btn-enviar-pago-whatsapp")?.addEventListener("click", function() {
+    const cliente = document.getElementById("cliente-nombre").value.trim();
+    const telefono = document.getElementById("cliente-telefono").value.trim();
+    const email = document.getElementById("cliente-email").value.trim();
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     
-    if (metodo === 'efectivo') {
+    let totalFinal = totalOriginal;
+    let metodoTexto = '';
+    let metodoDetalle = '';
+    let interes = 0;
+    
+    if (metodoPagoSeleccionado === 'efectivo') {
       metodoTexto = '💰 EFECTIVO';
       metodoDetalle = 'Pago en efectivo al momento de la entrega.';
-      totalFinal = totalOriginal;
-    } else if (metodo === 'transferencia') {
+    } else if (metodoPagoSeleccionado === 'transferencia') {
       metodoTexto = '🏦 TRANSFERENCIA BANCARIA';
       metodoDetalle = 'Realizar transferencia a la cuenta indicada.';
-      totalFinal = totalOriginal;
-    } else if (metodo === 'credito') {
-      const planRadio = document.querySelector('input[name="plan-credito"]:checked');
-      const plan = planRadio ? parseInt(planRadio.value) : 2;
-      let interes = 0;
-      if (plan === 3) interes = 5;
-      else if (plan === 4) interes = 10;
+    } else if (metodoPagoSeleccionado === 'credito') {
+      if (planCreditoSeleccionado === 3) interes = 5;
+      else if (planCreditoSeleccionado === 4) interes = 10;
       totalFinal = totalOriginal + interes;
-      const cuota = (totalFinal / plan).toFixed(2);
-      metodoTexto = `📋 CRÉDITO (${plan} pagos)`;
-      metodoDetalle = `${plan} pagos de $${cuota} (Total: $${totalFinal.toFixed(2)})`;
+      const cuota = (totalFinal / planCreditoSeleccionado).toFixed(2);
+      metodoTexto = `📋 CRÉDITO (${planCreditoSeleccionado} pagos)`;
+      metodoDetalle = `${planCreditoSeleccionado} pagos de $${cuota} (Total: $${totalFinal.toFixed(2)})`;
       if (interes > 0) {
         metodoDetalle += ` (Interés: $${interes.toFixed(2)})`;
       } else {
@@ -2670,7 +2841,7 @@
     const mensaje = `🎁 *NUEVO PEDIDO - LOS AMIGOS ESTORE* 🎁\n\n` +
       `👤 *Cliente:* ${cliente}\n` +
       `📱 *WhatsApp:* ${telefono}\n` +
-      `${document.getElementById("cliente-email").value.trim() ? `📧 *Email:* ${document.getElementById("cliente-email").value.trim()}\n` : ''}` +
+      `${email ? `📧 *Email:* ${email}\n` : ''}` +
       `\n📦 *Productos solicitados:*\n${detalleProductos}\n\n` +
       `💰 *TOTAL A PAGAR: $${totalFinal.toFixed(2)}*\n` +
       `💳 *Método de pago:* ${metodoTexto}\n` +
@@ -2680,6 +2851,13 @@
     const numero = WHATSAPP_NUMBER;
     const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
+    
+    // Cerrar modal y limpiar carrito
+    cerrarModalPago();
+    
+    // Opcional: limpiar carrito después de enviar
+    // cart = [];
+    // renderCarrito();
   });
 
   // ===== CATEGORÍAS =====
