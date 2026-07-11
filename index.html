@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ===== TODOS LOS ESTILOS ANTERIORES + NUEVOS ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -1331,6 +1332,62 @@
       color: #cc0000;
     }
 
+    /* ===== ESTILOS PARA ADMINISTRACIÓN DE MÉTODOS DE PAGO ===== */
+    .metodo-pago-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .metodo-pago-item .info {
+      flex: 2;
+      min-width: 150px;
+    }
+    .metodo-pago-item .info .nombre {
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .metodo-pago-item .info .detalle {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .metodo-pago-item .acciones {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .metodo-pago-item .estado-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .metodo-pago-item .estado-badge.activo {
+      background: #d4edda;
+      color: #155724;
+    }
+    .metodo-pago-item .estado-badge.inactivo {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .interes-config {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .interes-config input {
+      width: 80px;
+      padding: 6px 10px;
+      margin: 0;
+    }
+
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
@@ -1441,6 +1498,8 @@
         <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
         <div class="nav-item" data-page="usuarios"><i class="fas fa-users-cog"></i> Usuarios</div>
         <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
+        <!-- NUEVO: Métodos de Pago Admin -->
+        <div class="nav-item" data-page="metodos-pago-admin"><i class="fas fa-cog"></i> Configurar Pagos</div>
         <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
         <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
       </div>
@@ -1672,7 +1731,7 @@
         </div>
       </div>
 
-      <!-- ===== FACTURACIÓN (CARRITO) - SIN DATOS DE CLIENTE ===== -->
+      <!-- ===== FACTURACIÓN (CARRITO) ===== -->
       <div id="page-ventas" class="page">
         <div class="card">
           <div class="card-header">
@@ -1724,60 +1783,94 @@
             <div class="detalle-credito-pagos" id="detalle-credito-modal"></div>
           </div>
           
-          <!-- Opciones de pago -->
-          <div class="opcion-pago active" onclick="seleccionarPago('efectivo')">
-            <input type="radio" name="metodo-pago-modal" value="efectivo" checked>
-            <div class="icono">💰</div>
-            <div class="info">
-              <h4>Efectivo</h4>
-              <p>Pago al momento de la entrega</p>
-            </div>
-          </div>
-          
-          <div class="opcion-pago" onclick="seleccionarPago('transferencia')">
-            <input type="radio" name="metodo-pago-modal" value="transferencia">
-            <div class="icono">🏦</div>
-            <div class="info">
-              <h4>Transferencia Bancaria</h4>
-              <p>Pago por transferencia a nuestra cuenta</p>
-            </div>
-          </div>
-          
-          <div class="opcion-pago" onclick="seleccionarPago('credito')">
-            <input type="radio" name="metodo-pago-modal" value="credito">
-            <div class="icono">📋</div>
-            <div class="info">
-              <h4>Crédito (Pagos a plazos)</h4>
-              <p>Elige el número de cuotas</p>
-            </div>
-          </div>
+          <!-- Opciones de pago - se generan dinámicamente desde Firebase -->
+          <div id="opciones-pago-container"></div>
           
           <!-- Opciones de crédito -->
           <div class="opciones-credito-pago" id="opciones-credito-modal">
             <p style="font-weight: 600; color: #856404; margin-bottom: 10px;">📋 Selecciona el número de pagos:</p>
-            
-            <div class="plan-item active" onclick="seleccionarPlan(2)">
-              <input type="radio" name="plan-credito-modal" value="2" checked>
-              <span class="detalle-plan">2 pagos</span>
-              <span class="interes">Sin interés</span>
-            </div>
-            
-            <div class="plan-item" onclick="seleccionarPlan(3)">
-              <input type="radio" name="plan-credito-modal" value="3">
-              <span class="detalle-plan">3 pagos</span>
-              <span class="interes">+$5 de interés</span>
-            </div>
-            
-            <div class="plan-item" onclick="seleccionarPlan(4)">
-              <input type="radio" name="plan-credito-modal" value="4">
-              <span class="detalle-plan">4 pagos</span>
-              <span class="interes">+$10 de interés</span>
-            </div>
+            <div id="planes-credito-container"></div>
           </div>
           
           <button class="btn-enviar-pago" id="btn-enviar-pago-whatsapp">
             <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
           </button>
+        </div>
+      </div>
+
+      <!-- ===== NUEVO: ADMINISTRACIÓN DE MÉTODOS DE PAGO ===== -->
+      <div id="page-metodos-pago-admin" class="page admin-only">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-cog" style="color:#cc0000;"></i> Configurar Métodos de Pago</h3>
+            <span style="color: #666; font-size: 0.8rem;">Gestiona los métodos de pago que aparecen en la tienda</span>
+          </div>
+          
+          <!-- Agregar nuevo método -->
+          <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 12px; color: #cc0000;">➕ Agregar nuevo método de pago</h4>
+            <div class="flex">
+              <input type="text" id="nuevo-metodo-nombre" placeholder="Nombre (ej: Efectivo, Transferencia)" style="flex:2;">
+              <input type="text" id="nuevo-metodo-icono" placeholder="Icono (ej: 💰, 🏦)" style="flex:1;">
+              <input type="text" id="nuevo-metodo-descripcion" placeholder="Descripción corta" style="flex:2;">
+            </div>
+            <div class="flex">
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #333;">
+                <input type="checkbox" id="nuevo-metodo-activo" checked> Activo
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #333;">
+                <input type="checkbox" id="nuevo-metodo-es-credito"> Es Crédito (permite planes de pago)
+              </label>
+            </div>
+            <button id="btn-agregar-metodo-pago" class="btn-success"><i class="fas fa-plus"></i> Agregar Método</button>
+          </div>
+          
+          <!-- Lista de métodos -->
+          <h4 style="margin-bottom: 12px; color: #333;">📋 Métodos de pago actuales</h4>
+          <div id="lista-metodos-pago-admin"></div>
+        </div>
+        
+        <!-- Configuración de intereses para crédito -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-percent" style="color:#cc0000;"></i> Configurar Intereses para Crédito</h3>
+            <span style="color: #666; font-size: 0.8rem;">Define los intereses para cada plan de pagos</span>
+          </div>
+          
+          <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; border: 1px solid #e0e0e0;">
+            <div class="flex">
+              <div style="flex:1; min-width:150px;">
+                <label style="font-weight:600;">2 pagos</label>
+                <div class="interes-config">
+                  <input type="number" id="interes-2-pagos" value="0" step="0.5" min="0">
+                  <span>$</span>
+                </div>
+              </div>
+              <div style="flex:1; min-width:150px;">
+                <label style="font-weight:600;">3 pagos</label>
+                <div class="interes-config">
+                  <input type="number" id="interes-3-pagos" value="5" step="0.5" min="0">
+                  <span>$</span>
+                </div>
+              </div>
+              <div style="flex:1; min-width:150px;">
+                <label style="font-weight:600;">4 pagos</label>
+                <div class="interes-config">
+                  <input type="number" id="interes-4-pagos" value="10" step="0.5" min="0">
+                  <span>$</span>
+                </div>
+              </div>
+            </div>
+            <button id="btn-guardar-intereses" class="btn-success" style="margin-top:12px;"><i class="fas fa-save"></i> Guardar Intereses</button>
+          </div>
+          
+          <div style="margin-top:12px; background: #f0f8ff; border-radius: 12px; padding: 16px; border: 1px solid #d0e8ff;">
+            <p style="color: #666; font-size: 0.9rem;">
+              <i class="fas fa-info-circle" style="color: #007bff;"></i> 
+              <strong>Nota:</strong> Los intereses se suman al total del producto cuando el cliente elige crédito.
+              Ejemplo: Producto de $50 con 3 pagos (+$5) = Total $55 (3 cuotas de $18.33)
+            </p>
+          </div>
         </div>
       </div>
 
@@ -1836,7 +1929,7 @@
         <div class="card"><h3>Base de miembros</h3><div id="lista-miembros"></div></div>
       </div>
 
-      <!-- MÉTODOS DE PAGO -->
+      <!-- MÉTODOS DE PAGO (cliente) -->
       <div id="page-metodos-pago" class="page admin-only">
         <div class="card">
           <h3>Agregar método de pago</h3>
@@ -1949,8 +2042,186 @@
   let metodoPagoSeleccionado = 'efectivo';
   let planCreditoSeleccionado = 2;
   let modoCompraDirecta = false;
+  let metodosPagoConfig = [];
+  let interesesConfig = { pagos2: 0, pagos3: 5, pagos4: 10 };
 
-  // ===== FUNCIÓN PARA GENERAR TALLAS =====
+  // ===== FUNCIONES PARA CONFIGURACIÓN DE MÉTODOS DE PAGO =====
+  function cargarMetodosPago() {
+    onSnapshot(collection(db, "metodos_pago_config"), (snap) => {
+      metodosPagoConfig = [];
+      snap.forEach(doc => {
+        metodosPagoConfig.push({ id: doc.id, ...doc.data() });
+      });
+      renderOpcionesPago();
+      renderListaMetodosPagoAdmin();
+    });
+  }
+
+  function cargarIntereses() {
+    const docRef = doc(db, "configuracion", "intereses");
+    getDoc(docRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        interesesConfig.pagos2 = data.pagos2 || 0;
+        interesesConfig.pagos3 = data.pagos3 || 5;
+        interesesConfig.pagos4 = data.pagos4 || 10;
+      }
+      // Actualizar inputs
+      document.getElementById('interes-2-pagos').value = interesesConfig.pagos2;
+      document.getElementById('interes-3-pagos').value = interesesConfig.pagos3;
+      document.getElementById('interes-4-pagos').value = interesesConfig.pagos4;
+    }).catch(err => console.log("Error cargando intereses:", err));
+  }
+
+  function guardarIntereses() {
+    const pagos2 = parseFloat(document.getElementById('interes-2-pagos').value) || 0;
+    const pagos3 = parseFloat(document.getElementById('interes-3-pagos').value) || 0;
+    const pagos4 = parseFloat(document.getElementById('interes-4-pagos').value) || 0;
+    
+    setDoc(doc(db, "configuracion", "intereses"), {
+      pagos2, pagos3, pagos4
+    }).then(() => {
+      interesesConfig.pagos2 = pagos2;
+      interesesConfig.pagos3 = pagos3;
+      interesesConfig.pagos4 = pagos4;
+      addDebugLog('✅ Intereses guardados correctamente', 'success');
+      alert('✅ Intereses guardados correctamente');
+    }).catch(err => {
+      addDebugLog(`❌ Error guardando intereses: ${err.message}`, 'error');
+      alert('Error: ' + err.message);
+    });
+  }
+
+  function renderOpcionesPago() {
+    const container = document.getElementById('opciones-pago-container');
+    if (!container) return;
+    
+    // Filtrar solo métodos activos
+    const activos = metodosPagoConfig.filter(m => m.activo !== false);
+    
+    if (activos.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:20px; color:#999;">
+          <i class="fas fa-exclamation-circle" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+          No hay métodos de pago configurados. Contacta al administrador.
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    activos.forEach((metodo, index) => {
+      const isActive = index === 0 ? 'active' : '';
+      const borderColor = index === 0 ? '#cc0000' : '#e0e0e0';
+      html += `
+        <div class="opcion-pago ${isActive}" onclick="seleccionarPago('${metodo.id}')" style="border-color:${borderColor};">
+          <input type="radio" name="metodo-pago-modal" value="${metodo.id}" ${index === 0 ? 'checked' : ''}>
+          <div class="icono">${metodo.icono || '💳'}</div>
+          <div class="info">
+            <h4>${metodo.nombre}</h4>
+            <p>${metodo.descripcion || ''}</p>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    
+    // Si hay métodos, seleccionar el primero
+    if (activos.length > 0) {
+      metodoPagoSeleccionado = activos[0].id;
+      // Mostrar/ocultar opciones de crédito
+      const esCredito = activos[0].esCredito || false;
+      document.getElementById('opciones-credito-modal').classList.toggle('show', esCredito);
+      if (esCredito) {
+        renderPlanesCredito();
+      }
+    }
+  }
+
+  function renderPlanesCredito() {
+    const container = document.getElementById('planes-credito-container');
+    if (!container) return;
+    
+    const planes = [
+      { pagos: 2, interes: interesesConfig.pagos2 },
+      { pagos: 3, interes: interesesConfig.pagos3 },
+      { pagos: 4, interes: interesesConfig.pagos4 }
+    ];
+    
+    let html = '';
+    planes.forEach((plan, index) => {
+      const isActive = index === 0 ? 'active' : '';
+      const borderColor = index === 0 ? '#cc0000' : '#e0e0e0';
+      const interesText = plan.interes === 0 ? 'Sin interés' : `+$${plan.interes} de interés`;
+      html += `
+        <div class="plan-item ${isActive}" onclick="seleccionarPlan(${plan.pagos})" style="border-color:${borderColor};">
+          <input type="radio" name="plan-credito-modal" value="${plan.pagos}" ${index === 0 ? 'checked' : ''}>
+          <span class="detalle-plan">${plan.pagos} pagos</span>
+          <span class="interes">${interesText}</span>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    
+    // Seleccionar 2 pagos por defecto
+    planCreditoSeleccionado = 2;
+  }
+
+  function renderListaMetodosPagoAdmin() {
+    const container = document.getElementById('lista-metodos-pago-admin');
+    if (!container) return;
+    
+    if (metodosPagoConfig.length === 0) {
+      container.innerHTML = '<p style="color:#999;">No hay métodos de pago configurados. Agrega uno arriba.</p>';
+      return;
+    }
+    
+    let html = '';
+    metodosPagoConfig.forEach(m => {
+      const estadoClass = m.activo !== false ? 'activo' : 'inactivo';
+      const estadoText = m.activo !== false ? 'Activo ✅' : 'Inactivo ⛔';
+      html += `
+        <div class="metodo-pago-item">
+          <div class="info">
+            <div class="nombre">${m.icono || '💳'} ${m.nombre}</div>
+            <div class="detalle">${m.descripcion || 'Sin descripción'} ${m.esCredito ? ' | 📋 Crédito' : ''}</div>
+          </div>
+          <div class="acciones">
+            <span class="estado-badge ${estadoClass}">${estadoText}</span>
+            <button class="btn-small btn-warning" onclick="toggleMetodoPago('${m.id}', ${m.activo !== false ? 'false' : 'true'})" style="background:#ffc107; color:#333; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${m.activo !== false ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarMetodoPago('${m.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // ===== FUNCIONES PARA ADMINISTRAR MÉTODOS DE PAGO =====
+  window.toggleMetodoPago = async (id, nuevoEstado) => {
+    try {
+      await updateDoc(doc(db, "metodos_pago_config", id), { activo: nuevoEstado });
+      addDebugLog(`🔄 Método ${id} -> ${nuevoEstado ? 'Activo' : 'Inactivo'}`, 'success');
+    } catch (error) {
+      addDebugLog(`❌ Error al cambiar estado: ${error.message}`, 'error');
+    }
+  };
+
+  window.eliminarMetodoPago = async (id) => {
+    if (!confirm("¿Eliminar este método de pago?")) return;
+    try {
+      await deleteDoc(doc(db, "metodos_pago_config", id));
+      addDebugLog(`🗑️ Método de pago eliminado: ${id}`, 'info');
+    } catch (error) {
+      addDebugLog(`❌ Error al eliminar: ${error.message}`, 'error');
+    }
+  };
+
+  // ===== FUNCIONES PARA GENERAR TALLAS =====
   function generarTallasDesdeRango(textoTallas) {
     if (!textoTallas) return [];
     textoTallas = textoTallas.trim();
@@ -2103,6 +2374,8 @@
     addDebugLog(`👤 Acceso como invitado`, 'info');
     loadAllData();
     cargarHeader();
+    cargarMetodosPago();
+    cargarIntereses();
   });
 
   logoutSidebar.addEventListener('click', () => {
@@ -2131,6 +2404,8 @@
       addDebugLog(`👤 Usuario: ${user.email} (${currentUserRol})`, 'success');
       loadAllData();
       cargarHeader();
+      cargarMetodosPago();
+      cargarIntereses();
     } else {
       if (currentUserRol !== 'guest') {
         loginContainer.style.display = "flex";
@@ -2616,13 +2891,8 @@
       return;
     }
     
-    // Crear un carrito temporal con solo este producto
     const nombreConDetalles = `${productoModal.nombre || 'Producto'}${tallaSeleccionada ? ' (Talla: ' + tallaSeleccionada : ''}${colorSeleccionado ? ', Color: ' + colorSeleccionado : ''})`;
     
-    // Guardar el carrito actual
-    const carritoGuardado = [...cart];
-    
-    // Establecer un carrito temporal con solo el producto seleccionado
     cart = [{
       productoId: productoModal.id,
       nombre: nombreConDetalles,
@@ -2633,8 +2903,6 @@
     }];
     
     modoCompraDirecta = true;
-    
-    // Abrir el modal de pago directamente
     abrirModalPago('directo');
   };
 
@@ -2727,7 +2995,6 @@
     
     modoCompraDirecta = (modo === 'directo');
     
-    // Mostrar resumen del pedido en el modal
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     let productosText = cart.map((item, i) => {
       let det = `${i+1}. ${item.nombre}`;
@@ -2743,25 +3010,8 @@
     document.getElementById('detalle-credito-modal').textContent = '';
     
     // Resetear selecciones
-    document.querySelectorAll('.opcion-pago').forEach(el => {
-      el.classList.remove('active');
-      el.style.borderColor = '#e0e0e0';
-    });
-    document.querySelector('.opcion-pago input[value="efectivo"]').closest('.opcion-pago').classList.add('active');
-    document.querySelector('.opcion-pago input[value="efectivo"]').closest('.opcion-pago').style.borderColor = '#cc0000';
-    document.querySelector('input[name="metodo-pago-modal"][value="efectivo"]').checked = true;
-    metodoPagoSeleccionado = 'efectivo';
-    planCreditoSeleccionado = 2;
-    document.getElementById('opciones-credito-modal').classList.remove('show');
-    
-    // Resetear planes de crédito
-    document.querySelectorAll('.plan-item').forEach(el => {
-      el.classList.remove('active');
-      el.style.borderColor = '#e0e0e0';
-    });
-    document.querySelector('.plan-item input[value="2"]').closest('.plan-item').classList.add('active');
-    document.querySelector('.plan-item input[value="2"]').closest('.plan-item').style.borderColor = '#cc0000';
-    document.querySelector('input[name="plan-credito-modal"][value="2"]').checked = true;
+    renderOpcionesPago();
+    renderPlanesCredito();
     
     document.getElementById('modal-pago').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -2775,16 +3025,13 @@
     document.getElementById('modal-pago').classList.remove('active');
     document.body.style.overflow = '';
     
-    // Si era compra directa, restaurar carrito
     if (modoCompraDirecta) {
-      // Limpiar el carrito temporal
       cart = [];
       renderCarrito();
       modoCompraDirecta = false;
     }
   };
 
-  // Cerrar modal al hacer clic fuera
   document.getElementById('modal-pago').addEventListener('click', function(e) {
     if (e.target === this) {
       cerrarModalPago();
@@ -2792,23 +3039,26 @@
   });
 
   // ===== FUNCIONES PARA SELECCIONAR PAGO =====
-  window.seleccionarPago = function(metodo) {
-    metodoPagoSeleccionado = metodo;
+  window.seleccionarPago = function(metodoId) {
+    metodoPagoSeleccionado = metodoId;
     
     document.querySelectorAll('.opcion-pago').forEach(el => {
       el.classList.remove('active');
       el.style.borderColor = '#e0e0e0';
     });
-    const selected = document.querySelector(`.opcion-pago input[value="${metodo}"]`).closest('.opcion-pago');
-    selected.classList.add('active');
-    selected.style.borderColor = '#cc0000';
-    document.querySelector(`input[name="metodo-pago-modal"][value="${metodo}"]`).checked = true;
+    const selected = document.querySelector(`.opcion-pago input[value="${metodoId}"]`).closest('.opcion-pago');
+    if (selected) {
+      selected.classList.add('active');
+      selected.style.borderColor = '#cc0000';
+      document.querySelector(`input[name="metodo-pago-modal"][value="${metodoId}"]`).checked = true;
+    }
     
-    const opcionesCredito = document.getElementById('opciones-credito-modal');
-    if (metodo === 'credito') {
-      opcionesCredito.classList.add('show');
-    } else {
-      opcionesCredito.classList.remove('show');
+    const metodo = metodosPagoConfig.find(m => m.id === metodoId);
+    const esCredito = metodo ? metodo.esCredito || false : false;
+    document.getElementById('opciones-credito-modal').classList.toggle('show', esCredito);
+    
+    if (esCredito) {
+      renderPlanesCredito();
     }
     
     actualizarTotalPagoModal();
@@ -2822,9 +3072,11 @@
       el.style.borderColor = '#e0e0e0';
     });
     const selected = document.querySelector(`.plan-item input[value="${plan}"]`).closest('.plan-item');
-    selected.classList.add('active');
-    selected.style.borderColor = '#cc0000';
-    document.querySelector(`input[name="plan-credito-modal"][value="${plan}"]`).checked = true;
+    if (selected) {
+      selected.classList.add('active');
+      selected.style.borderColor = '#cc0000';
+      document.querySelector(`input[name="plan-credito-modal"][value="${plan}"]`).checked = true;
+    }
     
     actualizarTotalPagoModal();
   };
@@ -2834,16 +3086,20 @@
     let totalFinal = totalOriginal;
     let interes = 0;
     
-    if (metodoPagoSeleccionado === 'credito') {
-      if (planCreditoSeleccionado === 3) interes = 5;
-      else if (planCreditoSeleccionado === 4) interes = 10;
+    const metodo = metodosPagoConfig.find(m => m.id === metodoPagoSeleccionado);
+    const esCredito = metodo ? metodo.esCredito || false : false;
+    
+    if (esCredito) {
+      if (planCreditoSeleccionado === 3) interes = interesesConfig.pagos3 || 0;
+      else if (planCreditoSeleccionado === 4) interes = interesesConfig.pagos4 || 0;
+      else interes = interesesConfig.pagos2 || 0;
       totalFinal = totalOriginal + interes;
     }
     
     const totalPagoElement = document.getElementById('total-pago-modal');
     const detalleCreditoElement = document.getElementById('detalle-credito-modal');
     
-    if (metodoPagoSeleccionado === 'credito') {
+    if (esCredito) {
       const cuota = (totalFinal / planCreditoSeleccionado).toFixed(2);
       let detalleHtml = '';
       for (let i = 1; i <= planCreditoSeleccionado; i++) {
@@ -2856,7 +3112,7 @@
       if (interes > 0) {
         totalPagoElement.innerHTML = `Total: $${totalFinal.toFixed(2)} <span style="font-size:0.8rem; color:#856404; display:block; font-weight:400;">(Incluye $${interes.toFixed(2)} de interés)</span>`;
       } else {
-        totalPagoElement.textContent = `Total: $${totalFinal.toFixed(2)} (2 cuotas de $${cuota})`;
+        totalPagoElement.textContent = `Total: $${totalFinal.toFixed(2)} (${planCreditoSeleccionado} cuotas de $${cuota})`;
       }
     } else {
       detalleCreditoElement.classList.remove('show');
@@ -2864,7 +3120,7 @@
     }
   }
 
-  // ===== ENVIAR PEDIDO POR WHATSAPP DESDE EL MODAL =====
+  // ===== ENVIAR PEDIDO POR WHATSAPP =====
   document.getElementById("btn-enviar-pago-whatsapp")?.addEventListener("click", function() {
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     
@@ -2873,15 +3129,13 @@
     let metodoDetalle = '';
     let interes = 0;
     
-    if (metodoPagoSeleccionado === 'efectivo') {
-      metodoTexto = '💰 EFECTIVO';
-      metodoDetalle = 'Pago en efectivo al momento de la entrega.';
-    } else if (metodoPagoSeleccionado === 'transferencia') {
-      metodoTexto = '🏦 TRANSFERENCIA BANCARIA';
-      metodoDetalle = 'Realizar transferencia a la cuenta indicada.';
-    } else if (metodoPagoSeleccionado === 'credito') {
-      if (planCreditoSeleccionado === 3) interes = 5;
-      else if (planCreditoSeleccionado === 4) interes = 10;
+    const metodo = metodosPagoConfig.find(m => m.id === metodoPagoSeleccionado);
+    const esCredito = metodo ? metodo.esCredito || false : false;
+    
+    if (esCredito) {
+      if (planCreditoSeleccionado === 3) interes = interesesConfig.pagos3 || 0;
+      else if (planCreditoSeleccionado === 4) interes = interesesConfig.pagos4 || 0;
+      else interes = interesesConfig.pagos2 || 0;
       totalFinal = totalOriginal + interes;
       const cuota = (totalFinal / planCreditoSeleccionado).toFixed(2);
       metodoTexto = `📋 CRÉDITO (${planCreditoSeleccionado} pagos)`;
@@ -2896,6 +3150,9 @@
       } else {
         metodoDetalle += ` (Sin interés)\n${detalleCuotas}`;
       }
+    } else {
+      metodoTexto = metodo ? `${metodo.icono || '💳'} ${metodo.nombre}` : '💰 EFECTIVO';
+      metodoDetalle = metodo ? metodo.descripcion || 'Pago al momento de la entrega.' : 'Pago al momento de la entrega.';
     }
     
     let detalleProductos = cart.map((item, i) => {
@@ -2918,10 +3175,8 @@
     const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
     
-    // Cerrar modal
     cerrarModalPago();
     
-    // Si fue compra directa, limpiar el carrito
     if (modoCompraDirecta) {
       cart = [];
       renderCarrito();
@@ -3055,6 +3310,44 @@
       alert("Error: " + error.message);
     }
   });
+
+  // ===== EVENTOS PARA ADMINISTRACIÓN DE MÉTODOS DE PAGO =====
+  document.getElementById("btn-agregar-metodo-pago")?.addEventListener("click", async () => {
+    const nombre = document.getElementById("nuevo-metodo-nombre").value.trim();
+    const icono = document.getElementById("nuevo-metodo-icono").value.trim() || '💳';
+    const descripcion = document.getElementById("nuevo-metodo-descripcion").value.trim();
+    const activo = document.getElementById("nuevo-metodo-activo").checked;
+    const esCredito = document.getElementById("nuevo-metodo-es-credito").checked;
+    
+    if (!nombre) {
+      alert("El nombre del método es obligatorio.");
+      return;
+    }
+    
+    try {
+      await addDoc(collection(db, "metodos_pago_config"), {
+        nombre,
+        icono,
+        descripcion: descripcion || `${nombre} - Pago disponible`,
+        activo,
+        esCredito
+      });
+      addDebugLog(`✅ Método de pago agregado: ${nombre}`, 'success');
+      alert(`✅ Método de pago "${nombre}" agregado correctamente`);
+      
+      document.getElementById("nuevo-metodo-nombre").value = "";
+      document.getElementById("nuevo-metodo-icono").value = "";
+      document.getElementById("nuevo-metodo-descripcion").value = "";
+      document.getElementById("nuevo-metodo-activo").checked = true;
+      document.getElementById("nuevo-metodo-es-credito").checked = false;
+      
+    } catch (error) {
+      addDebugLog(`❌ Error agregando método: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+  });
+
+  document.getElementById("btn-guardar-intereses")?.addEventListener("click", guardarIntereses);
 
   // ===== LOAD ALL DATA =====
   function loadAllData() {
@@ -3468,6 +3761,7 @@
   });
 
   console.log("🚀 LOS AMIGOS ESTORE 🎁 - Tienda online con Firebase");
+  console.log("📋 Métodos de pago configurados:", metodosPagoConfig.length);
 </script>
 </body>
 </html>
