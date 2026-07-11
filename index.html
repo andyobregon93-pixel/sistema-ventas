@@ -157,8 +157,13 @@
     .btn-outline { background: transparent; border: 2px solid #cc0000; color: #cc0000; }
     .btn-outline:hover { background: #cc0000; color: white; transform: scale(0.98); }
     .btn-danger { background: #dc3545; }
+    .btn-danger:hover { background: #c82333; }
     .btn-success { background: #28a745; }
+    .btn-success:hover { background: #218838; }
     .btn-info { background: #007bff; }
+    .btn-info:hover { background: #0069d9; }
+    .btn-warning { background: #ffc107; color: #333; }
+    .btn-warning:hover { background: #e0a800; }
     .btn-small { padding: 4px 12px; font-size: 0.8rem; border-radius: 8px; }
     .btn-guest { background: #6c757d; }
     .btn-guest:hover { background: #5a6268; }
@@ -212,7 +217,6 @@
     .upload-area-fotos .sub-texto { font-size: 0.8rem; color: #999; }
     .upload-area-fotos input[type="file"] { display: none; }
     
-    /* ===== PREVIEW DE IMÁGENES MEJORADO ===== */
     .preview-imagenes { 
       display: flex; 
       gap: 12px; 
@@ -227,7 +231,7 @@
     .preview-imagenes img { 
       width: 80px; 
       height: 80px; 
-      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
+      object-fit: contain;
       border-radius: 10px; 
       border: 2px solid #cc0000;
       background: #ffffff;
@@ -241,7 +245,6 @@
       padding: 20px 0;
     }
 
-    /* ===== HEADER - IMAGEN COMPLETA SIN BORDES ===== */
     .tienda-header {
       border-radius: 0px;
       margin-bottom: 0px;
@@ -258,15 +261,11 @@
       width: 100%;
       height: auto;
       max-height: 400px;
-      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
+      object-fit: contain;
       display: block;
       background: #f5f5f5;
     }
-    .tienda-header .sin-imagen-header {
-      display: none;
-    }
 
-    /* ===== BANNER PUBLICITARIO - SIN ESPACIOS ===== */
     .banner-publicidad-full {
       margin: 0;
       border-radius: 0px;
@@ -283,12 +282,11 @@
       width: 100%;
       height: auto;
       max-height: 400px;
-      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
+      object-fit: contain;
       display: block;
       background: #f5f5f5;
     }
 
-    /* ===== CATEGORÍAS Y FILTROS ===== */
     .categorias-section {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -323,7 +321,6 @@
     .categoria-item h4 { font-size: 0.75rem; color: #1a1a1a; }
     .categoria-item p { font-size: 0.6rem; color: #666; }
 
-    /* FILTROS */
     .filtros-container {
       display: flex;
       flex-wrap: wrap;
@@ -356,13 +353,7 @@
       cursor: pointer;
       min-width: 100px;
     }
-    .filtros-container .grupo-filtro select:focus {
-      outline: none;
-      border-color: #cc0000;
-      box-shadow: 0 0 0 3px rgba(204,0,0,0.1);
-    }
 
-    /* ===== PRODUCTOS GRID - IMAGEN SIN RECORTES ===== */
     .productos-grid-depratik {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -396,7 +387,7 @@
     .producto-card-depratik .imagen-container img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
+      object-fit: contain;
       transition: transform 0.3s;
       background: #f9f9f9;
     }
@@ -472,7 +463,6 @@
       line-height: 1.5;
     }
 
-    /* ===== LOGIN / REGISTER ===== */
     .auth-container {
       max-width: 420px;
       width: 100%;
@@ -539,9 +529,6 @@
       text-decoration: underline;
       font-weight: 600;
     }
-    .auth-container .auth-form .link-recuperar a:hover {
-      color: #b30000;
-    }
     .auth-container .btn-guest {
       width: 100%;
       justify-content: center;
@@ -549,9 +536,6 @@
       font-size: 1rem;
       margin-top: 12px;
       background: #6c757d;
-    }
-    .auth-container .btn-guest:hover {
-      background: #5a6268;
     }
     .auth-container .separador {
       display: flex;
@@ -569,7 +553,6 @@
       background: #e0e0e0;
     }
 
-    /* ===== MODAL ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -636,7 +619,7 @@
     .modal-imagen-principal {
       width: 100%;
       height: 350px;
-      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
+      object-fit: contain;
       border-radius: 16px;
       border: 1px solid #e0e0e0;
       background: #f9f9f9;
@@ -649,7 +632,7 @@
     .modal-miniaturas img {
       width: 70px;
       height: 70px;
-      object-fit: contain; /* 🔥 IMAGEN COMPLETA SIN RECORTES */
+      object-fit: contain;
       border-radius: 12px;
       border: 2px solid #e0e0e0;
       cursor: pointer;
@@ -704,7 +687,6 @@
       font-weight: 600;
     }
 
-    /* ===== BOTONES DE TALLA ===== */
     .modal-tallas-container {
       margin: 12px 0;
     }
@@ -745,7 +727,6 @@
       box-shadow: 0 4px 12px rgba(204,0,0,0.3);
     }
 
-    /* ===== COLORES ===== */
     .modal-colores-container {
       margin: 12px 0;
     }
@@ -833,7 +814,6 @@
       transform: none;
     }
 
-    /* ===== CARRITO ===== */
     .cart-item {
       display: flex;
       align-items: center;
@@ -1086,7 +1066,6 @@
     }
     .btn-crear-seller:hover { background: #218838; transform: scale(1.02); }
 
-    /* ===== PREVIEW IMAGEN EN TABLA ===== */
     .preview-img-tabla {
       width: 50px;
       height: 50px;
@@ -1094,6 +1073,60 @@
       border-radius: 6px;
       border: 1px solid #e0e0e0;
       background: #f9f9f9;
+    }
+
+    /* ===== ESTILOS PARA MÉTODOS DE PAGO ===== */
+    .metodo-pago-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 10px 16px;
+      background: #fff;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      flex: 1;
+      min-width: 120px;
+      transition: 0.2s;
+    }
+    .metodo-pago-option:hover {
+      border-color: #cc0000;
+      background: #fff5f5;
+    }
+    .metodo-pago-option.active {
+      border-color: #cc0000;
+      background: #fff5f5;
+    }
+    .metodo-pago-option input[type="radio"] {
+      margin: 0;
+      width: auto;
+      accent-color: #cc0000;
+    }
+
+    .plan-credito-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 8px 14px;
+      background: #fff;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      transition: 0.2s;
+      font-size: 0.85rem;
+    }
+    .plan-credito-option:hover {
+      border-color: #cc0000;
+      background: #fff5f5;
+    }
+    .plan-credito-option.active {
+      border-color: #cc0000;
+      background: #fff5f5;
+    }
+    .plan-credito-option input[type="radio"] {
+      margin: 0;
+      width: auto;
+      accent-color: #cc0000;
     }
 
     @media (max-width: 768px) {
@@ -1113,6 +1146,8 @@
       .filtros-container .grupo-filtro select { width: 100%; }
       .cart-item { flex-direction: column; align-items: stretch; text-align: center; }
       .cart-item .item-cantidad { justify-content: center; }
+      .metodo-pago-option { min-width: 80px; padding: 8px 12px; }
+      .plan-credito-option { font-size: 0.75rem; padding: 6px 10px; }
     }
     .menu-toggle { display: none; }
   </style>
@@ -1209,6 +1244,7 @@
       
       <div class="seller-only">
         <div class="nav-item active" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
+        <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
       </div>
       
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
@@ -1230,15 +1266,11 @@
 
       <!-- TIENDA -->
       <div id="page-tienda" class="page">
-        <!-- HEADER - IMAGEN COMPLETA SIN BORDES -->
         <div class="tienda-header" id="tienda-header">
           <img id="header-imagen-tienda" src="" alt="Header" style="width:100%; height:auto; max-height:400px; object-fit:contain; display:block;">
         </div>
-
-        <!-- BANNERS -->
         <div id="banners-container" style="margin:0; padding:0;"></div>
 
-        <!-- FILTROS -->
         <div class="filtros-container">
           <div class="grupo-filtro">
             <label><i class="fas fa-tshirt"></i> Género:</label>
@@ -1278,7 +1310,6 @@
           </button>
         </div>
 
-        <!-- CATEGORÍAS -->
         <div class="categorias-section" id="categorias-container">
           <div class="categoria-item active-categoria" data-categoria="todos">
             <i class="fas fa-th-large"></i><h4>Todos</h4><p>Todos los productos</p>
@@ -1306,7 +1337,6 @@
           </div>
         </div>
 
-        <!-- PRODUCTOS -->
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-store" style="color:#cc0000;"></i> Productos destacados</h3>
@@ -1439,7 +1469,7 @@
         </div>
       </div>
 
-      <!-- FACTURACIÓN -->
+      <!-- ===== FACTURACIÓN (CARRITO) - MODIFICADO CON MÉTODOS DE PAGO ===== -->
       <div id="page-ventas" class="page">
         <div class="card">
           <div class="card-header">
@@ -1455,7 +1485,7 @@
           </div>
           
           <div class="cart-resumen" style="display: none;" id="cart-resumen">
-            <div class="total">
+            <div class="total" id="total-container">
               Total: $<span id="carrito-total">0.00</span>
             </div>
             
@@ -1468,9 +1498,46 @@
               </div>
             </div>
             
-            <div style="background: #f0f8ff; padding: 12px; border-radius: 12px; border: 1px solid #cc0000; margin: 12px 0;">
-              <p style="color: #333; font-weight: 600;"><i class="fas fa-money-bill-wave" style="color: #cc0000;"></i> Método de pago: <strong>EFECTIVO</strong></p>
-              <p style="color: #666; font-size: 0.85rem;">Todos los pagos se realizan en efectivo al momento de la entrega.</p>
+            <!-- ===== MÉTODOS DE PAGO MEJORADOS ===== -->
+            <div style="background: #f0f8ff; padding: 16px; border-radius: 12px; border: 1px solid #cc0000; margin: 12px 0;">
+              <p style="color: #333; font-weight: 600; margin-bottom: 12px;">
+                <i class="fas fa-credit-card" style="color: #cc0000;"></i> Selecciona el método de pago:
+              </p>
+              
+              <div class="flex" style="gap: 12px;">
+                <label class="metodo-pago-option active" style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; background:#fff; border-radius:10px; border:2px solid #cc0000; flex:1; min-width:120px;">
+                  <input type="radio" name="metodo-pago" value="efectivo" checked onchange="actualizarMetodoPago()">
+                  <i class="fas fa-money-bill-wave" style="color: #28a745;"></i> Efectivo
+                </label>
+                <label class="metodo-pago-option" style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; background:#fff; border-radius:10px; border:2px solid #e0e0e0; flex:1; min-width:120px;">
+                  <input type="radio" name="metodo-pago" value="transferencia" onchange="actualizarMetodoPago()">
+                  <i class="fas fa-university" style="color: #007bff;"></i> Transferencia
+                </label>
+                <label class="metodo-pago-option" style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; background:#fff; border-radius:10px; border:2px solid #e0e0e0; flex:1; min-width:120px;">
+                  <input type="radio" name="metodo-pago" value="credito" onchange="actualizarMetodoPago()">
+                  <i class="fas fa-hand-holding-usd" style="color: #ffc107;"></i> Crédito
+                </label>
+              </div>
+              
+              <!-- ===== OPCIONES DE CRÉDITO ===== -->
+              <div id="opciones-credito" style="display: none; margin-top: 12px; padding: 12px; background: #fff8e1; border-radius: 10px; border: 1px solid #ffc107;">
+                <p style="font-weight: 600; color: #856404; margin-bottom: 8px;">📋 Plan de pagos a crédito:</p>
+                <div class="flex" style="gap: 10px;">
+                  <label class="plan-credito-option active" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 14px; background:#fff; border-radius:8px; border:2px solid #cc0000;">
+                    <input type="radio" name="plan-credito" value="2" checked onchange="actualizarMetodoPago()">
+                    2 pagos (sin interés)
+                  </label>
+                  <label class="plan-credito-option" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 14px; background:#fff; border-radius:8px; border:2px solid #e0e0e0;">
+                    <input type="radio" name="plan-credito" value="3" onchange="actualizarMetodoPago()">
+                    3 pagos (+$5)
+                  </label>
+                  <label class="plan-credito-option" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 14px; background:#fff; border-radius:8px; border:2px solid #e0e0e0;">
+                    <input type="radio" name="plan-credito" value="4" onchange="actualizarMetodoPago()">
+                    4 pagos (+$10)
+                  </label>
+                </div>
+                <p id="detalle-credito" style="font-size: 0.85rem; color: #856404; margin-top: 8px;"></p>
+              </div>
             </div>
             
             <button class="btn-seguir-comprando" id="btn-seguir-comprando">
@@ -1654,6 +1721,11 @@
   let tallaSeleccionada = null;
   let colorSeleccionado = null;
   let headerImageUrl = "";
+  
+  // ===== VARIABLES PARA MÉTODOS DE PAGO =====
+  let metodoPagoSeleccionado = 'efectivo';
+  let planCreditoSeleccionado = 2;
+  let interesAplicado = 0;
 
   // ===== FUNCIÓN PARA GENERAR TALLAS =====
   function generarTallasDesdeRango(textoTallas) {
@@ -1800,7 +1872,7 @@
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => {
-      if (el.dataset.page !== 'tienda' && el.id !== 'logout-sidebar') {
+      if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
         el.style.display = 'none';
       }
     });
@@ -1861,7 +1933,7 @@
       adminElements.forEach(el => el.style.display = 'none');
       sellerElements.forEach(el => el.style.display = 'block');
       document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.page !== 'tienda' && el.id !== 'logout-sidebar') {
+        if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
           el.style.display = 'none';
         } else {
           el.style.display = 'flex';
@@ -1872,7 +1944,7 @@
       adminElements.forEach(el => el.style.display = 'none');
       sellerElements.forEach(el => el.style.display = 'none');
       document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.page !== 'tienda' && el.id !== 'logout-sidebar') {
+        if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
           el.style.display = 'none';
         } else {
           el.style.display = 'flex';
@@ -2038,7 +2110,6 @@
         uploadedImageUrls.push(url);
         addDebugLog(`✅ Subida exitosa: ${fileName}`, 'success');
         
-        // Actualizar el campo de URLs automáticamente
         const urlsString = uploadedImageUrls.join(", ");
         document.getElementById("prod-imagenes").value = urlsString;
         
@@ -2176,7 +2247,6 @@
     document.getElementById('modal-stock').textContent = stockText;
     document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
     
-    // Tallas
     const tallasContainer = document.getElementById('modal-tallas-container');
     const tallasGrid = document.getElementById('modal-tallas-grid');
     tallasGrid.innerHTML = '';
@@ -2199,7 +2269,6 @@
       tallasContainer.style.display = 'none';
     }
     
-    // Colores
     const coloresContainer = document.getElementById('modal-colores-container');
     const coloresGrid = document.getElementById('modal-colores-grid');
     coloresGrid.innerHTML = '';
@@ -2222,7 +2291,6 @@
       coloresContainer.style.display = 'none';
     }
     
-    // Botones
     const btnAgregar = document.getElementById('modal-btn-agregar');
     const btnWhatsApp = document.getElementById('modal-btn-whatsapp');
     if (product.stock <= 0) {
@@ -2237,7 +2305,6 @@
       btnWhatsApp.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp';
     }
     
-    // Miniaturas
     const miniContainer = document.getElementById('modal-miniaturas');
     miniContainer.innerHTML = '';
     if (imagenes.length > 0) {
@@ -2346,6 +2413,123 @@
     cerrarModal();
   };
 
+  // ===== FUNCIONES PARA MÉTODOS DE PAGO =====
+  window.actualizarMetodoPago = function() {
+    const metodoSeleccionado = document.querySelector('input[name="metodo-pago"]:checked');
+    if (metodoSeleccionado) {
+      metodoPagoSeleccionado = metodoSeleccionado.value;
+    }
+    
+    // Actualizar estilos de los métodos de pago
+    document.querySelectorAll('.metodo-pago-option').forEach(el => {
+      el.classList.remove('active');
+      el.style.borderColor = '#e0e0e0';
+    });
+    const selectedParent = metodoSeleccionado?.closest('.metodo-pago-option');
+    if (selectedParent) {
+      selectedParent.classList.add('active');
+      selectedParent.style.borderColor = '#cc0000';
+    }
+    
+    const opcionesCredito = document.getElementById('opciones-credito');
+    const detalleCredito = document.getElementById('detalle-credito');
+    
+    if (metodoPagoSeleccionado === 'credito') {
+      opcionesCredito.style.display = 'block';
+      
+      // Seleccionar plan por defecto si no hay ninguno seleccionado
+      const planSeleccionado = document.querySelector('input[name="plan-credito"]:checked');
+      if (planSeleccionado) {
+        planCreditoSeleccionado = parseInt(planSeleccionado.value);
+      } else {
+        const radio2 = document.querySelector('input[name="plan-credito"][value="2"]');
+        if (radio2) {
+          radio2.checked = true;
+          planCreditoSeleccionado = 2;
+        }
+      }
+      
+      // Actualizar estilos de los planes
+      document.querySelectorAll('.plan-credito-option').forEach(el => {
+        el.classList.remove('active');
+        el.style.borderColor = '#e0e0e0';
+      });
+      const planSelected = document.querySelector('input[name="plan-credito"]:checked');
+      const planParent = planSelected?.closest('.plan-credito-option');
+      if (planParent) {
+        planParent.classList.add('active');
+        planParent.style.borderColor = '#cc0000';
+      }
+      
+      calcularInteres();
+    } else {
+      opcionesCredito.style.display = 'none';
+      planCreditoSeleccionado = 2;
+      interesAplicado = 0;
+      actualizarTotalCarrito();
+    }
+  };
+
+  // ===== FUNCIÓN PARA CALCULAR INTERÉS =====
+  function calcularInteres() {
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    
+    if (planCreditoSeleccionado === 2) {
+      interesAplicado = 0;
+    } else if (planCreditoSeleccionado === 3) {
+      interesAplicado = 5;
+    } else if (planCreditoSeleccionado === 4) {
+      interesAplicado = 10;
+    } else {
+      interesAplicado = 0;
+    }
+    
+    const totalConInteres = totalOriginal + interesAplicado;
+    
+    const detalleCredito = document.getElementById('detalle-credito');
+    if (planCreditoSeleccionado === 2) {
+      detalleCredito.textContent = `✅ 2 pagos sin interés: $${totalOriginal.toFixed(2)} (2 cuotas de $${(totalOriginal/2).toFixed(2)})`;
+    } else if (planCreditoSeleccionado === 3) {
+      detalleCredito.textContent = `✅ 3 pagos con +$5 de interés: $${totalConInteres.toFixed(2)} (3 cuotas de $${(totalConInteres/3).toFixed(2)})`;
+    } else if (planCreditoSeleccionado === 4) {
+      detalleCredito.textContent = `✅ 4 pagos con +$10 de interés: $${totalConInteres.toFixed(2)} (4 cuotas de $${(totalConInteres/4).toFixed(2)})`;
+    }
+    
+    actualizarTotalCarrito();
+  }
+
+  // ===== FUNCIÓN PARA ACTUALIZAR TOTAL DEL CARRITO =====
+  function actualizarTotalCarrito() {
+    const totalSpan = document.getElementById('carrito-total');
+    const totalContainer = document.getElementById('total-container');
+    
+    if (cart.length === 0) {
+      totalSpan.textContent = '0.00';
+      return;
+    }
+    
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    
+    if (metodoPagoSeleccionado === 'credito' && planCreditoSeleccionado) {
+      const totalFinal = totalOriginal + interesAplicado;
+      totalSpan.textContent = totalFinal.toFixed(2);
+      
+      if (interesAplicado > 0) {
+        totalContainer.innerHTML = `
+          Total: $<span id="carrito-total">${totalFinal.toFixed(2)}</span>
+          <span style="font-size: 0.8rem; color: #856404; display: block; font-weight: 400;">
+            (Incluye $${interesAplicado.toFixed(2)} de interés por ${planCreditoSeleccionado} pagos)
+          </span>
+        `;
+      } else {
+        totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalFinal.toFixed(2)}</span>`;
+      }
+    } else {
+      totalSpan.textContent = totalOriginal.toFixed(2);
+      totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalOriginal.toFixed(2)}</span>`;
+    }
+  }
+
   // ===== CARRITO =====
   function renderCarrito() {
     const container = document.getElementById('carrito-lista');
@@ -2397,8 +2581,10 @@
     });
     
     container.innerHTML = html;
-    totalSpan.textContent = total.toFixed(2);
     resumen.style.display = 'block';
+    
+    // Actualizar métodos de pago y total
+    window.actualizarMetodoPago();
   }
 
   window.cambiarCantidad = function(idx, cambio) {
@@ -2422,6 +2608,7 @@
     showPage('tienda');
   });
 
+  // ===== FINALIZAR PEDIDO CON MÉTODOS DE PAGO =====
   document.getElementById("btn-finalizar-pedido")?.addEventListener("click", function() {
     if (cart.length === 0) {
       alert("El carrito está vacío.");
@@ -2437,6 +2624,40 @@
       return;
     }
     
+    // Obtener método de pago seleccionado
+    const metodoRadio = document.querySelector('input[name="metodo-pago"]:checked');
+    const metodo = metodoRadio ? metodoRadio.value : 'efectivo';
+    
+    let metodoTexto = '';
+    let metodoDetalle = '';
+    let totalFinal = 0;
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    
+    if (metodo === 'efectivo') {
+      metodoTexto = '💰 EFECTIVO';
+      metodoDetalle = 'Pago en efectivo al momento de la entrega.';
+      totalFinal = totalOriginal;
+    } else if (metodo === 'transferencia') {
+      metodoTexto = '🏦 TRANSFERENCIA BANCARIA';
+      metodoDetalle = 'Realizar transferencia a la cuenta indicada.';
+      totalFinal = totalOriginal;
+    } else if (metodo === 'credito') {
+      const planRadio = document.querySelector('input[name="plan-credito"]:checked');
+      const plan = planRadio ? parseInt(planRadio.value) : 2;
+      let interes = 0;
+      if (plan === 3) interes = 5;
+      else if (plan === 4) interes = 10;
+      totalFinal = totalOriginal + interes;
+      const cuota = (totalFinal / plan).toFixed(2);
+      metodoTexto = `📋 CRÉDITO (${plan} pagos)`;
+      metodoDetalle = `${plan} pagos de $${cuota} (Total: $${totalFinal.toFixed(2)})`;
+      if (interes > 0) {
+        metodoDetalle += ` (Interés: $${interes.toFixed(2)})`;
+      } else {
+        metodoDetalle += ` (Sin interés)`;
+      }
+    }
+    
     let detalleProductos = cart.map((item, i) => {
       let det = ` ${i+1}. ${item.nombre}`;
       if (item.talla) det += ` (Talla: ${item.talla}`;
@@ -2446,14 +2667,14 @@
       return det;
     }).join('\n');
     
-    const total = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
-    
     const mensaje = `🎁 *NUEVO PEDIDO - LOS AMIGOS ESTORE* 🎁\n\n` +
       `👤 *Cliente:* ${cliente}\n` +
-      `📱 *WhatsApp:* ${telefono}\n\n` +
-      `📦 *Productos solicitados:*\n${detalleProductos}\n\n` +
-      `💰 *TOTAL A PAGAR: $${total.toFixed(2)}*\n` +
-      `💳 *Método de pago:* EFECTIVO\n\n` +
+      `📱 *WhatsApp:* ${telefono}\n` +
+      `${document.getElementById("cliente-email").value.trim() ? `📧 *Email:* ${document.getElementById("cliente-email").value.trim()}\n` : ''}` +
+      `\n📦 *Productos solicitados:*\n${detalleProductos}\n\n` +
+      `💰 *TOTAL A PAGAR: $${totalFinal.toFixed(2)}*\n` +
+      `💳 *Método de pago:* ${metodoTexto}\n` +
+      `📝 *Detalle del pago:* ${metodoDetalle}\n\n` +
       `✅ *Por favor confirmar disponibilidad y coordinar entrega.*`;
     
     const numero = WHATSAPP_NUMBER;
