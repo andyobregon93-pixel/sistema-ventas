@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ===== TODOS LOS ESTILOS ANTERIORES ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -1294,7 +1293,6 @@
       background: #f9f9f9;
     }
 
-    /* ===== ESTILOS PARA DETALLE DE CRÉDITO EN MODAL ===== */
     .detalle-cuotas {
       font-size: 0.85rem;
       color: #856404;
@@ -1674,7 +1672,7 @@
         </div>
       </div>
 
-      <!-- ===== FACTURACIÓN (CARRITO) ===== -->
+      <!-- ===== FACTURACIÓN (CARRITO) - SIN DATOS DE CLIENTE ===== -->
       <div id="page-ventas" class="page">
         <div class="card">
           <div class="card-header">
@@ -1692,15 +1690,6 @@
           <div class="cart-resumen" style="display: none;" id="cart-resumen">
             <div class="total" id="total-container">
               Total: $<span id="carrito-total">0.00</span>
-            </div>
-            
-            <div style="margin-top: 16px;">
-              <h4 style="margin-bottom: 8px; color: #333;">Datos del cliente</h4>
-              <div class="flex">
-                <input type="text" id="cliente-nombre" placeholder="Nombre completo*" style="flex:2">
-                <input type="text" id="cliente-telefono" placeholder="WhatsApp*" style="flex:2">
-                <input type="email" id="cliente-email" placeholder="Email (opcional)" style="flex:2">
-              </div>
             </div>
             
             <button class="btn-seguir-comprando" id="btn-seguir-comprando">
@@ -1956,11 +1945,10 @@
   let colorSeleccionado = null;
   let headerImageUrl = "";
   
-  // ===== VARIABLES PARA MÉTODOS DE PAGO (MODAL) =====
+  // ===== VARIABLES PARA MÉTODOS DE PAGO =====
   let metodoPagoSeleccionado = 'efectivo';
   let planCreditoSeleccionado = 2;
   let modoCompraDirecta = false;
-  let productoDirecto = null;
 
   // ===== FUNCIÓN PARA GENERAR TALLAS =====
   function generarTallasDesdeRango(textoTallas) {
@@ -2631,7 +2619,11 @@
     // Crear un carrito temporal con solo este producto
     const nombreConDetalles = `${productoModal.nombre || 'Producto'}${tallaSeleccionada ? ' (Talla: ' + tallaSeleccionada : ''}${colorSeleccionado ? ', Color: ' + colorSeleccionado : ''})`;
     
-    const items = [{
+    // Guardar el carrito actual
+    const carritoGuardado = [...cart];
+    
+    // Establecer un carrito temporal con solo el producto seleccionado
+    cart = [{
       productoId: productoModal.id,
       nombre: nombreConDetalles,
       talla: tallaSeleccionada || null,
@@ -2640,18 +2632,10 @@
       cantidad: 1
     }];
     
-    // Guardar el estado actual del carrito
-    const carritoGuardado = [...cart];
+    modoCompraDirecta = true;
     
-    // Establecer el carrito temporal
-    cart = items;
-    
-    // Abrir el modal de pago
+    // Abrir el modal de pago directamente
     abrirModalPago('directo');
-    
-    // Restaurar el carrito original después de cerrar el modal
-    // pero mantener los items para el envío
-    // En la función de envío se usará el carrito actual
   };
 
   // ===== CARRITO =====
@@ -2741,15 +2725,6 @@
       return;
     }
     
-    const cliente = document.getElementById("cliente-nombre").value.trim();
-    const telefono = document.getElementById("cliente-telefono").value.trim();
-    
-    if (!cliente || !telefono) {
-      alert("⚠️ Por favor completa tu nombre y número de WhatsApp para finalizar el pedido.");
-      document.getElementById("cliente-nombre").focus();
-      return;
-    }
-    
     modoCompraDirecta = (modo === 'directo');
     
     // Mostrar resumen del pedido en el modal
@@ -2800,9 +2775,11 @@
     document.getElementById('modal-pago').classList.remove('active');
     document.body.style.overflow = '';
     
-    // Si era compra directa, restaurar el carrito original
+    // Si era compra directa, restaurar carrito
     if (modoCompraDirecta) {
-      // El carrito ya se restauró o se mantiene igual
+      // Limpiar el carrito temporal
+      cart = [];
+      renderCarrito();
       modoCompraDirecta = false;
     }
   };
@@ -2889,9 +2866,6 @@
 
   // ===== ENVIAR PEDIDO POR WHATSAPP DESDE EL MODAL =====
   document.getElementById("btn-enviar-pago-whatsapp")?.addEventListener("click", function() {
-    const cliente = document.getElementById("cliente-nombre").value.trim();
-    const telefono = document.getElementById("cliente-telefono").value.trim();
-    const email = document.getElementById("cliente-email").value.trim();
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     
     let totalFinal = totalOriginal;
@@ -2934,10 +2908,7 @@
     }).join('\n');
     
     const mensaje = `🎁 *NUEVO PEDIDO - LOS AMIGOS ESTORE* 🎁\n\n` +
-      `👤 *Cliente:* ${cliente}\n` +
-      `📱 *WhatsApp:* ${telefono}\n` +
-      `${email ? `📧 *Email:* ${email}\n` : ''}` +
-      `\n📦 *Productos solicitados:*\n${detalleProductos}\n\n` +
+      `📦 *Productos solicitados:*\n${detalleProductos}\n\n` +
       `💰 *TOTAL A PAGAR: $${totalFinal.toFixed(2)}*\n` +
       `💳 *Método de pago:* ${metodoTexto}\n` +
       `📝 *Detalle del pago:* ${metodoDetalle}\n\n` +
@@ -2950,13 +2921,10 @@
     // Cerrar modal
     cerrarModalPago();
     
-    // Si fue compra directa, limpiar el carrito temporal
+    // Si fue compra directa, limpiar el carrito
     if (modoCompraDirecta) {
-      // Si el carrito solo tiene 1 item y es el de compra directa, limpiarlo
-      if (cart.length === 1) {
-        cart = [];
-        renderCarrito();
-      }
+      cart = [];
+      renderCarrito();
       modoCompraDirecta = false;
     }
   });
