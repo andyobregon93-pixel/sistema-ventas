@@ -1498,7 +1498,6 @@
         <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
         <div class="nav-item" data-page="usuarios"><i class="fas fa-users-cog"></i> Usuarios</div>
         <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
-        <!-- NUEVO: Métodos de Pago Admin -->
         <div class="nav-item" data-page="metodos-pago-admin"><i class="fas fa-cog"></i> Configurar Pagos</div>
         <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
         <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
@@ -1611,7 +1610,13 @@
       <!-- PRODUCTOS (admin) -->
       <div id="page-productos" class="page admin-only">
         <div class="card">
-          <div class="card-header"><h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3></div>
+          <div class="card-header">
+            <h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3>
+            <!-- ===== NUEVO BOTÓN PARA VER IMÁGENES FALLIDAS ===== -->
+            <button onclick="verReportesImagenes()" style="background:#dc3545; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
+              <i class="fas fa-exclamation-triangle"></i> 🔴 VER IMÁGENES FALLIDAS
+            </button>
+          </div>
           
           <div class="upload-area-fotos" id="upload-area">
             <i class="fas fa-cloud-upload-alt"></i>
@@ -2045,6 +2050,90 @@
   let metodosPagoConfig = [];
   let interesesConfig = { pagos2: 0, pagos3: 5, pagos4: 10 };
 
+  // ============================================
+  // 🚀 SISTEMA DE DETECCIÓN DE IMÁGENES FALLIDAS
+  // ============================================
+
+  function reportarImagenFallida(urlImagen, mensajeError) {
+    const ahora = new Date();
+    const fecha = ahora.toLocaleString('es-EC', { timeZone: 'America/Guayaquil' });
+    
+    firebase.database().ref('imagenes_fallidas').push({
+      url: urlImagen,
+      error: mensajeError || 'No cargó la imagen',
+      fecha: fecha,
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      navegador: navigator.userAgent,
+      resolucion: window.innerWidth + 'x' + window.innerHeight
+    }).catch(error => console.error('Error al reportar:', error));
+  }
+
+  function crearImagenSegura(url, alt = 'Imagen', className = '') {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = alt;
+    img.className = className;
+    img.loading = 'lazy';
+    
+    img.onerror = function() {
+      reportarImagenFallida(url, 'Error al cargar la imagen');
+      this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
+    };
+    
+    return img;
+  }
+
+  function verReportesImagenes() {
+    firebase.database().ref('imagenes_fallidas')
+      .orderByChild('timestamp')
+      .limitToLast(50)
+      .once('value')
+      .then(snapshot => {
+        const datos = snapshot.val();
+        if (!datos) {
+          alert('✅ No hay imágenes fallidas reportadas');
+          return;
+        }
+        
+        let mensaje = '📋 IMÁGENES FALLIDAS:\n\n';
+        let contador = 0;
+        Object.keys(datos).forEach(key => {
+          const item = datos[key];
+          contador++;
+          mensaje += `🔴 ${contador}. ${item.url}\n`;
+          mensaje += `   ❌ Error: ${item.error}\n`;
+          mensaje += `   📅 Fecha: ${item.fecha}\n\n`;
+        });
+        mensaje += `\n📊 Total: ${contador} imágenes fallidas`;
+        alert(mensaje);
+        console.log('📋 REPORTE DE IMÁGENES FALLIDAS:');
+        console.log(datos);
+      })
+      .catch(error => {
+        alert('❌ Error al obtener reportes: ' + error.message);
+      });
+  }
+
+  // Detectar imágenes rotas al cargar la página
+  window.addEventListener('load', function() {
+    document.querySelectorAll('img').forEach(img => {
+      if (!img.complete || img.naturalWidth === 0) {
+        if (img.src && !img.src.includes('data:image')) {
+          reportarImagenFallida(img.src, 'Imagen rota al cargar la página');
+        }
+      }
+    });
+  });
+
+  // Hacer funciones globales para usarlas desde cualquier parte
+  window.crearImagenSegura = crearImagenSegura;
+  window.reportarImagenFallida = reportarImagenFallida;
+  window.verReportesImagenes = verReportesImagenes;
+
+  console.log('✅ Sistema de detección de imágenes activado');
+  console.log('📊 Para ver reportes: verReportesImagenes()');
+  // ============================================
+
   // ===== FUNCIONES PARA CONFIGURACIÓN DE MÉTODOS DE PAGO =====
   function cargarMetodosPago() {
     onSnapshot(collection(db, "metodos_pago_config"), (snap) => {
@@ -2066,7 +2155,6 @@
         interesesConfig.pagos3 = data.pagos3 || 5;
         interesesConfig.pagos4 = data.pagos4 || 10;
       }
-      // Actualizar inputs
       document.getElementById('interes-2-pagos').value = interesesConfig.pagos2;
       document.getElementById('interes-3-pagos').value = interesesConfig.pagos3;
       document.getElementById('interes-4-pagos').value = interesesConfig.pagos4;
@@ -2096,7 +2184,6 @@
     const container = document.getElementById('opciones-pago-container');
     if (!container) return;
     
-    // Filtrar solo métodos activos
     const activos = metodosPagoConfig.filter(m => m.activo !== false);
     
     if (activos.length === 0) {
@@ -2126,10 +2213,8 @@
     });
     container.innerHTML = html;
     
-    // Si hay métodos, seleccionar el primero
     if (activos.length > 0) {
       metodoPagoSeleccionado = activos[0].id;
-      // Mostrar/ocultar opciones de crédito
       const esCredito = activos[0].esCredito || false;
       document.getElementById('opciones-credito-modal').classList.toggle('show', esCredito);
       if (esCredito) {
@@ -2163,7 +2248,6 @@
     });
     container.innerHTML = html;
     
-    // Seleccionar 2 pagos por defecto
     planCreditoSeleccionado = 2;
   }
 
@@ -2201,7 +2285,6 @@
     container.innerHTML = html;
   }
 
-  // ===== FUNCIONES PARA ADMINISTRAR MÉTODOS DE PAGO =====
   window.toggleMetodoPago = async (id, nuevoEstado) => {
     try {
       await updateDoc(doc(db, "metodos_pago_config", id), { activo: nuevoEstado });
@@ -2502,6 +2585,7 @@
       img.style.display = 'block';
       img.onerror = function() {
         this.style.display = 'none';
+        reportarImagenFallida(headerImageUrl, 'Header no cargó');
       };
     } else {
       img.style.display = 'none';
@@ -2673,11 +2757,12 @@
       const generoIcono = p.genero === 'hombre' ? '👨' : p.genero === 'mujer' ? '👩' : p.genero === 'ninos' ? '🧒' : p.genero === 'ninas' ? '👧' : '';
       const categoriaIcono = p.categoria === 'ropa' ? '👕' : p.categoria === 'zapatos' ? '👟' : p.categoria === 'relojes' ? '⌚' : p.categoria === 'medias' ? '🧦' : p.categoria === 'boxer' ? '🩲' : p.categoria === 'accesorios' ? '🧢' : '🏷️';
       
+      // ===== USAMOS crearImagenSegura PARA DETECTAR FOTOS FALLIDAS =====
       html += `
         <div class="producto-card-depratik" onclick="abrirModal('${p.id}')">
           <div class="imagen-container">
             <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" loading="lazy" 
-                 onerror="this.src='${getDefaultImage()}'">
+                 onerror="reportarImagenFallida('${primeraImagen}', 'Producto ${p.nombre} no cargó'); this.src='${getDefaultImage()}'">
             <span class="etiqueta-stock ${stockClass}">${stockText}</span>
             ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
           </div>
@@ -2695,6 +2780,17 @@
       `;
     });
     container.innerHTML = html;
+    
+    // ===== DETECTAR IMÁGENES QUE YA ESTÁN ROTAS DESPUÉS DE RENDERIZAR =====
+    setTimeout(() => {
+      container.querySelectorAll('img').forEach(img => {
+        if (!img.complete || img.naturalWidth === 0) {
+          if (img.src && !img.src.includes('data:image')) {
+            reportarImagenFallida(img.src, 'Imagen rota en la tienda');
+          }
+        }
+      });
+    }, 1000);
   };
 
   window.limpiarFiltros = function() {
@@ -2719,6 +2815,7 @@
     modalImg.src = primeraImagen;
     modalImg.onerror = function() {
       this.src = getDefaultImage();
+      reportarImagenFallida(primeraImagen, 'Modal - imagen principal');
     };
     
     document.getElementById('modal-nombre').textContent = product.nombre || 'Sin nombre';
@@ -2810,7 +2907,10 @@
         const mini = document.createElement('img');
         mini.src = img;
         mini.alt = 'Miniatura';
-        mini.onerror = function() { this.style.display = 'none'; };
+        mini.onerror = function() { 
+          this.style.display = 'none';
+          reportarImagenFallida(img, 'Modal - miniatura');
+        };
         if (index === 0) mini.classList.add('active-miniatura');
         mini.onclick = function() {
           document.getElementById('modal-img-principal').src = img;
@@ -3009,7 +3109,6 @@
     document.getElementById('detalle-credito-modal').classList.remove('show');
     document.getElementById('detalle-credito-modal').textContent = '';
     
-    // Resetear selecciones
     renderOpcionesPago();
     renderPlanesCredito();
     
@@ -3206,7 +3305,7 @@
     activos.forEach(b => {
       html += `
         <div class="banner-publicidad-full" ${b.enlace ? `onclick="window.open('${b.enlace}', '_blank')"` : ''}>
-          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" loading="lazy" onerror="this.style.display='none'">
+          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" loading="lazy" onerror="reportarImagenFallida('${b.imagen}', 'Banner ${b.titulo}'); this.style.display='none'">
         </div>
       `;
     });
@@ -3762,6 +3861,8 @@
 
   console.log("🚀 LOS AMIGOS ESTORE 🎁 - Tienda online con Firebase");
   console.log("📋 Métodos de pago configurados:", metodosPagoConfig.length);
+  console.log("✅ Sistema de detección de imágenes activado");
+  console.log("📊 Para ver reportes: verReportesImagenes()");
 </script>
 </body>
 </html>
