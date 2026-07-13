@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=1280, user-scalable=yes">
   <title>LOS AMIGOS ESTORE 🎁</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1414,6 +1414,111 @@
 </head>
 <body>
 
+<!-- ===== BOTÓN FLOTANTE PARA CLIENTES (REPORTAR IMÁGENES) ===== -->
+<div id="reporte-boton-flotante" style="position:fixed; bottom:20px; right:20px; z-index:9999;">
+  <button onclick="reportarImagenManual()" style="
+    background:#cc0000;
+    color:white;
+    border:none;
+    border-radius:50px;
+    padding:14px 24px;
+    font-weight:700;
+    font-size:0.9rem;
+    cursor:pointer;
+    box-shadow:0 8px 30px rgba(204,0,0,0.4);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    transition:0.3s;
+    font-family:inherit;
+  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    <i class="fas fa-exclamation-triangle"></i> 📸 ¿No ves una imagen? Repórtala
+  </button>
+</div>
+
+<!-- ===== MODAL PARA REPORTAR IMAGEN (CLIENTE) ===== -->
+<div id="modal-reporte-imagen" style="
+  display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(10px);
+  z-index:10000;
+  justify-content:center;
+  align-items:center;
+">
+  <div style="
+    background:#ffffff;
+    border-radius:24px;
+    max-width:500px;
+    width:95%;
+    padding:30px;
+    position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  ">
+    <button onclick="cerrarModalReporte()" style="
+      position:absolute;
+      top:12px;right:16px;
+      background:transparent;
+      border:none;
+      font-size:1.5rem;
+      cursor:pointer;
+      color:#999;
+    ">×</button>
+    
+    <h2 style="color:#cc0000; margin-bottom:8px; font-size:1.4rem;">
+      <i class="fas fa-exclamation-triangle" style="color:#cc0000;"></i> Reportar imagen fallida
+    </h2>
+    <p style="color:#666; font-size:0.9rem; margin-bottom:16px;">
+      ¿Ves una imagen que no carga? Copia la URL de la imagen y pégala abajo.
+    </p>
+    
+    <label style="font-weight:600; color:#333; font-size:0.85rem;">URL de la imagen que no ves:</label>
+    <input type="text" id="input-url-fallida" placeholder="Ej: https://postimage.org/foto.jpg" style="
+      width:100%;
+      padding:12px 16px;
+      border:2px solid #e0e0e0;
+      border-radius:12px;
+      margin:8px 0 16px 0;
+      font-size:0.9rem;
+    ">
+    
+    <label style="font-weight:600; color:#333; font-size:0.85rem;">¿Qué producto es? (opcional)</label>
+    <input type="text" id="input-producto-fallido" placeholder="Ej: Camisa roja" style="
+      width:100%;
+      padding:12px 16px;
+      border:2px solid #e0e0e0;
+      border-radius:12px;
+      margin:8px 0 16px 0;
+      font-size:0.9rem;
+    ">
+    
+    <button onclick="enviarReporteImagen()" style="
+      width:100%;
+      padding:14px;
+      background:#cc0000;
+      color:white;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      font-size:1rem;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition:0.2s;
+    " onmouseover="this.style.background='#b30000'" onmouseout="this.style.background='#cc0000'">
+      <i class="fas fa-paper-plane"></i> Enviar reporte al administrador
+    </button>
+    
+    <p style="color:#999; font-size:0.75rem; text-align:center; margin-top:12px;">
+      <i class="fas fa-info-circle"></i> El administrador recibirá este reporte y arreglará la imagen.
+    </p>
+  </div>
+</div>
+
 <!-- ===== LOGIN / REGISTER ===== -->
 <div id="login-container" class="app-wrapper" style="justify-content: center; align-items: center; min-height: 100vh;">
   <div class="auth-container">
@@ -1612,10 +1717,16 @@
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3>
-            <!-- ===== NUEVO BOTÓN PARA VER IMÁGENES FALLIDAS ===== -->
-            <button onclick="verReportesImagenes()" style="background:#dc3545; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
-              <i class="fas fa-exclamation-triangle"></i> 🔴 VER IMÁGENES FALLIDAS
-            </button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <!-- ===== BOTÓN PARA VER IMÁGENES FALLIDAS ===== -->
+              <button onclick="verReportesImagenes()" style="background:#dc3545; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-exclamation-triangle"></i> 🔴 VER IMÁGENES FALLIDAS
+              </button>
+              <!-- ===== BOTÓN PARA VER REPORTES DE CLIENTES ===== -->
+              <button onclick="verReportesClientes()" style="background:#007bff; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-users"></i> 📩 VER REPORTES DE CLIENTES
+              </button>
+            </div>
           </div>
           
           <div class="upload-area-fotos" id="upload-area">
@@ -2114,24 +2225,86 @@
       });
   }
 
-  // Detectar imágenes rotas al cargar la página
-  window.addEventListener('load', function() {
-    document.querySelectorAll('img').forEach(img => {
-      if (!img.complete || img.naturalWidth === 0) {
-        if (img.src && !img.src.includes('data:image')) {
-          reportarImagenFallida(img.src, 'Imagen rota al cargar la página');
-        }
-      }
-    });
-  });
+  // ============================================
+  // 📩 FUNCIONES PARA REPORTES DE CLIENTES
+  // ============================================
 
-  // Hacer funciones globales para usarlas desde cualquier parte
+  function reportarImagenManual() {
+    document.getElementById('modal-reporte-imagen').style.display = 'flex';
+  }
+
+  function cerrarModalReporte() {
+    document.getElementById('modal-reporte-imagen').style.display = 'none';
+    document.getElementById('input-url-fallida').value = '';
+    document.getElementById('input-producto-fallido').value = '';
+  }
+
+  function enviarReporteImagen() {
+    const url = document.getElementById('input-url-fallida').value.trim();
+    const producto = document.getElementById('input-producto-fallido').value.trim() || 'Producto no especificado';
+    
+    if (!url) {
+      alert('⚠️ Por favor, pega la URL de la imagen que no ves.');
+      return;
+    }
+    
+    firebase.database().ref('reportes_clientes').push({
+      url: url,
+      producto: producto,
+      fecha: new Date().toLocaleString('es-EC', { timeZone: 'America/Guayaquil' }),
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      reportado_por: 'Cliente',
+      navegador: navigator.userAgent
+    }).then(() => {
+      alert('✅ Reporte enviado correctamente. El administrador lo revisará.');
+      cerrarModalReporte();
+    }).catch((error) => {
+      alert('❌ Error al enviar el reporte: ' + error.message);
+    });
+  }
+
+  function verReportesClientes() {
+    firebase.database().ref('reportes_clientes')
+      .orderByChild('timestamp')
+      .limitToLast(50)
+      .once('value')
+      .then((snapshot) => {
+        const datos = snapshot.val();
+        if (!datos) {
+          alert('✅ No hay reportes de clientes');
+          return;
+        }
+        
+        let mensaje = '📋 REPORTES DE CLIENTES (imágenes fallidas):\n\n';
+        let contador = 0;
+        Object.keys(datos).forEach(key => {
+          const item = datos[key];
+          contador++;
+          mensaje += `🔴 ${contador}. URL: ${item.url}\n`;
+          mensaje += `   📦 Producto: ${item.producto || 'No especificado'}\n`;
+          mensaje += `   📅 Fecha: ${item.fecha}\n\n`;
+        });
+        mensaje += `\n📊 Total: ${contador} reportes`;
+        alert(mensaje);
+        console.log('📋 REPORTES DE CLIENTES:', datos);
+      })
+      .catch((error) => {
+        alert('❌ Error al obtener reportes: ' + error.message);
+      });
+  }
+
+  // Hacer funciones globales
   window.crearImagenSegura = crearImagenSegura;
   window.reportarImagenFallida = reportarImagenFallida;
   window.verReportesImagenes = verReportesImagenes;
+  window.reportarImagenManual = reportarImagenManual;
+  window.cerrarModalReporte = cerrarModalReporte;
+  window.enviarReporteImagen = enviarReporteImagen;
+  window.verReportesClientes = verReportesClientes;
 
   console.log('✅ Sistema de detección de imágenes activado');
   console.log('📊 Para ver reportes: verReportesImagenes()');
+  console.log('📩 Para ver reportes de clientes: verReportesClientes()');
   // ============================================
 
   // ===== FUNCIONES PARA CONFIGURACIÓN DE MÉTODOS DE PAGO =====
@@ -2757,7 +2930,6 @@
       const generoIcono = p.genero === 'hombre' ? '👨' : p.genero === 'mujer' ? '👩' : p.genero === 'ninos' ? '🧒' : p.genero === 'ninas' ? '👧' : '';
       const categoriaIcono = p.categoria === 'ropa' ? '👕' : p.categoria === 'zapatos' ? '👟' : p.categoria === 'relojes' ? '⌚' : p.categoria === 'medias' ? '🧦' : p.categoria === 'boxer' ? '🩲' : p.categoria === 'accesorios' ? '🧢' : '🏷️';
       
-      // ===== USAMOS crearImagenSegura PARA DETECTAR FOTOS FALLIDAS =====
       html += `
         <div class="producto-card-depratik" onclick="abrirModal('${p.id}')">
           <div class="imagen-container">
@@ -2781,7 +2953,6 @@
     });
     container.innerHTML = html;
     
-    // ===== DETECTAR IMÁGENES QUE YA ESTÁN ROTAS DESPUÉS DE RENDERIZAR =====
     setTimeout(() => {
       container.querySelectorAll('img').forEach(img => {
         if (!img.complete || img.naturalWidth === 0) {
@@ -3863,6 +4034,7 @@
   console.log("📋 Métodos de pago configurados:", metodosPagoConfig.length);
   console.log("✅ Sistema de detección de imágenes activado");
   console.log("📊 Para ver reportes: verReportesImagenes()");
+  console.log("📩 Para ver reportes de clientes: verReportesClientes()");
 </script>
 </body>
 </html>
