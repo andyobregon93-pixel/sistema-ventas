@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* ===== TODOS LOS ESTILOS ANTERIORES ===== */
+    /* ===== TODOS LOS ESTILOS ANTERIORES + NUEVOS ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -18,108 +18,6 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #e0e0e0; }
     ::-webkit-scrollbar-thumb { background: #cc0000; border-radius: 10px; }
-
-    /* ===== MENÚ SUPERIOR (SIEMPRE VISIBLE) ===== */
-    .top-bar {
-      background: #ffffff;
-      border-bottom: 2px solid #cc0000;
-      padding: 12px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .top-bar .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-    }
-    .top-bar .logo-area i {
-      font-size: 2rem;
-      color: #cc0000;
-    }
-    .top-bar .logo-area h1 {
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: #cc0000;
-      letter-spacing: -0.5px;
-    }
-    .top-bar .logo-area span {
-      font-size: 0.7rem;
-      color: #666;
-      font-weight: 400;
-      letter-spacing: 1px;
-    }
-    .top-bar .menu-buttons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .top-bar .menu-buttons button {
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.2s;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-login {
-      background: #cc0000;
-      color: white;
-    }
-    .btn-login:hover {
-      background: #b30000;
-      transform: scale(0.97);
-    }
-    .btn-quejas {
-      background: #ffc107;
-      color: #333;
-    }
-    .btn-quejas:hover {
-      background: #e0a800;
-      transform: scale(0.97);
-    }
-    .btn-register-top {
-      background: #28a745;
-      color: white;
-    }
-    .btn-register-top:hover {
-      background: #218838;
-      transform: scale(0.97);
-    }
-    .btn-logout-top {
-      background: #dc3545;
-      color: white;
-    }
-    .btn-logout-top:hover {
-      background: #c82333;
-      transform: scale(0.97);
-    }
-    .top-bar .user-info {
-      font-size: 0.8rem;
-      color: #333;
-      font-weight: 600;
-      background: #f0f0f0;
-      padding: 6px 14px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .top-bar .user-info i {
-      color: #cc0000;
-    }
 
     .app-wrapper { display: flex; min-height: 100vh; }
     .sidebar {
@@ -132,7 +30,6 @@
       transition: all 0.3s;
       z-index: 100;
       box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-      top: 70px;
     }
     .sidebar-header {
       padding: 24px 20px;
@@ -189,7 +86,6 @@
       padding: 24px 32px; 
       transition: all 0.3s; 
       background: #f5f5f5;
-      margin-top: 70px;
     }
 
     .stats-grid {
@@ -568,81 +464,81 @@
       line-height: 1.5;
     }
 
-    /* ===== MODAL LOGIN (POPUP) ===== */
-    .modal-login-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
-      z-index: 10000;
-      justify-content: center;
-      align-items: center;
-      animation: fadeIn 0.3s ease;
-    }
-    .modal-login-overlay.active { display: flex; }
-    .modal-login-overlay .modal-login-content {
-      background: #ffffff;
-      border-radius: 24px;
+    .auth-container {
       max-width: 420px;
-      width: 95%;
-      padding: 35px 30px;
-      position: relative;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      width: 100%;
+      margin: 20px auto;
     }
-    .modal-login-overlay .modal-login-content .btn-cerrar-login {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #999;
+    .auth-container .card {
+      padding: 30px;
     }
-    .modal-login-overlay .modal-login-content .btn-cerrar-login:hover {
-      color: #333;
-    }
-    .modal-login-overlay .modal-login-content h2 {
-      text-align: center;
-      color: #cc0000;
+    .auth-container .auth-tabs {
+      display: flex;
+      gap: 8px;
       margin-bottom: 20px;
-      font-size: 1.5rem;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 12px;
     }
-    .modal-login-overlay .modal-login-content .form-group {
+    .auth-container .auth-tabs button {
+      flex: 1;
+      background: transparent;
+      color: #666;
+      border: none;
+      padding: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: 0.2s;
+      justify-content: center;
+    }
+    .auth-container .auth-tabs button.active-tab {
+      background: #cc0000;
+      color: white;
+    }
+    .auth-container .auth-tabs button:hover:not(.active-tab) {
+      background: #f0f0f0;
+    }
+    .auth-container .auth-form { display: none; }
+    .auth-container .auth-form.active-form { display: block; }
+    .auth-container .auth-form .form-group {
       margin-bottom: 16px;
     }
-    .modal-login-overlay .modal-login-content .form-group label {
+    .auth-container .auth-form .form-group label {
       display: block;
       font-weight: 600;
       color: #333;
       margin-bottom: 4px;
       font-size: 0.9rem;
     }
-    .modal-login-overlay .modal-login-content .form-group input {
+    .auth-container .auth-form .form-group input {
       margin-top: 0;
       margin-bottom: 0;
     }
-    .modal-login-overlay .modal-login-content .btn-auth {
+    .auth-container .auth-form .btn-auth {
       width: 100%;
       justify-content: center;
       padding: 14px;
       font-size: 1rem;
     }
-    .modal-login-overlay .modal-login-content .link-recuperar {
+    .auth-container .auth-form .link-recuperar {
       text-align: center;
       margin-top: 12px;
     }
-    .modal-login-overlay .modal-login-content .link-recuperar a {
+    .auth-container .auth-form .link-recuperar a {
       color: #cc0000;
       cursor: pointer;
       text-decoration: underline;
       font-weight: 600;
     }
-    .modal-login-overlay .modal-login-content .separador {
+    .auth-container .btn-guest {
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 1rem;
+      margin-top: 12px;
+      background: #6c757d;
+    }
+    .auth-container .separador {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -650,22 +546,12 @@
       color: #999;
       font-size: 0.85rem;
     }
-    .modal-login-overlay .modal-login-content .separador::before,
-    .modal-login-overlay .modal-login-content .separador::after {
+    .auth-container .separador::before,
+    .auth-container .separador::after {
       content: '';
       flex: 1;
       height: 1px;
       background: #e0e0e0;
-    }
-    .modal-login-overlay .modal-login-content .btn-guest-modal {
-      width: 100%;
-      justify-content: center;
-      padding: 14px;
-      font-size: 1rem;
-      background: #6c757d;
-    }
-    .modal-login-overlay .modal-login-content .btn-guest-modal:hover {
-      background: #5a6268;
     }
 
     /* ===== MODAL PRODUCTO ===== */
@@ -1522,80 +1408,11 @@
       .modal-pago-contenido { padding: 25px 20px; }
       .opcion-pago { padding: 12px 14px; }
       .opcion-pago .icono { font-size: 1.4rem; width: 35px; }
-      .top-bar { padding: 10px 16px; flex-direction: column; align-items: stretch; }
-      .top-bar .menu-buttons { justify-content: center; }
-      .top-bar .logo-area { justify-content: center; }
-      .sidebar { top: 120px; }
-      .main-content { margin-top: 120px; }
     }
     .menu-toggle { display: none; }
   </style>
 </head>
 <body>
-
-<!-- ===== TOP BAR (SIEMPRE VISIBLE) ===== -->
-<header class="top-bar">
-  <div class="logo-area" onclick="showPage('tienda')">
-    <i class="fas fa-gift"></i>
-    <div>
-      <h1>LOS AMIGOS</h1>
-      <span>ESTORE 🎁</span>
-    </div>
-  </div>
-  <div class="menu-buttons">
-    <!-- Botón de Quejas/Sugerencias -->
-    <button class="btn-quejas" onclick="window.open('mailto:andyobregon799@gmail.com?subject=Queja%20o%20Sugerencia%20-%20LOS%20AMIGOS%20ESTORE', '_blank')">
-      <i class="fas fa-envelope"></i> 📧 Quejas/Sugerencias
-    </button>
-    
-    <!-- Botones que cambian según autenticación -->
-    <div id="top-buttons-container">
-      <!-- Si NO está logueado: muestra "Iniciar Sesión" y "Registrarse" -->
-      <button class="btn-login" id="btn-abrir-login" onclick="abrirModalLogin()">
-        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-      </button>
-      <button class="btn-register-top" onclick="abrirModalLogin('register')">
-        <i class="fas fa-user-plus"></i> Registrarse
-      </button>
-    </div>
-    <div id="top-user-info" style="display:none;">
-      <span class="user-info" id="user-info-display">
-        <i class="fas fa-user-circle"></i> <span id="user-email-display">admin@tienda.com</span>
-      </span>
-      <button class="btn-logout-top" onclick="cerrarSesionTop()">
-        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- ===== MODAL LOGIN ===== -->
-<div class="modal-login-overlay" id="modal-login">
-  <div class="modal-login-content">
-    <button class="btn-cerrar-login" onclick="cerrarModalLogin()">×</button>
-    <h2><i class="fas fa-gift" style="color:#cc0000;"></i> LOS AMIGOS</h2>
-    <p style="text-align:center; color:#666; margin-bottom:20px;">Inicia sesión para administrar tu tienda</p>
-    
-    <div id="login-form-modal">
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="login-email-top" placeholder="tucorreo@ejemplo.com">
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="login-password-top" placeholder="••••••••">
-      </div>
-      <button class="btn-auth" id="login-btn-top"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
-      <div class="link-recuperar">
-        <a onclick="alert('Envía un correo a andyobregon799@gmail.com para recuperar tu contraseña')">¿Olvidaste tu contraseña?</a>
-      </div>
-      <div class="separador">o</div>
-      <button class="btn-guest-modal" onclick="cerrarModalLogin(); entrarComoInvitado();">
-        <i class="fas fa-user"></i> Continuar como Invitado
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- ===== BOTÓN FLOTANTE PARA CLIENTES (REPORTAR IMÁGENES) ===== -->
 <div id="reporte-boton-flotante" style="position:fixed; bottom:20px; right:20px; z-index:9999;">
@@ -1702,8 +1519,70 @@
   </div>
 </div>
 
+<!-- ===== LOGIN / REGISTER ===== -->
+<div id="login-container" class="app-wrapper" style="justify-content: center; align-items: center; min-height: 100vh;">
+  <div class="auth-container">
+    <div class="card">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <i class="fas fa-gift" style="font-size: 4rem; color: #cc0000;"></i>
+        <h2 style="color: #cc0000; font-weight: 900;">LOS AMIGOS</h2>
+        <h3 style="font-size: 1rem; color: #666;">ESTORE 🎁</h3>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="active-tab" data-tab="login" onclick="cambiarTabAuth('login')"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
+        <button data-tab="register" onclick="cambiarTabAuth('register')"><i class="fas fa-user-plus"></i> Registrarse</button>
+      </div>
+
+      <div class="auth-form active-form" id="form-login">
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="tucorreo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="login-password" placeholder="••••••••">
+        </div>
+        <button class="btn-auth" id="login-btn"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</button>
+        <div class="link-recuperar">
+          <a onclick="mostrarRecuperar()">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div class="separador">o</div>
+        <button class="btn-guest" id="guest-btn"><i class="fas fa-user"></i> Entrar como Invitado</button>
+      </div>
+
+      <div class="auth-form" id="form-register">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="register-nombre" placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="register-email" placeholder="tucorreo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="register-password" placeholder="•••••••• (mínimo 6 caracteres)">
+        </div>
+        <button class="btn-auth" id="register-btn"><i class="fas fa-user-plus"></i> Crear Cuenta</button>
+      </div>
+
+      <div class="auth-form" id="form-recuperar" style="display:none;">
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="recuperar-email" placeholder="tucorreo@ejemplo.com">
+        </div>
+        <button class="btn-auth" id="recuperar-btn"><i class="fas fa-envelope"></i> Enviar enlace de recuperación</button>
+        <div class="link-recuperar">
+          <a onclick="volverALogin()">← Volver al inicio de sesión</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== DASHBOARD ===== -->
-<div id="dashboard-app" style="display: block;">
+<div id="dashboard-app" style="display: none;">
   <div class="app-wrapper">
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -1714,7 +1593,7 @@
         </div>
       </div>
       
-      <div class="admin-only" id="admin-menu-items">
+      <div class="admin-only">
         <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
         <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
         <div class="nav-item" data-page="productos"><i class="fas fa-boxes"></i> Productos</div>
@@ -1729,14 +1608,10 @@
         <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
       </div>
       
-      <div class="seller-only" id="seller-menu-items" style="display:none;">
+      <div class="seller-only">
         <div class="nav-item active" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
         <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
       </div>
-      
-      <!-- Menú visible para todos (clientes) -->
-      <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
-      <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Carrito</div>
       
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
@@ -1756,7 +1631,7 @@
       </div>
 
       <!-- TIENDA -->
-      <div id="page-tienda" class="page active-page">
+      <div id="page-tienda" class="page">
         <div class="tienda-header" id="tienda-header">
           <img id="header-imagen-tienda" src="" alt="Header" style="width:100%; height:auto; max-height:400px; object-fit:contain; display:block;">
         </div>
@@ -1843,9 +1718,11 @@
           <div class="card-header">
             <h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <!-- ===== BOTÓN PARA VER IMÁGENES FALLIDAS ===== -->
               <button onclick="verReportesImagenes()" style="background:#dc3545; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
                 <i class="fas fa-exclamation-triangle"></i> 🔴 VER IMÁGENES FALLIDAS
               </button>
+              <!-- ===== BOTÓN PARA VER REPORTES DE CLIENTES ===== -->
               <button onclick="verReportesClientes()" style="background:#007bff; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
                 <i class="fas fa-users"></i> 📩 VER REPORTES DE CLIENTES
               </button>
@@ -2430,59 +2307,341 @@
   console.log('📩 Para ver reportes de clientes: verReportesClientes()');
   // ============================================
 
-  // ===== FUNCIONES DE MODAL LOGIN =====
-  window.abrirModalLogin = function(tab = 'login') {
-    document.getElementById('modal-login').classList.add('active');
-    document.getElementById('login-email-top').value = '';
-    document.getElementById('login-password-top').value = '';
+  // ===== FUNCIONES PARA CONFIGURACIÓN DE MÉTODOS DE PAGO =====
+  function cargarMetodosPago() {
+    onSnapshot(collection(db, "metodos_pago_config"), (snap) => {
+      metodosPagoConfig = [];
+      snap.forEach(doc => {
+        metodosPagoConfig.push({ id: doc.id, ...doc.data() });
+      });
+      renderOpcionesPago();
+      renderListaMetodosPagoAdmin();
+    });
   }
 
-  window.cerrarModalLogin = function() {
-    document.getElementById('modal-login').classList.remove('active');
+  function cargarIntereses() {
+    const docRef = doc(db, "configuracion", "intereses");
+    getDoc(docRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        interesesConfig.pagos2 = data.pagos2 || 0;
+        interesesConfig.pagos3 = data.pagos3 || 5;
+        interesesConfig.pagos4 = data.pagos4 || 10;
+      }
+      document.getElementById('interes-2-pagos').value = interesesConfig.pagos2;
+      document.getElementById('interes-3-pagos').value = interesesConfig.pagos3;
+      document.getElementById('interes-4-pagos').value = interesesConfig.pagos4;
+    }).catch(err => console.log("Error cargando intereses:", err));
   }
 
-  window.entrarComoInvitado = function() {
-    currentUser = null;
-    currentUserRol = "guest";
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
-    document.getElementById('admin-menu-items').style.display = 'none';
-    document.getElementById('seller-menu-items').style.display = 'none';
-    document.getElementById('top-buttons-container').style.display = 'flex';
-    document.getElementById('top-user-info').style.display = 'none';
-    showPage('tienda');
-    addDebugLog(`👤 Acceso como invitado`, 'info');
-    loadAllData();
-    cargarHeader();
-    cargarMetodosPago();
-    cargarIntereses();
-    cerrarModalLogin();
+  function guardarIntereses() {
+    const pagos2 = parseFloat(document.getElementById('interes-2-pagos').value) || 0;
+    const pagos3 = parseFloat(document.getElementById('interes-3-pagos').value) || 0;
+    const pagos4 = parseFloat(document.getElementById('interes-4-pagos').value) || 0;
+    
+    setDoc(doc(db, "configuracion", "intereses"), {
+      pagos2, pagos3, pagos4
+    }).then(() => {
+      interesesConfig.pagos2 = pagos2;
+      interesesConfig.pagos3 = pagos3;
+      interesesConfig.pagos4 = pagos4;
+      addDebugLog('✅ Intereses guardados correctamente', 'success');
+      alert('✅ Intereses guardados correctamente');
+    }).catch(err => {
+      addDebugLog(`❌ Error guardando intereses: ${err.message}`, 'error');
+      alert('Error: ' + err.message);
+    });
   }
 
-  window.cerrarSesionTop = function() {
-    if (currentUser) {
-      signOut(auth);
-    } else {
-      location.reload();
+  function renderOpcionesPago() {
+    const container = document.getElementById('opciones-pago-container');
+    if (!container) return;
+    
+    const activos = metodosPagoConfig.filter(m => m.activo !== false);
+    
+    if (activos.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:20px; color:#999;">
+          <i class="fas fa-exclamation-circle" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+          No hay métodos de pago configurados. Contacta al administrador.
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    activos.forEach((metodo, index) => {
+      const isActive = index === 0 ? 'active' : '';
+      const borderColor = index === 0 ? '#cc0000' : '#e0e0e0';
+      html += `
+        <div class="opcion-pago ${isActive}" onclick="seleccionarPago('${metodo.id}')" style="border-color:${borderColor};">
+          <input type="radio" name="metodo-pago-modal" value="${metodo.id}" ${index === 0 ? 'checked' : ''}>
+          <div class="icono">${metodo.icono || '💳'}</div>
+          <div class="info">
+            <h4>${metodo.nombre}</h4>
+            <p>${metodo.descripcion || ''}</p>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    
+    if (activos.length > 0) {
+      metodoPagoSeleccionado = activos[0].id;
+      const esCredito = activos[0].esCredito || false;
+      document.getElementById('opciones-credito-modal').classList.toggle('show', esCredito);
+      if (esCredito) {
+        renderPlanesCredito();
+      }
     }
   }
 
-  // ===== BOTÓN LOGIN TOP =====
-  document.getElementById("login-btn-top")?.addEventListener("click", async () => {
-    const email = document.getElementById("login-email-top").value.trim();
-    const pass = document.getElementById("login-password-top").value.trim();
+  function renderPlanesCredito() {
+    const container = document.getElementById('planes-credito-container');
+    if (!container) return;
+    
+    const planes = [
+      { pagos: 2, interes: interesesConfig.pagos2 },
+      { pagos: 3, interes: interesesConfig.pagos3 },
+      { pagos: 4, interes: interesesConfig.pagos4 }
+    ];
+    
+    let html = '';
+    planes.forEach((plan, index) => {
+      const isActive = index === 0 ? 'active' : '';
+      const borderColor = index === 0 ? '#cc0000' : '#e0e0e0';
+      const interesText = plan.interes === 0 ? 'Sin interés' : `+$${plan.interes} de interés`;
+      html += `
+        <div class="plan-item ${isActive}" onclick="seleccionarPlan(${plan.pagos})" style="border-color:${borderColor};">
+          <input type="radio" name="plan-credito-modal" value="${plan.pagos}" ${index === 0 ? 'checked' : ''}>
+          <span class="detalle-plan">${plan.pagos} pagos</span>
+          <span class="interes">${interesText}</span>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    
+    planCreditoSeleccionado = 2;
+  }
+
+  function renderListaMetodosPagoAdmin() {
+    const container = document.getElementById('lista-metodos-pago-admin');
+    if (!container) return;
+    
+    if (metodosPagoConfig.length === 0) {
+      container.innerHTML = '<p style="color:#999;">No hay métodos de pago configurados. Agrega uno arriba.</p>';
+      return;
+    }
+    
+    let html = '';
+    metodosPagoConfig.forEach(m => {
+      const estadoClass = m.activo !== false ? 'activo' : 'inactivo';
+      const estadoText = m.activo !== false ? 'Activo ✅' : 'Inactivo ⛔';
+      html += `
+        <div class="metodo-pago-item">
+          <div class="info">
+            <div class="nombre">${m.icono || '💳'} ${m.nombre}</div>
+            <div class="detalle">${m.descripcion || 'Sin descripción'} ${m.esCredito ? ' | 📋 Crédito' : ''}</div>
+          </div>
+          <div class="acciones">
+            <span class="estado-badge ${estadoClass}">${estadoText}</span>
+            <button class="btn-small btn-warning" onclick="toggleMetodoPago('${m.id}', ${m.activo !== false ? 'false' : 'true'})" style="background:#ffc107; color:#333; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${m.activo !== false ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarMetodoPago('${m.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  window.toggleMetodoPago = async (id, nuevoEstado) => {
+    try {
+      await updateDoc(doc(db, "metodos_pago_config", id), { activo: nuevoEstado });
+      addDebugLog(`🔄 Método ${id} -> ${nuevoEstado ? 'Activo' : 'Inactivo'}`, 'success');
+    } catch (error) {
+      addDebugLog(`❌ Error al cambiar estado: ${error.message}`, 'error');
+    }
+  };
+
+  window.eliminarMetodoPago = async (id) => {
+    if (!confirm("¿Eliminar este método de pago?")) return;
+    try {
+      await deleteDoc(doc(db, "metodos_pago_config", id));
+      addDebugLog(`🗑️ Método de pago eliminado: ${id}`, 'info');
+    } catch (error) {
+      addDebugLog(`❌ Error al eliminar: ${error.message}`, 'error');
+    }
+  };
+
+  // ===== FUNCIONES PARA GENERAR TALLAS =====
+  function generarTallasDesdeRango(textoTallas) {
+    if (!textoTallas) return [];
+    textoTallas = textoTallas.trim();
+    if (textoTallas.includes(',')) {
+      return textoTallas.split(',').map(t => t.trim()).filter(t => t);
+    }
+    const rangoMatch = textoTallas.match(/(\d+)\s*(?:al|a|-)\s*(\d+)/i);
+    if (rangoMatch) {
+      const inicio = parseInt(rangoMatch[1]);
+      const fin = parseInt(rangoMatch[2]);
+      if (inicio && fin && inicio < fin) {
+        const tallas = [];
+        for (let i = inicio; i <= fin; i++) {
+          tallas.push(i.toString());
+        }
+        return tallas;
+      }
+    }
+    const letras = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const rangoLetras = textoTallas.match(/([A-Z]+)\s*(?:al|a|-)\s*([A-Z]+)/i);
+    if (rangoLetras) {
+      const inicio = letras.indexOf(rangoLetras[1].toUpperCase());
+      const fin = letras.indexOf(rangoLetras[2].toUpperCase());
+      if (inicio !== -1 && fin !== -1 && inicio < fin) {
+        return letras.slice(inicio, fin + 1);
+      }
+    }
+    return [textoTallas];
+  }
+
+  // ===== FUNCIÓN PARA OBTENER IMAGEN POR DEFECTO =====
+  function getDefaultImage() {
+    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
+  }
+
+  // ===== FUNCIÓN PARA OBTENER IMÁGENES DEL PRODUCTO =====
+  function getProductImages(product) {
+    let imagenes = [];
+    if (product.imagenes) {
+      if (typeof product.imagenes === 'string') {
+        imagenes = product.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
+      } else if (Array.isArray(product.imagenes)) {
+        imagenes = product.imagenes;
+      }
+    }
+    return imagenes;
+  }
+
+  // ===== FUNCIÓN PARA OBTENER PRIMERA IMAGEN =====
+  function getFirstImage(product) {
+    const imagenes = getProductImages(product);
+    return imagenes.length > 0 ? imagenes[0] : getDefaultImage();
+  }
+
+  // ===== VARIABLES GLOBALES =====
+  const loginContainer = document.getElementById("login-container");
+  const dashboardApp = document.getElementById("dashboard-app");
+  const loginBtn = document.getElementById("login-btn");
+  const registerBtn = document.getElementById("register-btn");
+  const recuperarBtn = document.getElementById("recuperar-btn");
+  const guestBtn = document.getElementById("guest-btn");
+  const logoutSidebar = document.getElementById("logout-sidebar");
+
+  // ===== FUNCIONES DE AUTENTICACIÓN =====
+  window.cambiarTabAuth = function(tab) {
+    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
+    document.querySelector(`.auth-tabs button[data-tab="${tab}"]`).classList.add('active-tab');
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+    document.getElementById(`form-${tab}`).classList.add('active-form');
+    document.getElementById('form-recuperar').style.display = 'none';
+  };
+
+  window.mostrarRecuperar = function() {
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+    document.getElementById('form-recuperar').style.display = 'block';
+  };
+
+  window.volverALogin = function() {
+    document.getElementById('form-recuperar').style.display = 'none';
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+    document.getElementById('form-login').classList.add('active-form');
+    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
+    document.querySelector('.auth-tabs button[data-tab="login"]').classList.add('active-tab');
+  };
+
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById("login-email").value.trim();
+    const pass = document.getElementById("login-password").value.trim();
     if (!email || !pass) { alert("Completa todos los campos."); return; }
     try {
       await signInWithEmailAndPassword(auth, email, pass);
       addDebugLog(`✅ Login exitoso: ${email}`, 'success');
-      cerrarModalLogin();
     } catch (err) {
       addDebugLog(`❌ Error login: ${err.message}`, 'error');
       alert("Error: " + err.message);
     }
   });
 
-  // ===== FUNCIONES DE AUTENTICACIÓN =====
+  registerBtn.addEventListener('click', async () => {
+    const nombre = document.getElementById("register-nombre").value.trim();
+    const email = document.getElementById("register-email").value.trim();
+    const pass = document.getElementById("register-password").value.trim();
+    if (!nombre || !email || !pass) { alert("Completa todos los campos."); return; }
+    if (pass.length < 6) { alert("La contraseña debe tener al menos 6 caracteres."); return; }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await setDoc(doc(db, "usuarios_permisos", email), { 
+        rol: "seller", 
+        estado: true, 
+        nombre: nombre,
+        uid: userCredential.user.uid
+      });
+      addDebugLog(`✅ Usuario registrado: ${email}`, 'success');
+      alert("✅ Cuenta creada exitosamente. Ahora inicia sesión.");
+      cambiarTabAuth('login');
+      document.getElementById("login-email").value = email;
+    } catch (err) {
+      addDebugLog(`❌ Error registro: ${err.message}`, 'error');
+      alert("Error: " + err.message);
+    }
+  });
+
+  recuperarBtn.addEventListener('click', async () => {
+    const email = document.getElementById("recuperar-email").value.trim();
+    if (!email) { alert("Ingresa tu correo electrónico."); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      addDebugLog(`✅ Email de recuperación enviado a: ${email}`, 'success');
+      alert("✅ Se ha enviado un enlace de recuperación a tu correo electrónico.");
+      volverALogin();
+    } catch (err) {
+      addDebugLog(`❌ Error recuperación: ${err.message}`, 'error');
+      alert("Error: " + err.message);
+    }
+  });
+
+  guestBtn.addEventListener('click', () => {
+    currentUser = null;
+    currentUserRol = "guest";
+    loginContainer.style.display = "none";
+    dashboardApp.style.display = "block";
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(el => {
+      if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
+        el.style.display = 'none';
+      }
+    });
+    showPage('tienda');
+    addDebugLog(`👤 Acceso como invitado`, 'info');
+    loadAllData();
+    cargarHeader();
+    cargarMetodosPago();
+    cargarIntereses();
+  });
+
+  logoutSidebar.addEventListener('click', () => {
+    if (currentUser) {
+      signOut(auth);
+    } else {
+      location.reload();
+    }
+  });
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
@@ -2495,12 +2654,8 @@
       } else {
         currentUserRol = "seller";
       }
-      
-      // Mostrar info de usuario en top bar
-      document.getElementById('top-buttons-container').style.display = 'none';
-      document.getElementById('top-user-info').style.display = 'flex';
-      document.getElementById('user-email-display').textContent = user.email;
-      
+      loginContainer.style.display = "none";
+      dashboardApp.style.display = "block";
       updateVisibilityByRole();
       addDebugLog(`👤 Usuario: ${user.email} (${currentUserRol})`, 'success');
       loadAllData();
@@ -2509,15 +2664,10 @@
       cargarIntereses();
     } else {
       if (currentUserRol !== 'guest') {
+        loginContainer.style.display = "flex";
+        dashboardApp.style.display = "none";
         currentUser = null;
         currentUserRol = "visitor";
-        document.getElementById('top-buttons-container').style.display = 'flex';
-        document.getElementById('top-user-info').style.display = 'none';
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
-        document.getElementById('admin-menu-items').style.display = 'none';
-        document.getElementById('seller-menu-items').style.display = 'none';
-        showPage('tienda');
       }
     }
   });
@@ -2531,21 +2681,15 @@
     if (isAdmin()) {
       adminElements.forEach(el => el.style.display = 'block');
       sellerElements.forEach(el => el.style.display = 'none');
-      document.getElementById('admin-menu-items').style.display = 'block';
-      document.getElementById('seller-menu-items').style.display = 'none';
-      document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.page === 'tienda' || el.dataset.page === 'ventas') {
-          el.style.display = 'flex';
-        }
-      });
+      document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'flex');
       showPage('dashboard');
     } else if (isSeller()) {
       adminElements.forEach(el => el.style.display = 'none');
       sellerElements.forEach(el => el.style.display = 'block');
-      document.getElementById('admin-menu-items').style.display = 'none';
-      document.getElementById('seller-menu-items').style.display = 'block';
       document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.page === 'tienda' || el.dataset.page === 'ventas') {
+        if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
+          el.style.display = 'none';
+        } else {
           el.style.display = 'flex';
         }
       });
@@ -2553,10 +2697,10 @@
     } else {
       adminElements.forEach(el => el.style.display = 'none');
       sellerElements.forEach(el => el.style.display = 'none');
-      document.getElementById('admin-menu-items').style.display = 'none';
-      document.getElementById('seller-menu-items').style.display = 'none';
       document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.page === 'tienda' || el.dataset.page === 'ventas') {
+        if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
+          el.style.display = 'none';
+        } else {
           el.style.display = 'flex';
         }
       });
@@ -2575,10 +2719,7 @@
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
-      if (item.id === "logout-sidebar") {
-        cerrarSesionTop();
-        return;
-      }
+      if (item.id === "logout-sidebar") return;
       const page = item.getAttribute('data-page');
       if (page) showPage(page);
     });
@@ -2828,231 +2969,6 @@
     document.getElementById("filtro-talla").value = 'todos';
     document.getElementById("filtro-productos-tienda").value = '';
     renderTiendaDepratik();
-  };
-
-  // ===== FUNCIONES PARA GENERAR TALLAS =====
-  function generarTallasDesdeRango(textoTallas) {
-    if (!textoTallas) return [];
-    textoTallas = textoTallas.trim();
-    if (textoTallas.includes(',')) {
-      return textoTallas.split(',').map(t => t.trim()).filter(t => t);
-    }
-    const rangoMatch = textoTallas.match(/(\d+)\s*(?:al|a|-)\s*(\d+)/i);
-    if (rangoMatch) {
-      const inicio = parseInt(rangoMatch[1]);
-      const fin = parseInt(rangoMatch[2]);
-      if (inicio && fin && inicio < fin) {
-        const tallas = [];
-        for (let i = inicio; i <= fin; i++) {
-          tallas.push(i.toString());
-        }
-        return tallas;
-      }
-    }
-    const letras = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-    const rangoLetras = textoTallas.match(/([A-Z]+)\s*(?:al|a|-)\s*([A-Z]+)/i);
-    if (rangoLetras) {
-      const inicio = letras.indexOf(rangoLetras[1].toUpperCase());
-      const fin = letras.indexOf(rangoLetras[2].toUpperCase());
-      if (inicio !== -1 && fin !== -1 && inicio < fin) {
-        return letras.slice(inicio, fin + 1);
-      }
-    }
-    return [textoTallas];
-  }
-
-  // ===== FUNCIÓN PARA OBTENER IMAGEN POR DEFECTO =====
-  function getDefaultImage() {
-    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
-  }
-
-  // ===== FUNCIÓN PARA OBTENER IMÁGENES DEL PRODUCTO =====
-  function getProductImages(product) {
-    let imagenes = [];
-    if (product.imagenes) {
-      if (typeof product.imagenes === 'string') {
-        imagenes = product.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
-      } else if (Array.isArray(product.imagenes)) {
-        imagenes = product.imagenes;
-      }
-    }
-    return imagenes;
-  }
-
-  // ===== FUNCIÓN PARA OBTENER PRIMERA IMAGEN =====
-  function getFirstImage(product) {
-    const imagenes = getProductImages(product);
-    return imagenes.length > 0 ? imagenes[0] : getDefaultImage();
-  }
-
-  // ===== FUNCIONES PARA CONFIGURACIÓN DE MÉTODOS DE PAGO =====
-  function cargarMetodosPago() {
-    onSnapshot(collection(db, "metodos_pago_config"), (snap) => {
-      metodosPagoConfig = [];
-      snap.forEach(doc => {
-        metodosPagoConfig.push({ id: doc.id, ...doc.data() });
-      });
-      renderOpcionesPago();
-      renderListaMetodosPagoAdmin();
-    });
-  }
-
-  function cargarIntereses() {
-    const docRef = doc(db, "configuracion", "intereses");
-    getDoc(docRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        interesesConfig.pagos2 = data.pagos2 || 0;
-        interesesConfig.pagos3 = data.pagos3 || 5;
-        interesesConfig.pagos4 = data.pagos4 || 10;
-      }
-      document.getElementById('interes-2-pagos').value = interesesConfig.pagos2;
-      document.getElementById('interes-3-pagos').value = interesesConfig.pagos3;
-      document.getElementById('interes-4-pagos').value = interesesConfig.pagos4;
-    }).catch(err => console.log("Error cargando intereses:", err));
-  }
-
-  function guardarIntereses() {
-    const pagos2 = parseFloat(document.getElementById('interes-2-pagos').value) || 0;
-    const pagos3 = parseFloat(document.getElementById('interes-3-pagos').value) || 0;
-    const pagos4 = parseFloat(document.getElementById('interes-4-pagos').value) || 0;
-    
-    setDoc(doc(db, "configuracion", "intereses"), {
-      pagos2, pagos3, pagos4
-    }).then(() => {
-      interesesConfig.pagos2 = pagos2;
-      interesesConfig.pagos3 = pagos3;
-      interesesConfig.pagos4 = pagos4;
-      addDebugLog('✅ Intereses guardados correctamente', 'success');
-      alert('✅ Intereses guardados correctamente');
-    }).catch(err => {
-      addDebugLog(`❌ Error guardando intereses: ${err.message}`, 'error');
-      alert('Error: ' + err.message);
-    });
-  }
-
-  function renderOpcionesPago() {
-    const container = document.getElementById('opciones-pago-container');
-    if (!container) return;
-    
-    const activos = metodosPagoConfig.filter(m => m.activo !== false);
-    
-    if (activos.length === 0) {
-      container.innerHTML = `
-        <div style="text-align:center; padding:20px; color:#999;">
-          <i class="fas fa-exclamation-circle" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
-          No hay métodos de pago configurados. Contacta al administrador.
-        </div>
-      `;
-      return;
-    }
-    
-    let html = '';
-    activos.forEach((metodo, index) => {
-      const isActive = index === 0 ? 'active' : '';
-      const borderColor = index === 0 ? '#cc0000' : '#e0e0e0';
-      html += `
-        <div class="opcion-pago ${isActive}" onclick="seleccionarPago('${metodo.id}')" style="border-color:${borderColor};">
-          <input type="radio" name="metodo-pago-modal" value="${metodo.id}" ${index === 0 ? 'checked' : ''}>
-          <div class="icono">${metodo.icono || '💳'}</div>
-          <div class="info">
-            <h4>${metodo.nombre}</h4>
-            <p>${metodo.descripcion || ''}</p>
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-    
-    if (activos.length > 0) {
-      metodoPagoSeleccionado = activos[0].id;
-      const esCredito = activos[0].esCredito || false;
-      document.getElementById('opciones-credito-modal').classList.toggle('show', esCredito);
-      if (esCredito) {
-        renderPlanesCredito();
-      }
-    }
-  }
-
-  function renderPlanesCredito() {
-    const container = document.getElementById('planes-credito-container');
-    if (!container) return;
-    
-    const planes = [
-      { pagos: 2, interes: interesesConfig.pagos2 },
-      { pagos: 3, interes: interesesConfig.pagos3 },
-      { pagos: 4, interes: interesesConfig.pagos4 }
-    ];
-    
-    let html = '';
-    planes.forEach((plan, index) => {
-      const isActive = index === 0 ? 'active' : '';
-      const borderColor = index === 0 ? '#cc0000' : '#e0e0e0';
-      const interesText = plan.interes === 0 ? 'Sin interés' : `+$${plan.interes} de interés`;
-      html += `
-        <div class="plan-item ${isActive}" onclick="seleccionarPlan(${plan.pagos})" style="border-color:${borderColor};">
-          <input type="radio" name="plan-credito-modal" value="${plan.pagos}" ${index === 0 ? 'checked' : ''}>
-          <span class="detalle-plan">${plan.pagos} pagos</span>
-          <span class="interes">${interesText}</span>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-    
-    planCreditoSeleccionado = 2;
-  }
-
-  function renderListaMetodosPagoAdmin() {
-    const container = document.getElementById('lista-metodos-pago-admin');
-    if (!container) return;
-    
-    if (metodosPagoConfig.length === 0) {
-      container.innerHTML = '<p style="color:#999;">No hay métodos de pago configurados. Agrega uno arriba.</p>';
-      return;
-    }
-    
-    let html = '';
-    metodosPagoConfig.forEach(m => {
-      const estadoClass = m.activo !== false ? 'activo' : 'inactivo';
-      const estadoText = m.activo !== false ? 'Activo ✅' : 'Inactivo ⛔';
-      html += `
-        <div class="metodo-pago-item">
-          <div class="info">
-            <div class="nombre">${m.icono || '💳'} ${m.nombre}</div>
-            <div class="detalle">${m.descripcion || 'Sin descripción'} ${m.esCredito ? ' | 📋 Crédito' : ''}</div>
-          </div>
-          <div class="acciones">
-            <span class="estado-badge ${estadoClass}">${estadoText}</span>
-            <button class="btn-small btn-warning" onclick="toggleMetodoPago('${m.id}', ${m.activo !== false ? 'false' : 'true'})" style="background:#ffc107; color:#333; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              ${m.activo !== false ? 'Desactivar' : 'Activar'}
-            </button>
-            <button class="btn-small btn-danger" onclick="eliminarMetodoPago('${m.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-  }
-
-  window.toggleMetodoPago = async (id, nuevoEstado) => {
-    try {
-      await updateDoc(doc(db, "metodos_pago_config", id), { activo: nuevoEstado });
-      addDebugLog(`🔄 Método ${id} -> ${nuevoEstado ? 'Activo' : 'Inactivo'}`, 'success');
-    } catch (error) {
-      addDebugLog(`❌ Error al cambiar estado: ${error.message}`, 'error');
-    }
-  };
-
-  window.eliminarMetodoPago = async (id) => {
-    if (!confirm("¿Eliminar este método de pago?")) return;
-    try {
-      await deleteDoc(doc(db, "metodos_pago_config", id));
-      addDebugLog(`🗑️ Método de pago eliminado: ${id}`, 'info');
-    } catch (error) {
-      addDebugLog(`❌ Error al eliminar: ${error.message}`, 'error');
-    }
   };
 
   // ===== MODAL PRODUCTO =====
