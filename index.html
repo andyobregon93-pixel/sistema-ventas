@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ===== TODOS LOS ESTILOS ANTERIORES + NUEVOS ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -29,7 +30,6 @@
       transition: all 0.3s;
       z-index: 100;
       box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-      top: 0;
     }
     .sidebar-header {
       padding: 24px 20px;
@@ -166,6 +166,10 @@
     .btn-warning { background: #ffc107; color: #333; }
     .btn-warning:hover { background: #e0a800; }
     .btn-small { padding: 4px 12px; font-size: 0.8rem; border-radius: 8px; }
+    .btn-guest { background: #6c757d; }
+    .btn-guest:hover { background: #5a6268; }
+    .btn-whatsapp { background: #25D366; }
+    .btn-whatsapp:hover { background: #1da851; }
     
     .badge { 
       background: #f0f0f0; 
@@ -353,7 +357,7 @@
 
     .productos-grid-depratik {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 25px;
       margin-top: 20px;
     }
@@ -459,14 +463,6 @@
       overflow: hidden;
       line-height: 1.5;
     }
-    .producto-card-depratik .info .like-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #f0f0f0;
-    }
 
     .auth-container {
       max-width: 420px;
@@ -558,6 +554,7 @@
       background: #e0e0e0;
     }
 
+    /* ===== MODAL PRODUCTO ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -691,12 +688,6 @@
       color: #28a745;
       font-weight: 600;
     }
-    .modal-info .modal-like-display {
-      font-size: 1rem;
-      color: #cc0000;
-      font-weight: 600;
-      margin: 4px 0;
-    }
 
     .modal-tallas-container {
       margin: 12px 0;
@@ -825,6 +816,7 @@
       transform: none;
     }
 
+    /* ===== CARRITO ===== */
     .cart-item {
       display: flex;
       align-items: center;
@@ -957,6 +949,7 @@
       transform: none;
     }
 
+    /* ===== MODAL DE MÉTODO DE PAGO ===== */
     .modal-pago-overlay {
       display: none;
       position: fixed;
@@ -1172,8 +1165,25 @@
       transform: none;
     }
 
-    .admin-only { display: none; }
-    .seller-only { display: none; }
+    .btn-subir-foto {
+      background: #cc0000;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      margin: 8px 0;
+    }
+    .btn-subir-foto:hover { background: #b30000; transform: scale(1.02); }
+
+    .imagenes-preview { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+    .imagenes-preview img { width: 50px; height: 50px; object-fit: contain; border-radius: 8px; border: 1px solid #e0e0e0; background: #f9f9f9; }
 
     .debug-panel {
       background: #f9f9f9;
@@ -1195,14 +1205,38 @@
     .debug-panel .log-entry.error { color: #dc3545; }
     .debug-panel .log-entry.info { color: #007bff; }
 
-    .preview-img-tabla {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      border-radius: 6px;
+    .banner-preview-mini {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 12px;
       border: 1px solid #e0e0e0;
+      margin: 8px 0;
+    }
+    .banner-preview-mini img {
+      height: 50px;
+      width: auto;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      object-fit: contain;
       background: #f9f9f9;
     }
+    .banner-preview-mini .info {
+      flex: 1;
+    }
+    .banner-preview-mini .info h4 {
+      font-size: 0.95rem;
+      color: #1a1a1a;
+    }
+    .banner-preview-mini .info p {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .admin-only { display: none; }
+    .seller-only { display: none; }
 
     .config-header-panel {
       background: #f9f9f9;
@@ -1251,36 +1285,54 @@
     }
     .btn-crear-seller:hover { background: #218838; transform: scale(1.02); }
 
-    .banner-preview-mini {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 12px;
-      background: #f9f9f9;
-      border-radius: 12px;
-      border: 1px solid #e0e0e0;
-      margin: 8px 0;
-    }
-    .banner-preview-mini img {
+    .preview-img-tabla {
+      width: 50px;
       height: 50px;
-      width: auto;
-      border-radius: 8px;
-      border: 1px solid #e0e0e0;
       object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
       background: #f9f9f9;
-    }
-    .banner-preview-mini .info {
-      flex: 1;
-    }
-    .banner-preview-mini .info h4 {
-      font-size: 0.95rem;
-      color: #1a1a1a;
-    }
-    .banner-preview-mini .info p {
-      font-size: 0.8rem;
-      color: #666;
     }
 
+    .detalle-cuotas {
+      font-size: 0.85rem;
+      color: #856404;
+      background: #fff8e1;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 8px;
+      border: 1px solid #ffc107;
+      display: none;
+    }
+    .detalle-cuotas.show {
+      display: block;
+    }
+    .detalle-cuotas .cuota-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0e0c0;
+    }
+    .detalle-cuotas .cuota-item:last-child {
+      border-bottom: none;
+    }
+    .detalle-cuotas .cuota-item .label {
+      color: #666;
+    }
+    .detalle-cuotas .cuota-item .value {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .detalle-cuotas .total-interes {
+      text-align: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 2px solid #ffc107;
+      font-weight: 700;
+      color: #cc0000;
+    }
+
+    /* ===== ESTILOS PARA ADMINISTRACIÓN DE MÉTODOS DE PAGO ===== */
     .metodo-pago-item {
       display: flex;
       align-items: center;
@@ -1337,7 +1389,7 @@
     }
 
     @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; top:0; }
+      .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; background: white; }
       .sidebar.open { transform: translateX(0); }
       .main-content { margin-left: 0; padding: 16px; }
       .menu-toggle { display: block; position: fixed; top: 16px; left: 16px; z-index: 210; background: #cc0000; border-radius: 12px; padding: 8px 12px; color: white; border: none; }
@@ -1541,28 +1593,25 @@
         </div>
       </div>
       
-      <div class="admin-only" id="admin-menu">
+      <div class="admin-only">
         <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
         <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
         <div class="nav-item" data-page="productos"><i class="fas fa-boxes"></i> Productos</div>
         <div class="nav-item" data-page="configuracion"><i class="fas fa-cog"></i> Configuración</div>
         <div class="nav-item" data-page="publicidad"><i class="fas fa-ad"></i> Publicidad</div>
-        <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Carrito</div>
+        <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
         <div class="nav-item" data-page="pagos"><i class="fas fa-link"></i> Links de Pago</div>
         <div class="nav-item" data-page="usuarios"><i class="fas fa-users-cog"></i> Usuarios</div>
         <div class="nav-item" data-page="miembros"><i class="fas fa-id-card"></i> Miembros</div>
         <div class="nav-item" data-page="metodos-pago-admin"><i class="fas fa-cog"></i> Configurar Pagos</div>
+        <div class="nav-item" data-page="metodos-pago"><i class="fas fa-credit-card"></i> Métodos de Pago</div>
         <div class="nav-item" data-page="admin"><i class="fas fa-crown"></i> Admin / Roles</div>
       </div>
       
-      <div class="seller-only" id="seller-menu" style="display:none;">
+      <div class="seller-only">
         <div class="nav-item active" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
-        <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Carrito</div>
+        <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Facturación</div>
       </div>
-      
-      <!-- Menú visible para todos -->
-      <div class="nav-item" data-page="tienda"><i class="fas fa-store"></i> Tienda</div>
-      <div class="nav-item" data-page="ventas"><i class="fas fa-shopping-cart"></i> Carrito</div>
       
       <div class="nav-item logout-btn" id="logout-sidebar"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
     </div>
@@ -1579,19 +1628,6 @@
           <div class="stat-card"><div class="stat-title">Miembros</div><div class="stat-value" id="stat-miembros">0</div></div>
         </div>
         <div class="card"><h3>Últimas ventas</h3><div id="ultimas-ventas-lista"></div></div>
-        
-        <!-- ===== NUEVO: PRODUCTOS POPULARES ===== -->
-        <div class="card" style="margin-top:24px;">
-          <div class="card-header">
-            <h3><i class="fas fa-fire" style="color:#cc0000;"></i> 🔥 Productos Populares</h3>
-            <span style="color: #666; font-size: 0.8rem;">Los más vistos y con más likes</span>
-          </div>
-          <div id="productos-populares-container">
-            <p style="color:#999; text-align:center; padding:20px 0;">
-              <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i> Cargando datos...
-            </p>
-          </div>
-        </div>
       </div>
 
       <!-- TIENDA -->
@@ -1682,9 +1718,11 @@
           <div class="card-header">
             <h3><i class="fas fa-plus-circle" style="color:#cc0000;"></i> Nuevo Producto</h3>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <!-- ===== BOTÓN PARA VER IMÁGENES FALLIDAS ===== -->
               <button onclick="verReportesImagenes()" style="background:#dc3545; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
                 <i class="fas fa-exclamation-triangle"></i> 🔴 VER IMÁGENES FALLIDAS
               </button>
+              <!-- ===== BOTÓN PARA VER REPORTES DE CLIENTES ===== -->
               <button onclick="verReportesClientes()" style="background:#007bff; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px;">
                 <i class="fas fa-users"></i> 📩 VER REPORTES DE CLIENTES
               </button>
@@ -1861,8 +1899,10 @@
             <div class="detalle-credito-pagos" id="detalle-credito-modal"></div>
           </div>
           
+          <!-- Opciones de pago - se generan dinámicamente desde Firebase -->
           <div id="opciones-pago-container"></div>
           
+          <!-- Opciones de crédito -->
           <div class="opciones-credito-pago" id="opciones-credito-modal">
             <p style="font-weight: 600; color: #856404; margin-bottom: 10px;">📋 Selecciona el número de pagos:</p>
             <div id="planes-credito-container"></div>
@@ -1874,7 +1914,7 @@
         </div>
       </div>
 
-      <!-- ===== ADMINISTRACIÓN DE MÉTODOS DE PAGO ===== -->
+      <!-- ===== NUEVO: ADMINISTRACIÓN DE MÉTODOS DE PAGO ===== -->
       <div id="page-metodos-pago-admin" class="page admin-only">
         <div class="card">
           <div class="card-header">
@@ -1882,6 +1922,7 @@
             <span style="color: #666; font-size: 0.8rem;">Gestiona los métodos de pago que aparecen en la tienda</span>
           </div>
           
+          <!-- Agregar nuevo método -->
           <div style="background: #f9f9f9; border-radius: 12px; padding: 20px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
             <h4 style="margin-bottom: 12px; color: #cc0000;">➕ Agregar nuevo método de pago</h4>
             <div class="flex">
@@ -1900,10 +1941,12 @@
             <button id="btn-agregar-metodo-pago" class="btn-success"><i class="fas fa-plus"></i> Agregar Método</button>
           </div>
           
+          <!-- Lista de métodos -->
           <h4 style="margin-bottom: 12px; color: #333;">📋 Métodos de pago actuales</h4>
           <div id="lista-metodos-pago-admin"></div>
         </div>
         
+        <!-- Configuración de intereses para crédito -->
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-percent" style="color:#cc0000;"></i> Configurar Intereses para Crédito</h3>
@@ -2002,6 +2045,23 @@
         <div class="card"><h3>Base de miembros</h3><div id="lista-miembros"></div></div>
       </div>
 
+      <!-- MÉTODOS DE PAGO (cliente) -->
+      <div id="page-metodos-pago" class="page admin-only">
+        <div class="card">
+          <h3>Agregar método de pago</h3>
+          <select id="tipo-metodo">
+            <option value="bank">🏦 Banco</option>
+            <option value="paypal">💸 PayPal</option>
+            <option value="binance">₿ Binance</option>
+            <option value="efectivo">💰 Efectivo</option>
+          </select>
+          <input type="text" id="pais-metodo" placeholder="País (ej: Ecuador)">
+          <input type="text" id="detalle-metodo" placeholder="Detalles: número cuenta, usuario">
+          <button id="btn-add-metodo"><i class="fas fa-plus"></i> Añadir</button>
+        </div>
+        <div class="card"><h3>Métodos disponibles</h3><div id="lista-metodos"></div></div>
+      </div>
+
       <!-- ADMIN -->
       <div id="page-admin" class="page admin-only">
         <div class="card">
@@ -2032,7 +2092,6 @@
         <div class="detalles" id="modal-detalles"></div>
         <div class="descripcion" id="modal-descripcion">Descripción</div>
         <div class="stock-info" id="modal-stock">Stock disponible</div>
-        <div class="modal-like-display" id="modal-like-display"></div>
         
         <div class="modal-tallas-container" id="modal-tallas-container" style="display:none;">
           <label><i class="fas fa-ruler"></i> Selecciona tu talla:</label>
@@ -2095,6 +2154,7 @@
   let colorSeleccionado = null;
   let headerImageUrl = "";
   
+  // ===== VARIABLES PARA MÉTODOS DE PAGO =====
   let metodoPagoSeleccionado = 'efectivo';
   let planCreditoSeleccionado = 2;
   let modoCompraDirecta = false;
@@ -2117,6 +2177,21 @@
       navegador: navigator.userAgent,
       resolucion: window.innerWidth + 'x' + window.innerHeight
     }).catch(error => console.error('Error al reportar:', error));
+  }
+
+  function crearImagenSegura(url, alt = 'Imagen', className = '') {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = alt;
+    img.className = className;
+    img.loading = 'lazy';
+    
+    img.onerror = function() {
+      reportarImagenFallida(url, 'Error al cargar la imagen');
+      this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
+    };
+    
+    return img;
   }
 
   function verReportesImagenes() {
@@ -2218,1043 +2293,21 @@
       });
   }
 
+  // Hacer funciones globales
+  window.crearImagenSegura = crearImagenSegura;
+  window.reportarImagenFallida = reportarImagenFallida;
+  window.verReportesImagenes = verReportesImagenes;
   window.reportarImagenManual = reportarImagenManual;
   window.cerrarModalReporte = cerrarModalReporte;
   window.enviarReporteImagen = enviarReporteImagen;
   window.verReportesClientes = verReportesClientes;
-  window.verReportesImagenes = verReportesImagenes;
 
-  // ============================================
-  // ❤️ SISTEMA DE "ME GUSTA" Y VISUALIZACIONES
-  // ============================================
-
-  function registrarVisualizacion(productoId) {
-    if (!productoId) return;
-    if (isAdmin() || isSeller()) return;
-    
-    const yaVisto = sessionStorage.getItem('visto_' + productoId);
-    if (yaVisto) return;
-    
-    sessionStorage.setItem('visto_' + productoId, 'true');
-    
-    firebase.database().ref('productos_estadisticas/' + productoId + '/visualizaciones')
-      .transaction((current) => {
-        return (current || 0) + 1;
-      });
-    
-    firebase.database().ref('productos_estadisticas/' + productoId).update({
-      ultima_visualizacion: firebase.database.ServerValue.TIMESTAMP
-    });
-  }
-
-  function darMeGusta(productoId) {
-    if (!productoId) return;
-    
-    const usuario = currentUser ? currentUser.uid : 'invitado_' + (sessionStorage.getItem('invitado_id') || Date.now());
-    if (!sessionStorage.getItem('invitado_id')) {
-      sessionStorage.setItem('invitado_id', Date.now());
-    }
-    
-    const key = 'megusta_' + productoId + '_' + usuario;
-    
-    if (localStorage.getItem(key)) {
-      alert('⚠️ Ya le diste "Me gusta" a este producto.');
-      return;
-    }
-    
-    firebase.database().ref('productos_estadisticas/' + productoId + '/megustas')
-      .transaction((current) => {
-        return (current || 0) + 1;
-      });
-    
-    localStorage.setItem(key, 'true');
-    
-    firebase.database().ref('productos_estadisticas/' + productoId + '/usuarios_megusta')
-      .push(usuario);
-    
-    actualizarContadorLikes(productoId);
-    
-    alert('❤️ ¡Te gusta este producto!');
-  }
-
-  function actualizarContadorLikes(productoId) {
-    firebase.database().ref('productos_estadisticas/' + productoId + '/megustas')
-      .once('value')
-      .then((snapshot) => {
-        const likes = snapshot.val() || 0;
-        const span = document.querySelector(`.like-counter-${productoId}`);
-        if (span) span.textContent = likes;
-      });
-  }
-
-  function cargarProductosPopulares() {
-    const container = document.getElementById('productos-populares-container');
-    if (!container) return;
-    
-    firebase.database().ref('productos_estadisticas')
-      .once('value')
-      .then((snapshot) => {
-        const datos = snapshot.val();
-        if (!datos) {
-          container.innerHTML = '<p style="color:#999;">No hay datos aún. Los productos aparecerán aquí cuando los clientes interactúen.</p>';
-          return;
-        }
-        
-        let productos = [];
-        Object.keys(datos).forEach(id => {
-          const stats = datos[id];
-          const producto = allProducts.find(p => p.id === id);
-          productos.push({
-            id: id,
-            nombre: producto ? producto.nombre : 'Producto eliminado',
-            visualizaciones: stats.visualizaciones || 0,
-            megustas: stats.megustas || 0,
-            ultima_visualizacion: stats.ultima_visualizacion || 0
-          });
-        });
-        
-        productos.sort((a, b) => b.visualizaciones - a.visualizaciones);
-        
-        let html = `
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:16px; margin-top:12px;">
-        `;
-        
-        productos.slice(0, 10).forEach((p, index) => {
-          const medalla = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index+1}.`;
-          const colorTop = index === 0 ? '#cc0000' : index < 3 ? '#f5a623' : '#333';
-          html += `
-            <div style="background:#ffffff; border-radius:12px; padding:16px; border:1px solid #e0e0e0; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-              <div style="font-size:1.8rem; font-weight:900; color:${colorTop};">${medalla}</div>
-              <div style="font-weight:600; margin:8px 0; font-size:0.9rem;">${p.nombre}</div>
-              <div style="display:flex; justify-content:center; gap:16px; font-size:0.8rem; color:#666;">
-                <span>👁️ ${p.visualizaciones}</span>
-                <span>❤️ ${p.megustas}</span>
-              </div>
-            </div>
-          `;
-        });
-        
-        html += `</div>`;
-        container.innerHTML = html;
-      })
-      .catch(error => {
-        container.innerHTML = '<p style="color:#999;">Error al cargar datos: ' + error.message + '</p>';
-      });
-  }
-
-  // ============================================
-  // 🖼️ RENDER TIENDA CON LIKES Y VISUALIZACIONES
+  console.log('✅ Sistema de detección de imágenes activado');
+  console.log('📊 Para ver reportes: verReportesImagenes()');
+  console.log('📩 Para ver reportes de clientes: verReportesClientes()');
   // ============================================
 
-  window.renderTiendaDepratik = function() {
-    const container = document.getElementById("vitrina-productos");
-    const filtroTexto = document.getElementById("filtro-productos-tienda")?.value?.toLowerCase() || '';
-    const filtroGenero = document.getElementById("filtro-genero")?.value || 'todos';
-    const filtroTalla = document.getElementById("filtro-talla")?.value || 'todos';
-    
-    let filtered = allProducts;
-    
-    if (categoriaSeleccionada !== "todos") {
-      filtered = filtered.filter(p => p.categoria === categoriaSeleccionada);
-    }
-    
-    if (filtroGenero !== "todos") {
-      filtered = filtered.filter(p => p.genero === filtroGenero || p.genero === 'todos' || !p.genero);
-    }
-    
-    if (filtroTalla !== "todos") {
-      filtered = filtered.filter(p => {
-        if (!p.talla) return false;
-        const tallasDisponibles = generarTallasDesdeRango(p.talla);
-        return tallasDisponibles.includes(filtroTalla);
-      });
-    }
-    
-    if (filtroTexto) {
-      filtered = filtered.filter(p => p.nombre && p.nombre.toLowerCase().includes(filtroTexto));
-    }
-    
-    if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:#999;">
-          <i class="fas fa-box-open" style="font-size:3rem; margin-bottom:16px; display:block; color:#cc0000;"></i>
-          <p>No hay productos disponibles con estos filtros</p>
-          <p style="font-size:0.8rem;">Prueba cambiando los filtros o agregando nuevos productos</p>
-        </div>
-      `;
-      return;
-    }
-    
-    if (!isAdmin() && !isSeller()) {
-      filtered.forEach(p => {
-        registrarVisualizacion(p.id);
-      });
-    }
-    
-    let html = '';
-    filtered.forEach(p => {
-      const primeraImagen = getFirstImage(p);
-      const stockText = p.stock > 0 ? `${p.stock} disponibles` : 'Agotado';
-      const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
-      
-      const generoIcono = p.genero === 'hombre' ? '👨' : p.genero === 'mujer' ? '👩' : p.genero === 'ninos' ? '🧒' : p.genero === 'ninas' ? '👧' : '';
-      const categoriaIcono = p.categoria === 'ropa' ? '👕' : p.categoria === 'zapatos' ? '👟' : p.categoria === 'relojes' ? '⌚' : p.categoria === 'medias' ? '🧦' : p.categoria === 'boxer' ? '🩲' : p.categoria === 'accesorios' ? '🧢' : '🏷️';
-      
-      html += `
-        <div class="producto-card-depratik" onclick="abrirModal('${p.id}')">
-          <div class="imagen-container">
-            <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" loading="lazy" 
-                 onerror="reportarImagenFallida('${primeraImagen}', 'Producto ${p.nombre} no cargó'); this.src='${getDefaultImage()}'">
-            <span class="etiqueta-stock ${stockClass}">${stockText}</span>
-            ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
-          </div>
-          <div class="info">
-            <div class="nombre">${generoIcono} ${categoriaIcono} ${p.nombre || 'Sin nombre'}</div>
-            <div class="precio">$${p.precio || 0}</div>
-            <div class="detalles">
-              ${p.talla ? `<span>📏 ${p.talla}</span>` : ''}
-              ${p.color ? `<span>🎨 ${p.color}</span>` : ''}
-              ${p.medidas ? `<span>📐 ${p.medidas}</span>` : ''}
-            </div>
-            <div class="descripcion">${p.descripcion || 'Descripción no disponible'}</div>
-            <div class="like-section">
-              <button onclick="event.stopPropagation(); darMeGusta('${p.id}')" style="
-                background:transparent;
-                color:#cc0000;
-                border:2px solid #cc0000;
-                border-radius:30px;
-                padding:4px 16px;
-                font-size:0.85rem;
-                font-weight:600;
-                cursor:pointer;
-                display:flex;
-                align-items:center;
-                gap:6px;
-                transition:0.2s;
-              " onmouseover="this.style.background='#cc0000'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#cc0000';">
-                ❤️ <span class="like-counter-${p.id}">0</span>
-              </button>
-              <span style="font-size:0.7rem; color:#999;">
-                <i class="fas fa-eye"></i> <span class="view-counter-${p.id}">0</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-    
-    filtered.forEach(p => {
-      firebase.database().ref('productos_estadisticas/' + p.id + '/megustas')
-        .once('value')
-        .then(snap => {
-          const span = document.querySelector(`.like-counter-${p.id}`);
-          if (span) span.textContent = snap.val() || 0;
-        });
-      
-      firebase.database().ref('productos_estadisticas/' + p.id + '/visualizaciones')
-        .once('value')
-        .then(snap => {
-          const span = document.querySelector(`.view-counter-${p.id}`);
-          if (span) span.textContent = snap.val() || 0;
-        });
-    });
-    
-    setTimeout(() => {
-      container.querySelectorAll('img').forEach(img => {
-        if (!img.complete || img.naturalWidth === 0) {
-          if (img.src && !img.src.includes('data:image')) {
-            reportarImagenFallida(img.src, 'Imagen rota en la tienda');
-          }
-        }
-      });
-    }, 1000);
-  };
-
-  // ============================================
-  // 📊 MODIFICAR ABRIR MODAL PARA REGISTRAR VISUALIZACIÓN
-  // ============================================
-
-  const abrirModalOriginal = window.abrirModal;
-
-  window.abrirModal = function(productId) {
-    if (abrirModalOriginal) abrirModalOriginal(productId);
-    
-    if (!isAdmin() && !isSeller()) {
-      registrarVisualizacion(productId);
-    }
-    
-    setTimeout(() => {
-      firebase.database().ref('productos_estadisticas/' + productId + '/megustas')
-        .once('value')
-        .then(snap => {
-          const likes = snap.val() || 0;
-          const likeDisplay = document.getElementById('modal-like-display');
-          if (likeDisplay) {
-            likeDisplay.innerHTML = `❤️ ${likes} personas han dado "Me gusta" a este producto`;
-          }
-        });
-    }, 300);
-  };
-
-  // ============================================
-  // 🔧 FUNCIONES DE UTILIDAD
-  // ============================================
-
-  function generarTallasDesdeRango(textoTallas) {
-    if (!textoTallas) return [];
-    textoTallas = textoTallas.trim();
-    if (textoTallas.includes(',')) {
-      return textoTallas.split(',').map(t => t.trim()).filter(t => t);
-    }
-    const rangoMatch = textoTallas.match(/(\d+)\s*(?:al|a|-)\s*(\d+)/i);
-    if (rangoMatch) {
-      const inicio = parseInt(rangoMatch[1]);
-      const fin = parseInt(rangoMatch[2]);
-      if (inicio && fin && inicio < fin) {
-        const tallas = [];
-        for (let i = inicio; i <= fin; i++) {
-          tallas.push(i.toString());
-        }
-        return tallas;
-      }
-    }
-    const letras = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-    const rangoLetras = textoTallas.match(/([A-Z]+)\s*(?:al|a|-)\s*([A-Z]+)/i);
-    if (rangoLetras) {
-      const inicio = letras.indexOf(rangoLetras[1].toUpperCase());
-      const fin = letras.indexOf(rangoLetras[2].toUpperCase());
-      if (inicio !== -1 && fin !== -1 && inicio < fin) {
-        return letras.slice(inicio, fin + 1);
-      }
-    }
-    return [textoTallas];
-  }
-
-  function getDefaultImage() {
-    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
-  }
-
-  function getProductImages(product) {
-    let imagenes = [];
-    if (product.imagenes) {
-      if (typeof product.imagenes === 'string') {
-        imagenes = product.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
-      } else if (Array.isArray(product.imagenes)) {
-        imagenes = product.imagenes;
-      }
-    }
-    return imagenes;
-  }
-
-  function getFirstImage(product) {
-    const imagenes = getProductImages(product);
-    return imagenes.length > 0 ? imagenes[0] : getDefaultImage();
-  }
-
-  // ============================================
-  // 🔐 FUNCIONES DE AUTENTICACIÓN
-  // ============================================
-
-  const loginContainer = document.getElementById("login-container");
-  const dashboardApp = document.getElementById("dashboard-app");
-  const loginBtn = document.getElementById("login-btn");
-  const registerBtn = document.getElementById("register-btn");
-  const recuperarBtn = document.getElementById("recuperar-btn");
-  const guestBtn = document.getElementById("guest-btn");
-  const logoutSidebar = document.getElementById("logout-sidebar");
-
-  window.cambiarTabAuth = function(tab) {
-    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
-    document.querySelector(`.auth-tabs button[data-tab="${tab}"]`).classList.add('active-tab');
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
-    document.getElementById(`form-${tab}`).classList.add('active-form');
-    document.getElementById('form-recuperar').style.display = 'none';
-  };
-
-  window.mostrarRecuperar = function() {
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
-    document.getElementById('form-recuperar').style.display = 'block';
-  };
-
-  window.volverALogin = function() {
-    document.getElementById('form-recuperar').style.display = 'none';
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
-    document.getElementById('form-login').classList.add('active-form');
-    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
-    document.querySelector('.auth-tabs button[data-tab="login"]').classList.add('active-tab');
-  };
-
-  loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById("login-email").value.trim();
-    const pass = document.getElementById("login-password").value.trim();
-    if (!email || !pass) { alert("Completa todos los campos."); return; }
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  });
-
-  registerBtn.addEventListener('click', async () => {
-    const nombre = document.getElementById("register-nombre").value.trim();
-    const email = document.getElementById("register-email").value.trim();
-    const pass = document.getElementById("register-password").value.trim();
-    if (!nombre || !email || !pass) { alert("Completa todos los campos."); return; }
-    if (pass.length < 6) { alert("La contraseña debe tener al menos 6 caracteres."); return; }
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      await setDoc(doc(db, "usuarios_permisos", email), { 
-        rol: "seller", 
-        estado: true, 
-        nombre: nombre,
-        uid: userCredential.user.uid
-      });
-      alert("✅ Cuenta creada exitosamente. Ahora inicia sesión.");
-      cambiarTabAuth('login');
-      document.getElementById("login-email").value = email;
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  });
-
-  recuperarBtn.addEventListener('click', async () => {
-    const email = document.getElementById("recuperar-email").value.trim();
-    if (!email) { alert("Ingresa tu correo electrónico."); return; }
-    try {
-      await sendPasswordResetEmail(auth, email);
-      alert("✅ Se ha enviado un enlace de recuperación a tu correo electrónico.");
-      volverALogin();
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  });
-
-  guestBtn.addEventListener('click', () => {
-    currentUser = null;
-    currentUserRol = "guest";
-    loginContainer.style.display = "none";
-    dashboardApp.style.display = "block";
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
-    document.getElementById('admin-menu').style.display = 'none';
-    document.getElementById('seller-menu').style.display = 'none';
-    showPage('tienda');
-    loadAllData();
-    cargarHeader();
-    cargarMetodosPago();
-    cargarIntereses();
-  });
-
-  logoutSidebar.addEventListener('click', () => {
-    if (currentUser) {
-      signOut(auth);
-    } else {
-      location.reload();
-    }
-  });
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      currentUser = user;
-      const rolDoc = await getDoc(doc(db, "usuarios_permisos", user.email));
-      if (rolDoc.exists()) {
-        currentUserRol = rolDoc.data().rol;
-      } else if (user.email === MASTER_EMAIL) {
-        currentUserRol = "admin";
-        await setDoc(doc(db, "usuarios_permisos", user.email), { rol: "admin", estado: true });
-      } else {
-        currentUserRol = "seller";
-      }
-      loginContainer.style.display = "none";
-      dashboardApp.style.display = "block";
-      updateVisibilityByRole();
-      loadAllData();
-      cargarHeader();
-      cargarMetodosPago();
-      cargarIntereses();
-    } else {
-      if (currentUserRol !== 'guest') {
-        loginContainer.style.display = "flex";
-        dashboardApp.style.display = "none";
-        currentUser = null;
-        currentUserRol = "visitor";
-      }
-    }
-  });
-
-  const isAdmin = () => currentUserRol === "admin";
-  const isSeller = () => currentUserRol === "seller" || currentUserRol === "worker";
-
-  function updateVisibilityByRole() {
-    if (isAdmin()) {
-      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-      document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
-      document.getElementById('admin-menu').style.display = 'block';
-      document.getElementById('seller-menu').style.display = 'none';
-      document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'flex');
-      showPage('dashboard');
-    } else if (isSeller()) {
-      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'block');
-      document.getElementById('admin-menu').style.display = 'none';
-      document.getElementById('seller-menu').style.display = 'block';
-      document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'flex');
-      showPage('tienda');
-    } else {
-      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
-      document.getElementById('admin-menu').style.display = 'none';
-      document.getElementById('seller-menu').style.display = 'none';
-      document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.page === 'tienda' || el.dataset.page === 'ventas') {
-          el.style.display = 'flex';
-        } else {
-          el.style.display = 'none';
-        }
-      });
-      showPage('tienda');
-    }
-  }
-
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-    const target = document.getElementById(`page-${pageId}`);
-    if (target) target.classList.add('active-page');
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-    if (navItem) navItem.classList.add('active');
-    
-    if (pageId === 'dashboard') {
-      setTimeout(cargarProductosPopulares, 500);
-    }
-  }
-
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      if (item.id === "logout-sidebar") {
-        if (currentUser) {
-          signOut(auth);
-        } else {
-          location.reload();
-        }
-        return;
-      }
-      const page = item.getAttribute('data-page');
-      if (page) showPage(page);
-    });
-  });
-
-  // ============================================
-  // 🚀 FUNCIONES DE CARGA DE DATOS
-  // ============================================
-
-  function cargarHeader() {
-    const headerDocRef = doc(db, "configuracion", "header");
-    getDoc(headerDocRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        headerImageUrl = docSnap.data().imagen || "";
-        actualizarHeader();
-        actualizarPreviewHeader();
-      }
-    }).catch(err => console.log("Error cargando header:", err));
-  }
-
-  function actualizarHeader() {
-    const img = document.getElementById('header-imagen-tienda');
-    if (headerImageUrl && headerImageUrl.trim() !== "") {
-      img.src = headerImageUrl;
-      img.style.display = 'block';
-      img.onerror = function() {
-        this.style.display = 'none';
-        reportarImagenFallida(headerImageUrl, 'Header no cargó');
-      };
-    } else {
-      img.style.display = 'none';
-    }
-  }
-
-  function actualizarPreviewHeader() {
-    const container = document.getElementById('preview-header-actual-container');
-    if (headerImageUrl && headerImageUrl.trim() !== "") {
-      container.innerHTML = `<img src="${headerImageUrl}" style="height:60px; width:auto; border-radius:8px; border:1px solid #e0e0e0; object-fit:contain; background:#f9f9f9;" onerror="this.outerHTML='<span class=\\'sin-img\\'>❌ Error al cargar imagen</span>'">`;
-    } else {
-      container.innerHTML = `<span class="sin-img">📝 Texto original: "LOS AMIGOS ESTORE 🎁"</span>`;
-    }
-  }
-
-  document.getElementById("btn-guardar-header")?.addEventListener("click", async () => {
-    const url = document.getElementById("header-imagen-url").value.trim();
-    if (!url) { alert("Por favor, ingresa la URL de la imagen."); return; }
-    try {
-      await setDoc(doc(db, "configuracion", "header"), { imagen: url });
-      headerImageUrl = url;
-      actualizarHeader();
-      actualizarPreviewHeader();
-      document.getElementById("header-imagen-url").value = "";
-      alert("✅ Imagen del header guardada correctamente");
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  });
-
-  document.getElementById("btn-restaurar-header")?.addEventListener("click", async () => {
-    if (!confirm("¿Restaurar el texto original del header?")) return;
-    try {
-      await setDoc(doc(db, "configuracion", "header"), { imagen: "" });
-      headerImageUrl = "";
-      actualizarHeader();
-      actualizarPreviewHeader();
-      alert("✅ Header restaurado");
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  });
-
-  // ============================================
-  // 📤 SUBIDA DE IMÁGENES
-  // ============================================
-
-  const uploadArea = document.getElementById("upload-area");
-  const fileInput = document.getElementById("file-input");
-  const previewContainer = document.getElementById("preview-container");
-
-  uploadArea.addEventListener("click", () => fileInput.click());
-  uploadArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = "#b30000";
-    uploadArea.style.background = "#f5f5f5";
-  });
-  uploadArea.addEventListener("dragleave", () => {
-    uploadArea.style.borderColor = "#cc0000";
-    uploadArea.style.background = "#fafafa";
-  });
-  uploadArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = "#cc0000";
-    uploadArea.style.background = "#fafafa";
-    if (e.dataTransfer.files.length > 0) {
-      handleFiles(e.dataTransfer.files);
-    }
-  });
-
-  fileInput.addEventListener("change", (e) => {
-    if (e.target.files.length > 0) {
-      handleFiles(e.target.files);
-    }
-  });
-
-  async function handleFiles(files) {
-    if (uploadedImageUrls.length === 0) {
-      previewContainer.innerHTML = '';
-    }
-    const sinImg = previewContainer.querySelector('.sin-imagenes');
-    if (sinImg) sinImg.remove();
-
-    for (const file of files) {
-      if (!file.type.startsWith("image/")) continue;
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        img.alt = "Vista previa";
-        previewContainer.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-      
-      try {
-        const fileName = `${Date.now()}_${file.name}`;
-        const storageRef = ref(storage, `productos/${fileName}`);
-        const snapshot = await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(snapshot.ref);
-        uploadedImageUrls.push(url);
-        
-        const urlsString = uploadedImageUrls.join(", ");
-        document.getElementById("prod-imagenes").value = urlsString;
-        
-      } catch (error) {
-        alert("Error al subir imagen: " + error.message);
-      }
-    }
-    
-    fileInput.value = '';
-    if (uploadedImageUrls.length > 0) {
-      alert(`✅ ${uploadedImageUrls.length} imagen(es) subidas exitosamente`);
-    }
-  }
-
-  // ============================================
-  // 📦 CARGA DE DATOS DESDE FIRESTORE
-  // ============================================
-
-  function loadAllData() {
-    onSnapshot(collection(db, "productos"), (snap) => {
-      allProducts = [];
-      let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Género</th><th>Categoría</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
-      snap.forEach(doc => {
-        const p = doc.data();
-        allProducts.push({ id: doc.id, ...p });
-        const imagenes = getProductImages(p);
-        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" class="preview-img-tabla" onerror="this.outerHTML='📷'">` : '📷';
-        const generoLabel = p.genero && p.genero !== 'todos' ? p.genero : 'Todos';
-        const categoriaLabel = p.categoria || 'Sin categoría';
-        html += `<tr>
-          <td><strong>${p.nombre || 'Sin nombre'}</strong><br><small>${p.descripcion || ''}</small></td>
-          <td>$${p.precio || 0}</td>
-          <td><span class="stock-badge ${p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo'}">${p.stock || 0}</span></td>
-          <td>${p.talla || 'N/A'}</td>
-          <td>${p.color || 'N/A'}</td>
-          <td><span class="badge">${generoLabel}</span></td>
-          <td><span class="badge">${categoriaLabel}</span></td>
-          <td>${previewImg}</td>
-          <td>
-            <button class="btn-small btn-info" onclick="editarProducto('${doc.id}')"><i class="fas fa-edit"></i></button>
-            <button class="btn-small btn-danger" onclick="eliminarProducto('${doc.id}')"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("lista-productos").innerHTML = html || "<p>No hay productos.</p>";
-      document.getElementById("stat-productos").innerText = snap.size;
-      
-      renderTiendaDepratik();
-      cargarProductosPopulares();
-    }, (error) => {
-      console.log("Error cargando productos:", error);
-    });
-
-    onSnapshot(collection(db, "publicidad"), (snap) => {
-      allBanners = [];
-      snap.forEach(doc => {
-        allBanners.push({ id: doc.id, ...doc.data() });
-      });
-      renderBannersEnTienda();
-      renderBannersPanel();
-    });
-
-    onSnapshot(query(collection(db, "ventas"), orderBy("fecha", "desc")), (snap) => {
-      let totalVentas = 0, ingresos = 0, ultimas = "";
-      snap.forEach((doc, idx) => {
-        const v = doc.data();
-        totalVentas++;
-        ingresos += v.total || 0;
-        if (idx < 5) {
-          ultimas += `<div class="cart-item">💰 ${v.cliente || 'Cliente'} - $${v.total?.toFixed(2) || '0'} - ${v.fecha ? new Date(v.fecha.toDate()).toLocaleString() : ''}</div>`;
-        }
-      });
-      document.getElementById("stat-ventas").innerText = totalVentas;
-      document.getElementById("stat-ingresos").innerText = ingresos.toFixed(2);
-      document.getElementById("ultimas-ventas-lista").innerHTML = ultimas || "Sin ventas";
-
-      let historialHtml = `<table><thead><tr><th>Cliente</th><th>Productos</th><th>Total</th><th>Método</th><th>Fecha</th></tr></thead><tbody>`;
-      snap.forEach(d => {
-        const v = d.data();
-        historialHtml += `<tr>
-          <td>${v.cliente || 'Cliente'}</td>
-          <td>${v.items?.map(i => `${i.nombre || 'Producto'} x${i.cantidad}`).join(", ") || ''}</td>
-          <td>$${v.total?.toFixed(2) || '0'}</td>
-          <td>${v.metodoPago || 'Efectivo'}</td>
-          <td>${v.fecha ? new Date(v.fecha.toDate()).toLocaleString() : ''}</td>
-        </tr>`;
-      });
-      historialHtml += `</tbody></table>`;
-      document.getElementById("historial-ventas").innerHTML = historialHtml;
-    });
-
-    onSnapshot(collection(db, "miembros"), (snap) => {
-      document.getElementById("stat-miembros").innerText = snap.size;
-      let html = `<table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr></thead><tbody>`;
-      snap.forEach(doc => {
-        const m = doc.data();
-        html += `<tr><td>${m.nombre || 'Sin nombre'}</td><td>${m.telefono || ''}</td><td>${m.email || ''}</td><td><button class="btn-small btn-danger" onclick="eliminarMiembro('${doc.id}')">🗑️</button></td></tr>`;
-      });
-      html += `</tbody></table>`;
-      document.getElementById("lista-miembros").innerHTML = html;
-    });
-
-    onSnapshot(collection(db, "usuarios_permisos"), (snap) => {
-      let usuariosHtml = `<table><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
-      snap.forEach(doc => {
-        const u = doc.data();
-        if (doc.id === MASTER_EMAIL) {
-          usuariosHtml += `<tr>
-            <td><strong>${doc.id}</strong> 👑</td>
-            <td>${u.nombre || 'Master'}</td>
-            <td><span class="badge" style="background:#cc0000; color:white;">ADMIN</span></td>
-            <td>Activo ✅</td>
-            <td>-</td>
-          </tr>`;
-          return;
-        }
-        usuariosHtml += `<tr>
-          <td>${doc.id}</td>
-          <td>${u.nombre || 'Sin nombre'}</td>
-          <td><span class="badge">${u.rol || 'sin rol'}</span></td>
-          <td>${u.estado ? 'Activo ✅' : 'Inactivo ⛔'}</td>
-          <td>
-            <button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              ${u.estado ? 'Desactivar' : 'Activar'}
-            </button>
-            <button class="btn-small btn-danger" onclick="eliminarUsuario('${doc.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              🗑️
-            </button>
-          </td>
-        </tr>`;
-      });
-      usuariosHtml += `</tbody></table>`;
-      document.getElementById("lista-usuarios").innerHTML = usuariosHtml;
-      
-      let rolesHtml = `<table><thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
-      snap.forEach(doc => {
-        const u = doc.data();
-        if (doc.id === MASTER_EMAIL) return;
-        rolesHtml += `<tr>
-          <td>${doc.id}</td>
-          <td><span class="badge">${u.rol || ''}</span></td>
-          <td>${u.estado ? 'Activo ✅' : 'Inactivo ⛔'}</td>
-          <td>
-            <button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              ${u.estado ? 'Desactivar' : 'Activar'}
-            </button>
-            <button class="btn-small btn-danger" onclick="eliminarUsuario('${doc.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              🗑️
-            </button>
-          </td>
-        </tr>`;
-      });
-      rolesHtml += `</tbody></table>`;
-      document.getElementById("lista-roles").innerHTML = rolesHtml;
-    });
-  }
-
-  // ============================================
-  // 🛠️ FUNCIONES DE ADMINISTRACIÓN
-  // ============================================
-
-  window.eliminarProducto = async (id) => {
-    if (confirm("¿Eliminar este producto?")) {
-      await deleteDoc(doc(db, "productos", id));
-    }
-  };
-  
-  window.editarProducto = (id) => {
-    const product = allProducts.find(p => p.id === id);
-    if (!product) return;
-    document.getElementById("prod-nombre").value = product.nombre || '';
-    document.getElementById("prod-precio").value = product.precio || '';
-    document.getElementById("prod-stock").value = product.stock || '';
-    document.getElementById("prod-talla").value = product.talla || '';
-    document.getElementById("prod-color").value = product.color || '';
-    document.getElementById("prod-medidas").value = product.medidas || '';
-    document.getElementById("prod-desc").value = product.descripcion || '';
-    document.getElementById("prod-genero").value = product.genero || 'todos';
-    document.getElementById("prod-categoria").value = product.categoria || 'ropa';
-    
-    previewContainer.innerHTML = '';
-    uploadedImageUrls = [];
-    const imagenes = getProductImages(product);
-    if (imagenes.length > 0) {
-      imagenes.forEach(url => {
-        const img = document.createElement("img");
-        img.src = url;
-        img.alt = "Vista previa";
-        previewContainer.appendChild(img);
-      });
-      uploadedImageUrls = imagenes;
-      document.getElementById("prod-imagenes").value = imagenes.join(", ");
-    } else {
-      previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
-      document.getElementById("prod-imagenes").value = '';
-    }
-    document.getElementById("btn-add-producto").dataset.editId = id;
-    document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Actualizar Producto';
-  };
-
-  window.eliminarMiembro = async (id) => {
-    if (confirm("¿Eliminar miembro?")) await deleteDoc(doc(db, "miembros", id));
-  };
-
-  window.cambiarEstado = async (email, estado) => {
-    await updateDoc(doc(db, "usuarios_permisos", email), { estado: estado });
-  };
-
-  window.eliminarUsuario = async (email) => {
-    if (!confirm(`¿Eliminar el usuario ${email}?`)) return;
-    try {
-      await deleteDoc(doc(db, "usuarios_permisos", email));
-      alert("✅ Usuario eliminado correctamente");
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  };
-
-  // ============================================
-  // 💾 GUARDAR PRODUCTO
-  // ============================================
-
-  document.getElementById("btn-add-producto")?.addEventListener("click", async () => {
-    const nombre = document.getElementById("prod-nombre").value.trim();
-    const precio = parseFloat(document.getElementById("prod-precio").value);
-    const stock = parseInt(document.getElementById("prod-stock").value);
-    const talla = document.getElementById("prod-talla").value.trim();
-    const color = document.getElementById("prod-color").value.trim();
-    const medidas = document.getElementById("prod-medidas").value.trim();
-    const descripcion = document.getElementById("prod-desc").value.trim();
-    const imagenes = document.getElementById("prod-imagenes").value.trim();
-    const genero = document.getElementById("prod-genero").value;
-    const categoria = document.getElementById("prod-categoria").value;
-    
-    if (!nombre || isNaN(precio) || isNaN(stock)) {
-      return alert("Completa nombre, precio y stock");
-    }
-    
-    const data = { nombre, precio, stock, talla, color, medidas, descripcion, imagenes, genero, categoria };
-    
-    const editId = document.getElementById("btn-add-producto").dataset.editId;
-    try {
-      if (editId) {
-        await updateDoc(doc(db, "productos", editId), data);
-        delete document.getElementById("btn-add-producto").dataset.editId;
-        document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Guardar Producto';
-      } else {
-        await addDoc(collection(db, "productos"), data);
-      }
-      alert("✅ Producto guardado correctamente");
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-    
-    document.getElementById("prod-nombre").value = "";
-    document.getElementById("prod-precio").value = "";
-    document.getElementById("prod-stock").value = "";
-    document.getElementById("prod-talla").value = "";
-    document.getElementById("prod-color").value = "";
-    document.getElementById("prod-medidas").value = "";
-    document.getElementById("prod-desc").value = "";
-    document.getElementById("prod-imagenes").value = "";
-    previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
-    uploadedImageUrls = [];
-  });
-
-  // ============================================
-  // 🖼️ BANNERS
-  // ============================================
-
-  function renderBannersEnTienda() {
-    const container = document.getElementById("banners-container");
-    const activos = allBanners.filter(b => b.activo === true);
-    if (activos.length === 0) {
-      container.innerHTML = '';
-      return;
-    }
-    let html = '';
-    activos.forEach(b => {
-      html += `
-        <div class="banner-publicidad-full" ${b.enlace ? `onclick="window.open('${b.enlace}', '_blank')"` : ''}>
-          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" loading="lazy" onerror="reportarImagenFallida('${b.imagen}', 'Banner ${b.titulo}'); this.style.display='none'">
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-  }
-
-  function renderBannersPanel() {
-    const container = document.getElementById("lista-banners");
-    if (allBanners.length === 0) {
-      container.innerHTML = '<p style="color:#999;">No hay banners creados. Agrega uno arriba.</p>';
-      return;
-    }
-    let html = '';
-    allBanners.forEach((b) => {
-      const estadoClass = b.activo ? 'badge-activo' : 'badge-inactivo';
-      const estadoText = b.activo ? 'Activo' : 'Inactivo';
-      html += `
-        <div class="banner-preview-mini">
-          ${b.imagen ? `<img src="${b.imagen}" style="height:50px;width:auto;border-radius:8px;border:1px solid #e0e0e0;object-fit:contain;background:#f9f9f9;" onerror="this.style.display='none'">` : ''}
-          <div class="info">
-            <h4>${b.titulo || 'Sin título'}</h4>
-            <p>${b.enlace || 'Sin enlace'}</p>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <span class="badge ${estadoClass}">${estadoText}</span>
-            <button class="btn-small" onclick="toggleBanner('${b.id}', ${!b.activo})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              ${b.activo ? 'Desactivar' : 'Activar'}
-            </button>
-            <button class="btn-small" onclick="editarBanner('${b.id}')" style="background:#28a745; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn-small btn-danger" onclick="eliminarBanner('${b.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
-  }
-
-  window.toggleBanner = async (id, nuevoEstado) => {
-    try {
-      await updateDoc(doc(db, "publicidad", id), { activo: nuevoEstado });
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  };
-
-  window.eliminarBanner = async (id) => {
-    if (!confirm("¿Eliminar este banner?")) return;
-    try {
-      await deleteDoc(doc(db, "publicidad", id));
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  };
-
-  window.editarBanner = (id) => {
-    const banner = allBanners.find(b => b.id === id);
-    if (!banner) return;
-    document.getElementById("banner-titulo").value = banner.titulo || '';
-    document.getElementById("banner-imagen").value = banner.imagen || '';
-    document.getElementById("banner-enlace").value = banner.enlace || '';
-    document.getElementById("banner-activo").checked = banner.activo !== false;
-    document.getElementById("btn-add-banner").dataset.editId = id;
-    document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Actualizar Banner';
-  };
-
-  document.getElementById("btn-add-banner")?.addEventListener("click", async () => {
-    const titulo = document.getElementById("banner-titulo").value.trim();
-    const imagen = document.getElementById("banner-imagen").value.trim();
-    const enlace = document.getElementById("banner-enlace").value.trim();
-    const activo = document.getElementById("banner-activo").checked;
-    if (!imagen) {
-      alert("La URL de la imagen es obligatoria.");
-      return;
-    }
-    const data = { titulo, imagen, enlace, activo };
-    const editId = document.getElementById("btn-add-banner").dataset.editId;
-    try {
-      if (editId) {
-        await updateDoc(doc(db, "publicidad", editId), data);
-        delete document.getElementById("btn-add-banner").dataset.editId;
-        document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Guardar Banner';
-      } else {
-        await addDoc(collection(db, "publicidad"), data);
-      }
-      alert("✅ Banner guardado correctamente");
-      document.getElementById("banner-titulo").value = "";
-      document.getElementById("banner-imagen").value = "";
-      document.getElementById("banner-enlace").value = "";
-      document.getElementById("banner-activo").checked = true;
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  });
-
-  // ============================================
-  // 💳 MÉTODOS DE PAGO
-  // ============================================
-
+  // ===== FUNCIONES PARA CONFIGURACIÓN DE MÉTODOS DE PAGO =====
   function cargarMetodosPago() {
     onSnapshot(collection(db, "metodos_pago_config"), (snap) => {
       metodosPagoConfig = [];
@@ -3279,6 +2332,25 @@
       document.getElementById('interes-3-pagos').value = interesesConfig.pagos3;
       document.getElementById('interes-4-pagos').value = interesesConfig.pagos4;
     }).catch(err => console.log("Error cargando intereses:", err));
+  }
+
+  function guardarIntereses() {
+    const pagos2 = parseFloat(document.getElementById('interes-2-pagos').value) || 0;
+    const pagos3 = parseFloat(document.getElementById('interes-3-pagos').value) || 0;
+    const pagos4 = parseFloat(document.getElementById('interes-4-pagos').value) || 0;
+    
+    setDoc(doc(db, "configuracion", "intereses"), {
+      pagos2, pagos3, pagos4
+    }).then(() => {
+      interesesConfig.pagos2 = pagos2;
+      interesesConfig.pagos3 = pagos3;
+      interesesConfig.pagos4 = pagos4;
+      addDebugLog('✅ Intereses guardados correctamente', 'success');
+      alert('✅ Intereses guardados correctamente');
+    }).catch(err => {
+      addDebugLog(`❌ Error guardando intereses: ${err.message}`, 'error');
+      alert('Error: ' + err.message);
+    });
   }
 
   function renderOpcionesPago() {
@@ -3348,6 +2420,7 @@
       `;
     });
     container.innerHTML = html;
+    
     planCreditoSeleccionado = 2;
   }
 
@@ -3388,8 +2461,9 @@
   window.toggleMetodoPago = async (id, nuevoEstado) => {
     try {
       await updateDoc(doc(db, "metodos_pago_config", id), { activo: nuevoEstado });
+      addDebugLog(`🔄 Método ${id} -> ${nuevoEstado ? 'Activo' : 'Inactivo'}`, 'success');
     } catch (error) {
-      alert("Error: " + error.message);
+      addDebugLog(`❌ Error al cambiar estado: ${error.message}`, 'error');
     }
   };
 
@@ -3397,138 +2471,632 @@
     if (!confirm("¿Eliminar este método de pago?")) return;
     try {
       await deleteDoc(doc(db, "metodos_pago_config", id));
+      addDebugLog(`🗑️ Método de pago eliminado: ${id}`, 'info');
     } catch (error) {
-      alert("Error: " + error.message);
+      addDebugLog(`❌ Error al eliminar: ${error.message}`, 'error');
     }
   };
 
-  document.getElementById("btn-agregar-metodo-pago")?.addEventListener("click", async () => {
-    const nombre = document.getElementById("nuevo-metodo-nombre").value.trim();
-    const icono = document.getElementById("nuevo-metodo-icono").value.trim() || '💳';
-    const descripcion = document.getElementById("nuevo-metodo-descripcion").value.trim();
-    const activo = document.getElementById("nuevo-metodo-activo").checked;
-    const esCredito = document.getElementById("nuevo-metodo-es-credito").checked;
-    
-    if (!nombre) {
-      alert("El nombre del método es obligatorio.");
-      return;
+  // ===== FUNCIONES PARA GENERAR TALLAS =====
+  function generarTallasDesdeRango(textoTallas) {
+    if (!textoTallas) return [];
+    textoTallas = textoTallas.trim();
+    if (textoTallas.includes(',')) {
+      return textoTallas.split(',').map(t => t.trim()).filter(t => t);
     }
-    
+    const rangoMatch = textoTallas.match(/(\d+)\s*(?:al|a|-)\s*(\d+)/i);
+    if (rangoMatch) {
+      const inicio = parseInt(rangoMatch[1]);
+      const fin = parseInt(rangoMatch[2]);
+      if (inicio && fin && inicio < fin) {
+        const tallas = [];
+        for (let i = inicio; i <= fin; i++) {
+          tallas.push(i.toString());
+        }
+        return tallas;
+      }
+    }
+    const letras = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const rangoLetras = textoTallas.match(/([A-Z]+)\s*(?:al|a|-)\s*([A-Z]+)/i);
+    if (rangoLetras) {
+      const inicio = letras.indexOf(rangoLetras[1].toUpperCase());
+      const fin = letras.indexOf(rangoLetras[2].toUpperCase());
+      if (inicio !== -1 && fin !== -1 && inicio < fin) {
+        return letras.slice(inicio, fin + 1);
+      }
+    }
+    return [textoTallas];
+  }
+
+  // ===== FUNCIÓN PARA OBTENER IMAGEN POR DEFECTO =====
+  function getDefaultImage() {
+    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"%3E%3Crect width="300" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em"%3E%F0%9F%93%B7 Sin imagen%3C/text%3E%3C/svg%3E';
+  }
+
+  // ===== FUNCIÓN PARA OBTENER IMÁGENES DEL PRODUCTO =====
+  function getProductImages(product) {
+    let imagenes = [];
+    if (product.imagenes) {
+      if (typeof product.imagenes === 'string') {
+        imagenes = product.imagenes.split(',').map(i => i.trim()).filter(i => i && i.length > 0);
+      } else if (Array.isArray(product.imagenes)) {
+        imagenes = product.imagenes;
+      }
+    }
+    return imagenes;
+  }
+
+  // ===== FUNCIÓN PARA OBTENER PRIMERA IMAGEN =====
+  function getFirstImage(product) {
+    const imagenes = getProductImages(product);
+    return imagenes.length > 0 ? imagenes[0] : getDefaultImage();
+  }
+
+  // ===== VARIABLES GLOBALES =====
+  const loginContainer = document.getElementById("login-container");
+  const dashboardApp = document.getElementById("dashboard-app");
+  const loginBtn = document.getElementById("login-btn");
+  const registerBtn = document.getElementById("register-btn");
+  const recuperarBtn = document.getElementById("recuperar-btn");
+  const guestBtn = document.getElementById("guest-btn");
+  const logoutSidebar = document.getElementById("logout-sidebar");
+
+  // ===== FUNCIONES DE AUTENTICACIÓN =====
+  window.cambiarTabAuth = function(tab) {
+    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
+    document.querySelector(`.auth-tabs button[data-tab="${tab}"]`).classList.add('active-tab');
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+    document.getElementById(`form-${tab}`).classList.add('active-form');
+    document.getElementById('form-recuperar').style.display = 'none';
+  };
+
+  window.mostrarRecuperar = function() {
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+    document.getElementById('form-recuperar').style.display = 'block';
+  };
+
+  window.volverALogin = function() {
+    document.getElementById('form-recuperar').style.display = 'none';
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+    document.getElementById('form-login').classList.add('active-form');
+    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active-tab'));
+    document.querySelector('.auth-tabs button[data-tab="login"]').classList.add('active-tab');
+  };
+
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById("login-email").value.trim();
+    const pass = document.getElementById("login-password").value.trim();
+    if (!email || !pass) { alert("Completa todos los campos."); return; }
     try {
-      await addDoc(collection(db, "metodos_pago_config"), {
-        nombre, icono, descripcion: descripcion || `${nombre} - Pago disponible`,
-        activo, esCredito
+      await signInWithEmailAndPassword(auth, email, pass);
+      addDebugLog(`✅ Login exitoso: ${email}`, 'success');
+    } catch (err) {
+      addDebugLog(`❌ Error login: ${err.message}`, 'error');
+      alert("Error: " + err.message);
+    }
+  });
+
+  registerBtn.addEventListener('click', async () => {
+    const nombre = document.getElementById("register-nombre").value.trim();
+    const email = document.getElementById("register-email").value.trim();
+    const pass = document.getElementById("register-password").value.trim();
+    if (!nombre || !email || !pass) { alert("Completa todos los campos."); return; }
+    if (pass.length < 6) { alert("La contraseña debe tener al menos 6 caracteres."); return; }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await setDoc(doc(db, "usuarios_permisos", email), { 
+        rol: "seller", 
+        estado: true, 
+        nombre: nombre,
+        uid: userCredential.user.uid
       });
-      alert(`✅ Método de pago "${nombre}" agregado correctamente`);
-      document.getElementById("nuevo-metodo-nombre").value = "";
-      document.getElementById("nuevo-metodo-icono").value = "";
-      document.getElementById("nuevo-metodo-descripcion").value = "";
-      document.getElementById("nuevo-metodo-activo").checked = true;
-      document.getElementById("nuevo-metodo-es-credito").checked = false;
+      addDebugLog(`✅ Usuario registrado: ${email}`, 'success');
+      alert("✅ Cuenta creada exitosamente. Ahora inicia sesión.");
+      cambiarTabAuth('login');
+      document.getElementById("login-email").value = email;
+    } catch (err) {
+      addDebugLog(`❌ Error registro: ${err.message}`, 'error');
+      alert("Error: " + err.message);
+    }
+  });
+
+  recuperarBtn.addEventListener('click', async () => {
+    const email = document.getElementById("recuperar-email").value.trim();
+    if (!email) { alert("Ingresa tu correo electrónico."); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      addDebugLog(`✅ Email de recuperación enviado a: ${email}`, 'success');
+      alert("✅ Se ha enviado un enlace de recuperación a tu correo electrónico.");
+      volverALogin();
+    } catch (err) {
+      addDebugLog(`❌ Error recuperación: ${err.message}`, 'error');
+      alert("Error: " + err.message);
+    }
+  });
+
+  guestBtn.addEventListener('click', () => {
+    currentUser = null;
+    currentUserRol = "guest";
+    loginContainer.style.display = "none";
+    dashboardApp.style.display = "block";
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.seller-only').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(el => {
+      if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
+        el.style.display = 'none';
+      }
+    });
+    showPage('tienda');
+    addDebugLog(`👤 Acceso como invitado`, 'info');
+    loadAllData();
+    cargarHeader();
+    cargarMetodosPago();
+    cargarIntereses();
+  });
+
+  logoutSidebar.addEventListener('click', () => {
+    if (currentUser) {
+      signOut(auth);
+    } else {
+      location.reload();
+    }
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      const rolDoc = await getDoc(doc(db, "usuarios_permisos", user.email));
+      if (rolDoc.exists()) {
+        currentUserRol = rolDoc.data().rol;
+      } else if (user.email === MASTER_EMAIL) {
+        currentUserRol = "admin";
+        await setDoc(doc(db, "usuarios_permisos", user.email), { rol: "admin", estado: true });
+      } else {
+        currentUserRol = "seller";
+      }
+      loginContainer.style.display = "none";
+      dashboardApp.style.display = "block";
+      updateVisibilityByRole();
+      addDebugLog(`👤 Usuario: ${user.email} (${currentUserRol})`, 'success');
+      loadAllData();
+      cargarHeader();
+      cargarMetodosPago();
+      cargarIntereses();
+    } else {
+      if (currentUserRol !== 'guest') {
+        loginContainer.style.display = "flex";
+        dashboardApp.style.display = "none";
+        currentUser = null;
+        currentUserRol = "visitor";
+      }
+    }
+  });
+
+  const isAdmin = () => currentUserRol === "admin";
+  const isSeller = () => currentUserRol === "seller" || currentUserRol === "worker";
+
+  function updateVisibilityByRole() {
+    const adminElements = document.querySelectorAll('.admin-only');
+    const sellerElements = document.querySelectorAll('.seller-only');
+    if (isAdmin()) {
+      adminElements.forEach(el => el.style.display = 'block');
+      sellerElements.forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'flex');
+      showPage('dashboard');
+    } else if (isSeller()) {
+      adminElements.forEach(el => el.style.display = 'none');
+      sellerElements.forEach(el => el.style.display = 'block');
+      document.querySelectorAll('.nav-item').forEach(el => {
+        if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
+          el.style.display = 'none';
+        } else {
+          el.style.display = 'flex';
+        }
+      });
+      showPage('tienda');
+    } else {
+      adminElements.forEach(el => el.style.display = 'none');
+      sellerElements.forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-item').forEach(el => {
+        if (el.dataset.page !== 'tienda' && el.dataset.page !== 'ventas' && el.id !== 'logout-sidebar') {
+          el.style.display = 'none';
+        } else {
+          el.style.display = 'flex';
+        }
+      });
+      showPage('tienda');
+    }
+  }
+
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+    const target = document.getElementById(`page-${pageId}`);
+    if (target) target.classList.add('active-page');
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+    if (navItem) navItem.classList.add('active');
+  }
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (item.id === "logout-sidebar") return;
+      const page = item.getAttribute('data-page');
+      if (page) showPage(page);
+    });
+  });
+
+  // ===== FUNCIONES DE DEBUG =====
+  function addDebugLog(message, type = 'info') {
+    const panel = document.getElementById('debug-panel');
+    if (!panel) return;
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+    entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    panel.appendChild(entry);
+    panel.scrollTop = panel.scrollHeight;
+    while (panel.children.length > 50) {
+      panel.removeChild(panel.firstChild);
+    }
+  }
+
+  // ===== FUNCIONES DE HEADER =====
+  function cargarHeader() {
+    const headerDocRef = doc(db, "configuracion", "header");
+    getDoc(headerDocRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        headerImageUrl = docSnap.data().imagen || "";
+        actualizarHeader();
+        actualizarPreviewHeader();
+      }
+    }).catch(err => console.log("Error cargando header:", err));
+  }
+
+  function actualizarHeader() {
+    const img = document.getElementById('header-imagen-tienda');
+    if (headerImageUrl && headerImageUrl.trim() !== "") {
+      img.src = headerImageUrl;
+      img.style.display = 'block';
+      img.onerror = function() {
+        this.style.display = 'none';
+        reportarImagenFallida(headerImageUrl, 'Header no cargó');
+      };
+    } else {
+      img.style.display = 'none';
+    }
+  }
+
+  function actualizarPreviewHeader() {
+    const container = document.getElementById('preview-header-actual-container');
+    if (headerImageUrl && headerImageUrl.trim() !== "") {
+      container.innerHTML = `<img src="${headerImageUrl}" style="height:60px; width:auto; border-radius:8px; border:1px solid #e0e0e0; object-fit:contain; background:#f9f9f9;" onerror="this.outerHTML='<span class=\\'sin-img\\'>❌ Error al cargar imagen</span>'">`;
+    } else {
+      container.innerHTML = `<span class="sin-img">📝 Texto original: "LOS AMIGOS ESTORE 🎁"</span>`;
+    }
+  }
+
+  document.getElementById("btn-guardar-header")?.addEventListener("click", async () => {
+    const url = document.getElementById("header-imagen-url").value.trim();
+    if (!url) { alert("Por favor, ingresa la URL de la imagen."); return; }
+    try {
+      await setDoc(doc(db, "configuracion", "header"), { imagen: url });
+      headerImageUrl = url;
+      actualizarHeader();
+      actualizarPreviewHeader();
+      document.getElementById("header-imagen-url").value = "";
+      addDebugLog(`✅ Header actualizado: ${url}`, 'success');
+      alert("✅ Imagen del header guardada correctamente");
     } catch (error) {
+      addDebugLog(`❌ Error guardando header: ${error.message}`, 'error');
       alert("Error: " + error.message);
     }
   });
 
-  document.getElementById("btn-guardar-intereses")?.addEventListener("click", async () => {
-    const pagos2 = parseFloat(document.getElementById('interes-2-pagos').value) || 0;
-    const pagos3 = parseFloat(document.getElementById('interes-3-pagos').value) || 0;
-    const pagos4 = parseFloat(document.getElementById('interes-4-pagos').value) || 0;
-    
+  document.getElementById("btn-restaurar-header")?.addEventListener("click", async () => {
+    if (!confirm("¿Restaurar el texto original del header?")) return;
     try {
-      await setDoc(doc(db, "configuracion", "intereses"), { pagos2, pagos3, pagos4 });
-      interesesConfig.pagos2 = pagos2;
-      interesesConfig.pagos3 = pagos3;
-      interesesConfig.pagos4 = pagos4;
-      alert('✅ Intereses guardados correctamente');
-    } catch (err) {
-      alert('Error: ' + err.message);
+      await setDoc(doc(db, "configuracion", "header"), { imagen: "" });
+      headerImageUrl = "";
+      actualizarHeader();
+      actualizarPreviewHeader();
+      addDebugLog(`✅ Header restaurado a texto original`, 'success');
+      alert("✅ Header restaurado");
+    } catch (error) {
+      addDebugLog(`❌ Error restaurando header: ${error.message}`, 'error');
+      alert("Error: " + error.message);
     }
   });
 
-  // ============================================
-  // 🛒 CARRITO
-  // ============================================
+  // ===== FUNCIONES DE SUBIDA DE IMÁGENES =====
+  const uploadArea = document.getElementById("upload-area");
+  const fileInput = document.getElementById("file-input");
+  const previewContainer = document.getElementById("preview-container");
 
-  function renderCarrito() {
-    const container = document.getElementById('carrito-lista');
-    const resumen = document.getElementById('cart-resumen');
-    const totalSpan = document.getElementById('carrito-total');
+  uploadArea.addEventListener("click", () => fileInput.click());
+  uploadArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadArea.style.borderColor = "#b30000";
+    uploadArea.style.background = "#f5f5f5";
+  });
+  uploadArea.addEventListener("dragleave", () => {
+    uploadArea.style.borderColor = "#cc0000";
+    uploadArea.style.background = "#fafafa";
+  });
+  uploadArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadArea.style.borderColor = "#cc0000";
+    uploadArea.style.background = "#fafafa";
+    if (e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files.length > 0) {
+      handleFiles(e.target.files);
+    }
+  });
+
+  async function handleFiles(files) {
+    if (uploadedImageUrls.length === 0) {
+      previewContainer.innerHTML = '';
+    }
+    const sinImg = previewContainer.querySelector('.sin-imagenes');
+    if (sinImg) sinImg.remove();
+
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.alt = "Vista previa";
+        img.title = "Vista previa de la imagen";
+        previewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+      
+      try {
+        const fileName = `${Date.now()}_${file.name}`;
+        const storageRef = ref(storage, `productos/${fileName}`);
+        addDebugLog(`⬆️ Subiendo: ${fileName}`, 'info');
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        uploadedImageUrls.push(url);
+        addDebugLog(`✅ Subida exitosa: ${fileName}`, 'success');
+        
+        const urlsString = uploadedImageUrls.join(", ");
+        document.getElementById("prod-imagenes").value = urlsString;
+        
+      } catch (error) {
+        addDebugLog(`❌ Error subiendo ${file.name}: ${error.message}`, 'error');
+        alert("Error al subir imagen: " + error.message);
+      }
+    }
     
-    if (cart.length === 0) {
+    fileInput.value = '';
+    if (uploadedImageUrls.length > 0) {
+      addDebugLog(`📋 Total: ${uploadedImageUrls.length} imágenes subidas`, 'success');
+      alert(`✅ ${uploadedImageUrls.length} imagen(es) subidas exitosamente`);
+    }
+  }
+
+  // ===== RENDER TIENDA =====
+  window.renderTiendaDepratik = function() {
+    const container = document.getElementById("vitrina-productos");
+    const filtroTexto = document.getElementById("filtro-productos-tienda")?.value?.toLowerCase() || '';
+    const filtroGenero = document.getElementById("filtro-genero")?.value || 'todos';
+    const filtroTalla = document.getElementById("filtro-talla")?.value || 'todos';
+    
+    let filtered = allProducts;
+    
+    if (categoriaSeleccionada !== "todos") {
+      filtered = filtered.filter(p => p.categoria === categoriaSeleccionada);
+    }
+    
+    if (filtroGenero !== "todos") {
+      filtered = filtered.filter(p => p.genero === filtroGenero || p.genero === 'todos' || !p.genero);
+    }
+    
+    if (filtroTalla !== "todos") {
+      filtered = filtered.filter(p => {
+        if (!p.talla) return false;
+        const tallasDisponibles = generarTallasDesdeRango(p.talla);
+        return tallasDisponibles.includes(filtroTalla);
+      });
+    }
+    
+    if (filtroTexto) {
+      filtered = filtered.filter(p => p.nombre && p.nombre.toLowerCase().includes(filtroTexto));
+    }
+    
+    if (filtered.length === 0) {
       container.innerHTML = `
-        <p style="color: #999; text-align: center; padding: 30px 0;">
-          <i class="fas fa-cart-plus" style="font-size: 2rem; display: block; margin-bottom: 10px; color: #cc0000;"></i>
-          Tu carrito está vacío. Agrega productos desde la tienda.
-        </p>
+        <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:#999;">
+          <i class="fas fa-box-open" style="font-size:3rem; margin-bottom:16px; display:block; color:#cc0000;"></i>
+          <p>No hay productos disponibles con estos filtros</p>
+          <p style="font-size:0.8rem;">Prueba cambiando los filtros o agregando nuevos productos</p>
+        </div>
       `;
-      resumen.style.display = 'none';
       return;
     }
     
     let html = '';
-    let total = 0;
-    
-    cart.forEach((item, idx) => {
-      const subtotal = (item.precio || 0) * item.cantidad;
-      total += subtotal;
+    filtered.forEach(p => {
+      const primeraImagen = getFirstImage(p);
+      const stockText = p.stock > 0 ? `${p.stock} disponibles` : 'Agotado';
+      const stockClass = p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo';
       
-      const detalleTalla = item.talla ? `Talla: ${item.talla}` : '';
-      const detalleColor = item.color ? `Color: ${item.color}` : '';
-      const detalles = [detalleTalla, detalleColor].filter(d => d).join(' | ');
+      const generoIcono = p.genero === 'hombre' ? '👨' : p.genero === 'mujer' ? '👩' : p.genero === 'ninos' ? '🧒' : p.genero === 'ninas' ? '👧' : '';
+      const categoriaIcono = p.categoria === 'ropa' ? '👕' : p.categoria === 'zapatos' ? '👟' : p.categoria === 'relojes' ? '⌚' : p.categoria === 'medias' ? '🧦' : p.categoria === 'boxer' ? '🩲' : p.categoria === 'accesorios' ? '🧢' : '🏷️';
       
       html += `
-        <div class="cart-item">
-          <div class="item-info">
-            <div class="nombre">${item.nombre || 'Producto'}</div>
-            <div class="detalle">${detalles || 'Sin especificaciones'}</div>
-            <div class="precio">$${(item.precio || 0).toFixed(2)} c/u</div>
+        <div class="producto-card-depratik" onclick="abrirModal('${p.id}')">
+          <div class="imagen-container">
+            <img src="${primeraImagen}" alt="${p.nombre || 'Producto'}" loading="lazy" 
+                 onerror="reportarImagenFallida('${primeraImagen}', 'Producto ${p.nombre} no cargó'); this.src='${getDefaultImage()}'">
+            <span class="etiqueta-stock ${stockClass}">${stockText}</span>
+            ${p.stock > 0 && p.stock < 5 ? '<span class="oferta-badge">🔥 Últimas unidades</span>' : ''}
           </div>
-          <div class="item-cantidad">
-            <button onclick="cambiarCantidad(${idx}, -1)">−</button>
-            <span>${item.cantidad}</span>
-            <button onclick="cambiarCantidad(${idx}, 1)">+</button>
+          <div class="info">
+            <div class="nombre">${generoIcono} ${categoriaIcono} ${p.nombre || 'Sin nombre'}</div>
+            <div class="precio">$${p.precio || 0}</div>
+            <div class="detalles">
+              ${p.talla ? `<span>📏 ${p.talla}</span>` : ''}
+              ${p.color ? `<span>🎨 ${p.color}</span>` : ''}
+              ${p.medidas ? `<span>📐 ${p.medidas}</span>` : ''}
+            </div>
+            <div class="descripcion">${p.descripcion || 'Descripción no disponible'}</div>
           </div>
-          <div style="font-weight: 700; color: #cc0000; min-width: 80px; text-align: right;">
-            $${subtotal.toFixed(2)}
-          </div>
-          <button class="btn-eliminar-item" onclick="eliminarItemCarrito(${idx})" title="Eliminar producto">
-            <i class="fas fa-trash"></i>
-          </button>
         </div>
       `;
     });
-    
     container.innerHTML = html;
-    resumen.style.display = 'block';
-    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
-    totalSpan.textContent = totalOriginal.toFixed(2);
-  }
-
-  window.cambiarCantidad = function(idx, cambio) {
-    if (cart[idx]) {
-      cart[idx].cantidad += cambio;
-      if (cart[idx].cantidad <= 0) {
-        cart.splice(idx, 1);
-      }
-      renderCarrito();
-    }
+    
+    setTimeout(() => {
+      container.querySelectorAll('img').forEach(img => {
+        if (!img.complete || img.naturalWidth === 0) {
+          if (img.src && !img.src.includes('data:image')) {
+            reportarImagenFallida(img.src, 'Imagen rota en la tienda');
+          }
+        }
+      });
+    }, 1000);
   };
 
-  window.eliminarItemCarrito = function(idx) {
-    if (confirm(`¿Eliminar "${cart[idx].nombre || 'Producto'}" del carrito?`)) {
-      cart.splice(idx, 1);
-      renderCarrito();
-    }
+  window.limpiarFiltros = function() {
+    document.getElementById("filtro-genero").value = 'todos';
+    document.getElementById("filtro-talla").value = 'todos';
+    document.getElementById("filtro-productos-tienda").value = '';
+    renderTiendaDepratik();
   };
 
-  document.getElementById("btn-seguir-comprando")?.addEventListener("click", function() {
-    showPage('tienda');
-  });
-
-  // ============================================
-  // 🏪 MODAL PRODUCTO Y COMPRAS
-  // ============================================
+  // ===== MODAL PRODUCTO =====
+  window.abrirModal = function(productId) {
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+    productoModal = product;
+    tallaSeleccionada = null;
+    colorSeleccionado = null;
+    
+    const imagenes = getProductImages(product);
+    const primeraImagen = imagenes.length > 0 ? imagenes[0] : getDefaultImage();
+    
+    const modalImg = document.getElementById('modal-img-principal');
+    modalImg.src = primeraImagen;
+    modalImg.onerror = function() {
+      this.src = getDefaultImage();
+      reportarImagenFallida(primeraImagen, 'Modal - imagen principal');
+    };
+    
+    document.getElementById('modal-nombre').textContent = product.nombre || 'Sin nombre';
+    document.getElementById('modal-precio').textContent = `$${product.precio || 0}`;
+    document.getElementById('modal-codigo').textContent = `Código: ${product.id?.slice(0, 8) || '---'}`;
+    
+    let detallesHtml = '';
+    if (product.talla) detallesHtml += `<span>📏 ${product.talla}</span>`;
+    if (product.color) detallesHtml += `<span>🎨 ${product.color}</span>`;
+    if (product.medidas) detallesHtml += `<span>📐 ${product.medidas}</span>`;
+    if (product.genero && product.genero !== 'todos') {
+      const generoLabel = product.genero === 'hombre' ? '👨 Hombre' : product.genero === 'mujer' ? '👩 Mujer' : product.genero === 'ninos' ? '🧒 Niños' : '👧 Niñas';
+      detallesHtml += `<span>${generoLabel}</span>`;
+    }
+    if (product.categoria) {
+      const categoriaLabel = product.categoria === 'ropa' ? '👕 Ropa' : product.categoria === 'zapatos' ? '👟 Zapatos' : product.categoria === 'relojes' ? '⌚ Relojes' : product.categoria === 'medias' ? '🧦 Medias' : product.categoria === 'boxer' ? '🩲 Boxer' : product.categoria === 'accesorios' ? '🧢 Accesorios' : '🏷️ Ofertas';
+      detallesHtml += `<span>${categoriaLabel}</span>`;
+    }
+    document.getElementById('modal-detalles').innerHTML = detallesHtml || '<span>Sin especificaciones</span>';
+    
+    document.getElementById('modal-descripcion').textContent = product.descripcion || 'Descripción no disponible';
+    
+    const stockText = product.stock > 0 ? `✅ ${product.stock} unidades disponibles` : '❌ Agotado';
+    document.getElementById('modal-stock').textContent = stockText;
+    document.getElementById('modal-stock').style.color = product.stock > 0 ? '#28a745' : '#dc3545';
+    
+    const tallasContainer = document.getElementById('modal-tallas-container');
+    const tallasGrid = document.getElementById('modal-tallas-grid');
+    tallasGrid.innerHTML = '';
+    if (product.talla) {
+      tallasContainer.style.display = 'block';
+      const tallas = generarTallasDesdeRango(product.talla);
+      tallas.forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = 'talla-btn';
+        btn.textContent = t;
+        btn.dataset.talla = t;
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('active-talla'));
+          this.classList.add('active-talla');
+          tallaSeleccionada = t;
+        });
+        tallasGrid.appendChild(btn);
+      });
+    } else {
+      tallasContainer.style.display = 'none';
+    }
+    
+    const coloresContainer = document.getElementById('modal-colores-container');
+    const coloresGrid = document.getElementById('modal-colores-grid');
+    coloresGrid.innerHTML = '';
+    if (product.color) {
+      coloresContainer.style.display = 'block';
+      const colores = product.color.split(',').map(c => c.trim()).filter(c => c);
+      colores.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'color-btn';
+        btn.textContent = c;
+        btn.dataset.color = c;
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active-color'));
+          this.classList.add('active-color');
+          colorSeleccionado = c;
+        });
+        coloresGrid.appendChild(btn);
+      });
+    } else {
+      coloresContainer.style.display = 'none';
+    }
+    
+    const btnAgregar = document.getElementById('modal-btn-agregar');
+    const btnComprarAhora = document.getElementById('modal-btn-comprar-ahora');
+    if (product.stock <= 0) {
+      btnAgregar.disabled = true;
+      btnAgregar.innerHTML = '<i class="fas fa-times"></i> Agotado';
+      btnComprarAhora.disabled = true;
+      btnComprarAhora.innerHTML = '<i class="fas fa-times"></i> Agotado';
+    } else {
+      btnAgregar.disabled = false;
+      btnAgregar.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al carrito';
+      btnComprarAhora.disabled = false;
+      btnComprarAhora.innerHTML = '<i class="fab fa-whatsapp"></i> Comprar ahora por WhatsApp';
+    }
+    
+    const miniContainer = document.getElementById('modal-miniaturas');
+    miniContainer.innerHTML = '';
+    if (imagenes.length > 0) {
+      imagenes.forEach((img, index) => {
+        const mini = document.createElement('img');
+        mini.src = img;
+        mini.alt = 'Miniatura';
+        mini.onerror = function() { 
+          this.style.display = 'none';
+          reportarImagenFallida(img, 'Modal - miniatura');
+        };
+        if (index === 0) mini.classList.add('active-miniatura');
+        mini.onclick = function() {
+          document.getElementById('modal-img-principal').src = img;
+          document.querySelectorAll('.modal-miniaturas img').forEach(m => m.classList.remove('active-miniatura'));
+          this.classList.add('active-miniatura');
+        };
+        miniContainer.appendChild(mini);
+      });
+    } else {
+      miniContainer.innerHTML = '<p style="color:#999; font-size:0.8rem;">Sin imágenes adicionales</p>';
+    }
+    
+    document.getElementById('modal-producto').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
 
   window.cerrarModal = function() {
     document.getElementById('modal-producto').classList.remove('active');
@@ -3581,6 +3149,7 @@
     showPage('ventas');
   };
 
+  // ===== COMPRA DIRECTA DESDE EL MODAL =====
   window.comprarAhoraDirecto = function() {
     if (!productoModal) return;
     if (productoModal.stock <= 0) {
@@ -3608,6 +3177,87 @@
     abrirModalPago('directo');
   };
 
+  // ===== CARRITO =====
+  function renderCarrito() {
+    const container = document.getElementById('carrito-lista');
+    const resumen = document.getElementById('cart-resumen');
+    const totalSpan = document.getElementById('carrito-total');
+    const totalContainer = document.getElementById('total-container');
+    
+    if (cart.length === 0) {
+      container.innerHTML = `
+        <p style="color: #999; text-align: center; padding: 30px 0;">
+          <i class="fas fa-cart-plus" style="font-size: 2rem; display: block; margin-bottom: 10px; color: #cc0000;"></i>
+          Tu carrito está vacío. Agrega productos desde la tienda.
+        </p>
+      `;
+      resumen.style.display = 'none';
+      return;
+    }
+    
+    let html = '';
+    let total = 0;
+    
+    cart.forEach((item, idx) => {
+      const subtotal = (item.precio || 0) * item.cantidad;
+      total += subtotal;
+      
+      const detalleTalla = item.talla ? `Talla: ${item.talla}` : '';
+      const detalleColor = item.color ? `Color: ${item.color}` : '';
+      const detalles = [detalleTalla, detalleColor].filter(d => d).join(' | ');
+      
+      html += `
+        <div class="cart-item">
+          <div class="item-info">
+            <div class="nombre">${item.nombre || 'Producto'}</div>
+            <div class="detalle">${detalles || 'Sin especificaciones'}</div>
+            <div class="precio">$${(item.precio || 0).toFixed(2)} c/u</div>
+          </div>
+          <div class="item-cantidad">
+            <button onclick="cambiarCantidad(${idx}, -1)">−</button>
+            <span>${item.cantidad}</span>
+            <button onclick="cambiarCantidad(${idx}, 1)">+</button>
+          </div>
+          <div style="font-weight: 700; color: #cc0000; min-width: 80px; text-align: right;">
+            $${subtotal.toFixed(2)}
+          </div>
+          <button class="btn-eliminar-item" onclick="eliminarItemCarrito(${idx})" title="Eliminar producto">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    resumen.style.display = 'block';
+    
+    const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
+    totalSpan.textContent = totalOriginal.toFixed(2);
+    totalContainer.innerHTML = `Total: $<span id="carrito-total">${totalOriginal.toFixed(2)}</span>`;
+  }
+
+  window.cambiarCantidad = function(idx, cambio) {
+    if (cart[idx]) {
+      cart[idx].cantidad += cambio;
+      if (cart[idx].cantidad <= 0) {
+        cart.splice(idx, 1);
+      }
+      renderCarrito();
+    }
+  };
+
+  window.eliminarItemCarrito = function(idx) {
+    if (confirm(`¿Eliminar "${cart[idx].nombre || 'Producto'}" del carrito?`)) {
+      cart.splice(idx, 1);
+      renderCarrito();
+    }
+  };
+
+  document.getElementById("btn-seguir-comprando")?.addEventListener("click", function() {
+    showPage('tienda');
+  });
+
+  // ===== MODAL DE MÉTODO DE PAGO =====
   function abrirModalPago(modo = 'carrito') {
     if (cart.length === 0) {
       alert("El carrito está vacío.");
@@ -3658,6 +3308,7 @@
     }
   });
 
+  // ===== FUNCIONES PARA SELECCIONAR PAGO =====
   window.seleccionarPago = function(metodoId) {
     metodoPagoSeleccionado = metodoId;
     
@@ -3739,6 +3390,7 @@
     }
   }
 
+  // ===== ENVIAR PEDIDO POR WHATSAPP =====
   document.getElementById("btn-enviar-pago-whatsapp")?.addEventListener("click", function() {
     const totalOriginal = cart.reduce((acc, i) => acc + ((i.precio || 0) * i.cantidad), 0);
     
@@ -3802,10 +3454,7 @@
     }
   });
 
-  // ============================================
-  // 🏷️ CATEGORÍAS
-  // ============================================
-
+  // ===== CATEGORÍAS =====
   document.querySelectorAll('.categoria-item').forEach(el => {
     el.addEventListener('click', function() {
       document.querySelectorAll('.categoria-item').forEach(c => c.classList.remove('active-categoria'));
@@ -3815,22 +3464,473 @@
     });
   });
 
-  window.limpiarFiltros = function() {
-    document.getElementById("filtro-genero").value = 'todos';
-    document.getElementById("filtro-talla").value = 'todos';
-    document.getElementById("filtro-productos-tienda").value = '';
-    renderTiendaDepratik();
+  // ===== BANNERS =====
+  function renderBannersEnTienda() {
+    const container = document.getElementById("banners-container");
+    const activos = allBanners.filter(b => b.activo === true);
+    if (activos.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+    let html = '';
+    activos.forEach(b => {
+      html += `
+        <div class="banner-publicidad-full" ${b.enlace ? `onclick="window.open('${b.enlace}', '_blank')"` : ''}>
+          <img src="${b.imagen}" alt="${b.titulo || 'Banner'}" loading="lazy" onerror="reportarImagenFallida('${b.imagen}', 'Banner ${b.titulo}'); this.style.display='none'">
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function renderBannersPanel() {
+    const container = document.getElementById("lista-banners");
+    if (allBanners.length === 0) {
+      container.innerHTML = '<p style="color:#999;">No hay banners creados. Agrega uno arriba.</p>';
+      return;
+    }
+    let html = '';
+    allBanners.forEach((b) => {
+      const estadoClass = b.activo ? 'badge-activo' : 'badge-inactivo';
+      const estadoText = b.activo ? 'Activo' : 'Inactivo';
+      html += `
+        <div class="banner-preview-mini" style="display:flex; align-items:center; gap:16px; padding:12px; background:#f9f9f9; border-radius:12px; border:1px solid #e0e0e0; margin:8px 0; flex-wrap:wrap;">
+          ${b.imagen ? `<img src="${b.imagen}" style="height:50px;width:auto;border-radius:8px;border:1px solid #e0e0e0;object-fit:contain;background:#f9f9f9;" onerror="this.style.display='none'">` : ''}
+          <div class="info" style="flex:1; min-width:150px;">
+            <h4 style="font-size:0.95rem; color:#1a1a1a;">${b.titulo || 'Sin título'}</h4>
+            <p style="font-size:0.7rem; color:#999;">${b.enlace || 'Sin enlace'}</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <span class="badge ${estadoClass}">${estadoText}</span>
+            <button class="btn-small" onclick="toggleBanner('${b.id}', ${!b.activo})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${b.activo ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small" onclick="editarBanner('${b.id}')" style="background:#28a745; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarBanner('${b.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  window.toggleBanner = async (id, nuevoEstado) => {
+    try {
+      await updateDoc(doc(db, "publicidad", id), { activo: nuevoEstado });
+      addDebugLog(`🔄 Banner ${id} -> ${nuevoEstado ? 'Activo' : 'Inactivo'}`, 'success');
+    } catch (error) {
+      addDebugLog(`❌ Error al cambiar estado: ${error.message}`, 'error');
+    }
   };
 
-  // ============================================
-  // 🚀 OTROS EVENTOS
-  // ============================================
+  window.eliminarBanner = async (id) => {
+    if (!confirm("¿Eliminar este banner?")) return;
+    try {
+      await deleteDoc(doc(db, "publicidad", id));
+      addDebugLog(`🗑️ Banner eliminado: ${id}`, 'info');
+    } catch (error) {
+      addDebugLog(`❌ Error al eliminar: ${error.message}`, 'error');
+    }
+  };
 
+  window.editarBanner = (id) => {
+    const banner = allBanners.find(b => b.id === id);
+    if (!banner) return;
+    document.getElementById("banner-titulo").value = banner.titulo || '';
+    document.getElementById("banner-imagen").value = banner.imagen || '';
+    document.getElementById("banner-enlace").value = banner.enlace || '';
+    document.getElementById("banner-activo").checked = banner.activo !== false;
+    document.getElementById("btn-add-banner").dataset.editId = id;
+    document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Actualizar Banner';
+    addDebugLog(`✏️ Editando banner: ${banner.titulo}`, 'info');
+  };
+
+  document.getElementById("btn-add-banner")?.addEventListener("click", async () => {
+    const titulo = document.getElementById("banner-titulo").value.trim();
+    const imagen = document.getElementById("banner-imagen").value.trim();
+    const enlace = document.getElementById("banner-enlace").value.trim();
+    const activo = document.getElementById("banner-activo").checked;
+    if (!imagen) {
+      alert("La URL de la imagen es obligatoria.");
+      return;
+    }
+    const data = { titulo, imagen, enlace, activo };
+    const editId = document.getElementById("btn-add-banner").dataset.editId;
+    try {
+      if (editId) {
+        await updateDoc(doc(db, "publicidad", editId), data);
+        addDebugLog(`✅ Banner actualizado: ${titulo}`, 'success');
+        delete document.getElementById("btn-add-banner").dataset.editId;
+        document.getElementById("btn-add-banner").innerHTML = '<i class="fas fa-save"></i> Guardar Banner';
+      } else {
+        await addDoc(collection(db, "publicidad"), data);
+        addDebugLog(`✅ Banner agregado: ${titulo}`, 'success');
+      }
+      alert("✅ Banner guardado correctamente");
+      document.getElementById("banner-titulo").value = "";
+      document.getElementById("banner-imagen").value = "";
+      document.getElementById("banner-enlace").value = "";
+      document.getElementById("banner-activo").checked = true;
+    } catch (error) {
+      addDebugLog(`❌ Error al guardar banner: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+  });
+
+  // ===== EVENTOS PARA ADMINISTRACIÓN DE MÉTODOS DE PAGO =====
+  document.getElementById("btn-agregar-metodo-pago")?.addEventListener("click", async () => {
+    const nombre = document.getElementById("nuevo-metodo-nombre").value.trim();
+    const icono = document.getElementById("nuevo-metodo-icono").value.trim() || '💳';
+    const descripcion = document.getElementById("nuevo-metodo-descripcion").value.trim();
+    const activo = document.getElementById("nuevo-metodo-activo").checked;
+    const esCredito = document.getElementById("nuevo-metodo-es-credito").checked;
+    
+    if (!nombre) {
+      alert("El nombre del método es obligatorio.");
+      return;
+    }
+    
+    try {
+      await addDoc(collection(db, "metodos_pago_config"), {
+        nombre,
+        icono,
+        descripcion: descripcion || `${nombre} - Pago disponible`,
+        activo,
+        esCredito
+      });
+      addDebugLog(`✅ Método de pago agregado: ${nombre}`, 'success');
+      alert(`✅ Método de pago "${nombre}" agregado correctamente`);
+      
+      document.getElementById("nuevo-metodo-nombre").value = "";
+      document.getElementById("nuevo-metodo-icono").value = "";
+      document.getElementById("nuevo-metodo-descripcion").value = "";
+      document.getElementById("nuevo-metodo-activo").checked = true;
+      document.getElementById("nuevo-metodo-es-credito").checked = false;
+      
+    } catch (error) {
+      addDebugLog(`❌ Error agregando método: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+  });
+
+  document.getElementById("btn-guardar-intereses")?.addEventListener("click", guardarIntereses);
+
+  // ===== LOAD ALL DATA =====
+  function loadAllData() {
+    addDebugLog('🔄 Cargando datos de Firebase...', 'info');
+    
+    onSnapshot(collection(db, "productos"), (snap) => {
+      allProducts = [];
+      let html = `<table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Tallas</th><th>Color</th><th>Género</th><th>Categoría</th><th>Imagen</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const p = doc.data();
+        allProducts.push({ id: doc.id, ...p });
+        const imagenes = getProductImages(p);
+        const previewImg = imagenes.length > 0 ? `<img src="${imagenes[0]}" class="preview-img-tabla" onerror="this.outerHTML='📷'">` : '📷';
+        const generoLabel = p.genero && p.genero !== 'todos' ? p.genero : 'Todos';
+        const categoriaLabel = p.categoria || 'Sin categoría';
+        html += `<tr>
+          <td><strong>${p.nombre || 'Sin nombre'}</strong><br><small>${p.descripcion || ''}</small></td>
+          <td>$${p.precio || 0}</td>
+          <td><span class="stock-badge ${p.stock > 10 ? 'stock-alto' : p.stock > 5 ? 'stock-medio' : 'stock-bajo'}">${p.stock || 0}</span></td>
+          <td>${p.talla || 'N/A'}</td>
+          <td>${p.color || 'N/A'}</td>
+          <td><span class="badge">${generoLabel}</span></td>
+          <td><span class="badge">${categoriaLabel}</span></td>
+          <td>${previewImg}</td>
+          <td>
+            <button class="btn-small btn-info" onclick="editarProducto('${doc.id}')"><i class="fas fa-edit"></i></button>
+            <button class="btn-small btn-danger" onclick="eliminarProducto('${doc.id}')"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById("lista-productos").innerHTML = html || "<p>No hay productos.</p>";
+      document.getElementById("stat-productos").innerText = snap.size;
+      addDebugLog(`📦 ${snap.size} productos cargados`, 'success');
+      
+      renderTiendaDepratik();
+    }, (error) => {
+      addDebugLog(`❌ Error cargando productos: ${error.message}`, 'error');
+    });
+
+    onSnapshot(collection(db, "publicidad"), (snap) => {
+      allBanners = [];
+      snap.forEach(doc => {
+        allBanners.push({ id: doc.id, ...doc.data() });
+      });
+      addDebugLog(`📢 ${allBanners.length} banners cargados`, 'success');
+      renderBannersEnTienda();
+      renderBannersPanel();
+    }, (error) => {
+      addDebugLog(`❌ Error cargando banners: ${error.message}`, 'error');
+    });
+
+    onSnapshot(query(collection(db, "ventas"), orderBy("fecha", "desc")), (snap) => {
+      let totalVentas = 0, ingresos = 0, ultimas = "";
+      snap.forEach((doc, idx) => {
+        const v = doc.data();
+        totalVentas++;
+        ingresos += v.total || 0;
+        if (idx < 5) {
+          ultimas += `<div class="cart-item">💰 ${v.cliente || 'Cliente'} - $${v.total?.toFixed(2) || '0'} - ${v.fecha ? new Date(v.fecha.toDate()).toLocaleString() : ''}</div>`;
+        }
+      });
+      document.getElementById("stat-ventas").innerText = totalVentas;
+      document.getElementById("stat-ingresos").innerText = ingresos.toFixed(2);
+      document.getElementById("ultimas-ventas-lista").innerHTML = ultimas || "Sin ventas";
+
+      let historialHtml = `<table><thead><tr><th>Cliente</th><th>Productos</th><th>Total</th><th>Método</th><th>Fecha</th></tr></thead><tbody>`;
+      snap.forEach(d => {
+        const v = d.data();
+        historialHtml += `<tr>
+          <td>${v.cliente || 'Cliente'}</td>
+          <td>${v.items?.map(i => `${i.nombre || 'Producto'} x${i.cantidad}`).join(", ") || ''}</td>
+          <td>$${v.total?.toFixed(2) || '0'}</td>
+          <td>${v.metodoPago || 'Efectivo'}</td>
+          <td>${v.fecha ? new Date(v.fecha.toDate()).toLocaleString() : ''}</td>
+        </tr>`;
+      });
+      historialHtml += `</tbody></table>`;
+      document.getElementById("historial-ventas").innerHTML = historialHtml;
+    });
+
+    onSnapshot(collection(db, "miembros"), (snap) => {
+      document.getElementById("stat-miembros").innerText = snap.size;
+      let html = `<table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const m = doc.data();
+        html += `<tr><td>${m.nombre || 'Sin nombre'}</td><td>${m.telefono || ''}</td><td>${m.email || ''}</td><td><button class="btn-small btn-danger" onclick="eliminarMiembro('${doc.id}')">🗑️</button></td></tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById("lista-miembros").innerHTML = html;
+    });
+
+    onSnapshot(collection(db, "metodos_pago"), (snap) => {
+      let html = `<select id="metodo-pago-select">`;
+      snap.forEach(doc => {
+        const m = doc.data();
+        html += `<option value="${doc.id}">${m.tipo?.toUpperCase() || ''} - ${m.pais || ''} : ${m.detalle || ''}</option>`;
+      });
+      html += `</select>`;
+      const selectContainer = document.getElementById("metodo-pago-select");
+      if (selectContainer) selectContainer.innerHTML = html;
+      
+      let listaHtml = `<table><thead><tr><th>Tipo</th><th>País</th><th>Detalle</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const m = doc.data();
+        listaHtml += `<tr><td>${m.tipo || ''}</td><td>${m.pais || ''}</td><td>${m.detalle || ''}</td><td><button class="btn-small btn-danger" onclick="eliminarMetodo('${doc.id}')">🗑️</button></td></tr>`;
+      });
+      listaHtml += `</tbody></table>`;
+      document.getElementById("lista-metodos").innerHTML = listaHtml;
+    });
+
+    onSnapshot(collection(db, "linksPago"), (snap) => {
+      let html = `<table><thead><tr><th>Monto</th><th>Concepto</th><th>Link</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const l = doc.data();
+        const linkUrl = `${window.location.origin}?pago=${doc.id}`;
+        html += `<tr>
+          <td>$${l.monto || 0}</td>
+          <td>${l.concepto || ''}</td>
+          <td><a href="${linkUrl}" target="_blank">Abrir link</a></td>
+          <td>${l.pagado ? 'Pagado ✅' : 'Pendiente ⏳'}</td>
+          <td><button class="btn-small btn-success" onclick="marcarPagado('${doc.id}')">✅ Pagado</button> <button class="btn-small btn-danger" onclick="eliminarLink('${doc.id}')">🗑️</button></td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      document.getElementById("lista-links-pago").innerHTML = html;
+    });
+
+    onSnapshot(collection(db, "usuarios_permisos"), (snap) => {
+      let usuariosHtml = `<table><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const u = doc.data();
+        if (doc.id === MASTER_EMAIL) {
+          usuariosHtml += `<tr>
+            <td><strong>${doc.id}</strong> 👑</td>
+            <td>${u.nombre || 'Master'}</td>
+            <td><span class="badge" style="background:#cc0000; color:white;">ADMIN</span></td>
+            <td>Activo ✅</td>
+            <td>-</td>
+          </tr>`;
+          return;
+        }
+        usuariosHtml += `<tr>
+          <td>${doc.id}</td>
+          <td>${u.nombre || 'Sin nombre'}</td>
+          <td><span class="badge">${u.rol || 'sin rol'}</span></td>
+          <td>${u.estado ? 'Activo ✅' : 'Inactivo ⛔'}</td>
+          <td>
+            <button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${u.estado ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarUsuario('${doc.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              🗑️
+            </button>
+          </td>
+        </tr>`;
+      });
+      usuariosHtml += `</tbody></table>`;
+      document.getElementById("lista-usuarios").innerHTML = usuariosHtml;
+      
+      let rolesHtml = `<table><thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+      snap.forEach(doc => {
+        const u = doc.data();
+        if (doc.id === MASTER_EMAIL) return;
+        rolesHtml += `<tr>
+          <td>${doc.id}</td>
+          <td><span class="badge">${u.rol || ''}</span></td>
+          <td>${u.estado ? 'Activo ✅' : 'Inactivo ⛔'}</td>
+          <td>
+            <button class="btn-small" onclick="cambiarEstado('${doc.id}', ${!u.estado})" style="background:#007bff; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              ${u.estado ? 'Desactivar' : 'Activar'}
+            </button>
+            <button class="btn-small btn-danger" onclick="eliminarUsuario('${doc.id}')" style="background:#dc3545; color:white; border:none; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:0.75rem;">
+              🗑️
+            </button>
+          </td>
+        </tr>`;
+      });
+      rolesHtml += `</tbody></table>`;
+      document.getElementById("lista-roles").innerHTML = rolesHtml;
+    });
+  }
+
+  // ===== FUNCIONES GLOBALES =====
+  window.eliminarProducto = async (id) => {
+    if (confirm("¿Eliminar este producto?")) {
+      await deleteDoc(doc(db, "productos", id));
+      addDebugLog(`🗑️ Producto eliminado: ${id}`, 'info');
+    }
+  };
+  
+  window.editarProducto = (id) => {
+    const product = allProducts.find(p => p.id === id);
+    if (!product) return;
+    document.getElementById("prod-nombre").value = product.nombre || '';
+    document.getElementById("prod-precio").value = product.precio || '';
+    document.getElementById("prod-stock").value = product.stock || '';
+    document.getElementById("prod-talla").value = product.talla || '';
+    document.getElementById("prod-color").value = product.color || '';
+    document.getElementById("prod-medidas").value = product.medidas || '';
+    document.getElementById("prod-desc").value = product.descripcion || '';
+    document.getElementById("prod-genero").value = product.genero || 'todos';
+    document.getElementById("prod-categoria").value = product.categoria || 'ropa';
+    
+    previewContainer.innerHTML = '';
+    uploadedImageUrls = [];
+    const imagenes = getProductImages(product);
+    if (imagenes.length > 0) {
+      imagenes.forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Vista previa";
+        previewContainer.appendChild(img);
+      });
+      uploadedImageUrls = imagenes;
+      document.getElementById("prod-imagenes").value = imagenes.join(", ");
+      addDebugLog(`✏️ Editando: ${product.nombre} (${imagenes.length} imágenes)`, 'info');
+    } else {
+      previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
+      document.getElementById("prod-imagenes").value = '';
+      addDebugLog(`✏️ Editando: ${product.nombre} (sin imágenes)`, 'info');
+    }
+    document.getElementById("btn-add-producto").dataset.editId = id;
+    document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Actualizar Producto';
+  };
+
+  window.eliminarMiembro = async (id) => {
+    if (confirm("¿Eliminar miembro?")) await deleteDoc(doc(db, "miembros", id));
+  };
+  window.eliminarMetodo = async (id) => {
+    if (confirm("¿Eliminar método de pago?")) await deleteDoc(doc(db, "metodos_pago", id));
+  };
+  window.eliminarLink = async (id) => {
+    if (confirm("¿Eliminar link?")) await deleteDoc(doc(db, "linksPago", id));
+  };
+  window.marcarPagado = async (id) => {
+    await updateDoc(doc(db, "linksPago", id), { pagado: true });
+    addDebugLog(`✅ Link marcado como pagado: ${id}`, 'success');
+    alert("✅ Link marcado como pagado");
+  };
+  window.cambiarEstado = async (email, estado) => {
+    await updateDoc(doc(db, "usuarios_permisos", email), { estado: estado });
+    addDebugLog(`🔄 Estado cambiado: ${email} -> ${estado ? 'Activo' : 'Inactivo'}`, 'info');
+  };
+  window.eliminarUsuario = async (email) => {
+    if (!confirm(`¿Eliminar el usuario ${email}? Solo se eliminará su rol, no la cuenta de autenticación.`)) return;
+    try {
+      await deleteDoc(doc(db, "usuarios_permisos", email));
+      addDebugLog(`🗑️ Usuario eliminado: ${email}`, 'info');
+      alert("✅ Usuario eliminado correctamente");
+    } catch (error) {
+      addDebugLog(`❌ Error eliminando usuario: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+  };
+
+  // ===== GUARDAR PRODUCTO =====
+  document.getElementById("btn-add-producto")?.addEventListener("click", async () => {
+    const nombre = document.getElementById("prod-nombre").value.trim();
+    const precio = parseFloat(document.getElementById("prod-precio").value);
+    const stock = parseInt(document.getElementById("prod-stock").value);
+    const talla = document.getElementById("prod-talla").value.trim();
+    const color = document.getElementById("prod-color").value.trim();
+    const medidas = document.getElementById("prod-medidas").value.trim();
+    const descripcion = document.getElementById("prod-desc").value.trim();
+    const imagenes = document.getElementById("prod-imagenes").value.trim();
+    const genero = document.getElementById("prod-genero").value;
+    const categoria = document.getElementById("prod-categoria").value;
+    
+    if (!nombre || isNaN(precio) || isNaN(stock)) {
+      addDebugLog('❌ Faltan campos obligatorios', 'error');
+      return alert("Completa nombre, precio y stock");
+    }
+    
+    const data = { nombre, precio, stock, talla, color, medidas, descripcion, imagenes, genero, categoria };
+    addDebugLog(`📦 Guardando producto: ${nombre} (${genero} - ${categoria})`, 'info');
+    
+    const editId = document.getElementById("btn-add-producto").dataset.editId;
+    try {
+      if (editId) {
+        await updateDoc(doc(db, "productos", editId), data);
+        addDebugLog(`✅ Producto actualizado: ${nombre}`, 'success');
+        delete document.getElementById("btn-add-producto").dataset.editId;
+        document.getElementById("btn-add-producto").innerHTML = '<i class="fas fa-save"></i> Guardar Producto';
+      } else {
+        await addDoc(collection(db, "productos"), data);
+        addDebugLog(`✅ Producto agregado: ${nombre}`, 'success');
+      }
+      alert("✅ Producto guardado correctamente");
+    } catch (error) {
+      addDebugLog(`❌ Error guardando: ${error.message}`, 'error');
+      alert("Error: " + error.message);
+    }
+    
+    document.getElementById("prod-nombre").value = "";
+    document.getElementById("prod-precio").value = "";
+    document.getElementById("prod-stock").value = "";
+    document.getElementById("prod-talla").value = "";
+    document.getElementById("prod-color").value = "";
+    document.getElementById("prod-medidas").value = "";
+    document.getElementById("prod-desc").value = "";
+    document.getElementById("prod-imagenes").value = "";
+    previewContainer.innerHTML = '<div class="sin-imagenes">🖼️ Aún no hay imágenes seleccionadas</div>';
+    uploadedImageUrls = [];
+  });
+
+  // ===== OTROS EVENTOS =====
   document.getElementById("btn-generar-link")?.addEventListener("click", async () => {
     const monto = parseFloat(document.getElementById("link-monto").value);
     const concepto = document.getElementById("link-concepto").value.trim();
     if (isNaN(monto) || !concepto) return alert("Monto y concepto requeridos");
     await addDoc(collection(db, "linksPago"), { monto, concepto, pagado: false, creado: new Date() });
+    addDebugLog(`✅ Link generado: $${monto} - ${concepto}`, 'success');
     alert("✅ Link generado");
     document.getElementById("link-monto").value = "";
     document.getElementById("link-concepto").value = "";
@@ -3857,10 +3957,14 @@
         uid: userCredential.user.uid
       });
       
-      alert(`✅ Vendedor creado exitosamente.\n📧 Email: ${email}\n🔑 Contraseña temporal: ${tempPass}`);
+      addDebugLog(`✅ Vendedor creado: ${email} (${rol})`, 'success');
+      alert(`✅ Vendedor creado exitosamente.\n📧 Email: ${email}\n🔑 Contraseña temporal: ${tempPass}\n\n¡El vendedor debe cambiar su contraseña al iniciar sesión!`);
+      
       document.getElementById("seller-email").value = "";
       document.getElementById("seller-nombre").value = "";
+      
     } catch (error) {
+      addDebugLog(`❌ Error creando vendedor: ${error.message}`, 'error');
       alert("Error al crear vendedor: " + error.message);
     }
   });
@@ -3871,10 +3975,23 @@
     const email = document.getElementById("member-email").value.trim();
     if (!nombre || !telefono) return alert("Nombre y teléfono requeridos");
     await addDoc(collection(db, "miembros"), { nombre, telefono, email });
+    addDebugLog(`✅ Miembro registrado: ${nombre}`, 'success');
     alert("✅ Miembro registrado");
     document.getElementById("member-nombre").value = "";
     document.getElementById("member-telefono").value = "";
     document.getElementById("member-email").value = "";
+  });
+
+  document.getElementById("btn-add-metodo")?.addEventListener("click", async () => {
+    const tipo = document.getElementById("tipo-metodo").value;
+    const pais = document.getElementById("pais-metodo").value.trim();
+    const detalle = document.getElementById("detalle-metodo").value.trim();
+    if (!pais || !detalle) return alert("País y detalle obligatorios");
+    await addDoc(collection(db, "metodos_pago"), { tipo, pais, detalle });
+    addDebugLog(`✅ Método de pago agregado: ${tipo} - ${pais}`, 'success');
+    alert("✅ Método agregado");
+    document.getElementById("pais-metodo").value = "";
+    document.getElementById("detalle-metodo").value = "";
   });
 
   document.getElementById("btn-crear-admin")?.addEventListener("click", async () => {
@@ -3885,24 +4002,19 @@
     try {
       await createUserWithEmailAndPassword(auth, email, pass);
       await setDoc(doc(db, "usuarios_permisos", email), { rol: "admin", estado: true });
+      addDebugLog(`✅ Admin creado: ${email}`, 'success');
       alert("✅ Admin creado");
     } catch (err) {
+      addDebugLog(`❌ Error creando admin: ${err.message}`, 'error');
       alert("Error: " + err.message);
     }
   });
-
-  // ============================================
-  // 🖥️ MENÚ TOGGLE (MÓVIL)
-  // ============================================
 
   const menuToggle = document.getElementById("menu-toggle");
   const sidebar = document.getElementById("sidebar");
   menuToggle?.addEventListener("click", () => sidebar.classList.toggle("open"));
 
-  // ============================================
-  // 🔍 FILTRO EN GESTIÓN DE PRODUCTOS
-  // ============================================
-
+  // ===== FILTRO EN GESTIÓN DE PRODUCTOS =====
   document.getElementById("filtro-productos-gestion")?.addEventListener("input", function() {
     const filtro = this.value.toLowerCase();
     const rows = document.querySelectorAll("#lista-productos table tbody tr");
@@ -3918,22 +4030,11 @@
     rows.forEach(row => row.style.display = '');
   });
 
-  // ============================================
-  // 📊 ESCUCHAR CAMBIOS EN ESTADÍSTICAS
-  // ============================================
-
-  firebase.database().ref('productos_estadisticas').on('value', function() {
-    const tiendaVisible = document.getElementById('page-tienda').classList.contains('active-page');
-    if (tiendaVisible) {
-      renderTiendaDepratik();
-    }
-    cargarProductosPopulares();
-  });
-
-  console.log("🚀 LOS AMIGOS ESTORE 🎁");
-  console.log("❤️ Sistema de 'Me gusta' activado");
-  console.log("📊 Productos populares en Dashboard");
-  console.log("✅ Todo funcionando correctamente");
+  console.log("🚀 LOS AMIGOS ESTORE 🎁 - Tienda online con Firebase");
+  console.log("📋 Métodos de pago configurados:", metodosPagoConfig.length);
+  console.log("✅ Sistema de detección de imágenes activado");
+  console.log("📊 Para ver reportes: verReportesImagenes()");
+  console.log("📩 Para ver reportes de clientes: verReportesClientes()");
 </script>
 </body>
 </html>
